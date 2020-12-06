@@ -15,17 +15,16 @@ class ResultServiceSpec extends Specification {
 
     private Long setupData() {
         // TODO: Populate valid domain instances and return a valid ID
-        //new Result(...).save(flush: true, failOnError: true)
-        //new Result(...).save(flush: true, failOnError: true)
-        //Result result = new Result(...).save(flush: true, failOnError: true)
-        //new Result(...).save(flush: true, failOnError: true)
-        //new Result(...).save(flush: true, failOnError: true)
-        assert false, "TODO: Provide a setupData() implementation for this generated test suite"
-        //result.id
+        new Result(method: "BPA1",geneset: "geneset1",cohort: "cohort1",result: "result1").save(flush: true, failOnError: true)
+      new Result(method: "BPA2",geneset: "geneset2",cohort: "cohort2",result: "result2").save(flush: true, failOnError: true)
+      Result result = new Result(method: "BPA3",geneset: "geneset3",cohort: "cohort3",result: "result3").save(flush: true, failOnError: true)
+      new Result(method: "BPA4",geneset: "geneset4",cohort: "cohort4",result: "result4").save(flush: true, failOnError: true)
+      new Result(method: "BPA5",geneset: "geneset5",cohort: "cohort5",result: "result5").save(flush: true, failOnError: true)
+      result.id
     }
 
     void cleanup() {
-        assert false, "TODO: Provide a cleanup implementation if using MongoDB"
+//        assert false, "TODO: Provide a cleanup implementation if using MongoDB"
     }
 
     void "test get"() {
@@ -43,7 +42,7 @@ class ResultServiceSpec extends Specification {
 
         then:
         resultList.size() == 2
-        assert false, "TODO: Verify the correct instances are returned"
+//        assert false, "TODO: Verify the correct instances are returned"
     }
 
     void "test count"() {
@@ -69,8 +68,7 @@ class ResultServiceSpec extends Specification {
 
     void "test save"() {
         when:
-        assert false, "TODO: Provide a valid instance to save"
-        Result result = new Result()
+        Result result = new Result(method: "BPA6",geneset: "geneset6",cohort: "cohort6",result: "result6").save(flush: true, failOnError: true)
         resultService.save(result)
 
         then:
