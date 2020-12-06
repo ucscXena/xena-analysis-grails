@@ -2,6 +2,15 @@ package org.xena.analysis
 
 class Tpm {
 
-    static constraints = {
-    }
+
+  String cohort
+  String url
+  String data
+
+  static constraints = {
+  }
+
+  static mapping = {
+    data: 'text'
+  }
 }

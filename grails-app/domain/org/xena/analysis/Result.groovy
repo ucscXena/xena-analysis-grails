@@ -2,6 +2,17 @@ package org.xena.analysis
 
 class Result {
 
-    static constraints = {
-    }
+
+
+  String method
+  String geneset
+  String cohort
+  String result
+
+  static constraints = {
+  }
+
+  static mapping = {
+    result: 'text'
+  }
 }

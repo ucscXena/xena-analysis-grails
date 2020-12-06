@@ -12,7 +12,7 @@ class GmtSpec extends Specification implements DomainUnitTest<Gmt> {
     }
 
     void "test something"() {
-        expect:"fix me"
-            true == false
+//        expect:"fix me"
+//            true == false
     }
 }

@@ -12,7 +12,7 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
     }
 
     void "test something"() {
-        expect:"fix me"
-            true == false
+//        expect:"fix me"
+//            true == false
     }
 }

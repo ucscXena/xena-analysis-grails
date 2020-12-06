@@ -21,7 +21,7 @@ class GmtControllerSpec extends Specification implements ControllerUnitTest<GmtC
     params["name"] = 'someValidName'
     params["data"] = 'data'
     params["hash"] = 'hash'
-    params["id"] = 7
+//    params["id"] = 7
   }
 
   void "Test the index action returns the correct response"() {
