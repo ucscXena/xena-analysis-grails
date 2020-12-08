@@ -14,6 +14,7 @@ class ResultController {
 
   ResultService resultService
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
+  final String TPM_DIRECTORY = "data/tpm/"
 
   static responseFormats = ['json', 'xml']
 //    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyze: "POST", checkAnalysisEnvironment: "GET"]
@@ -93,7 +94,7 @@ class ResultController {
 
     // handl and write tpm file
     Tpm tpm = Tpm.findByCohort(cohort)
-    File tpmFile = new File(mangledCohortName+ ".tpm.gz")
+    File tpmFile = new File(TPM_DIRECTORY+mangledCohortName+ ".tpm.gz")
     println "tpm file ${tpmFile}"
     println "tpm file size ${tpmFile.size()}"
     if (tpm == null) {
