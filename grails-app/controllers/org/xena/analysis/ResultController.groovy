@@ -65,7 +65,7 @@ class ResultController {
     jsonObject.cohort = result.cohort.name
     jsonObject.gmt = result.gmt.name
     def dataObject = new JsonSlurper().parseText(result.result) as JSONObject
-    jsonObject.genesets = dataObject.data
+    jsonObject.genesets = dataObject.data as List<Float>
     jsonObject.samples = dataObject.samples
     return jsonObject
   }
@@ -86,7 +86,13 @@ class ResultController {
     String gmtDataHash = gmtdata.md5()
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
-      gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata, method: method)
+      def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
+      if(sameDataGmt){
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method)
+      }
+      else{
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata, method: method)
+      }
       gmt.save(failOnError: true, flush: true)
     }
 
@@ -153,7 +159,7 @@ class ResultController {
     println("analysis environment exists ${method}")
     long lastOutputFileSize = 0
     int waitCount = 0
-    if (method == 'BPA') {
+    if (method .startsWith('BPA')) {
       runBpaAnalysis(gmtFile, tpmFile, outputFile)
       println "gmt file ${gmtFile.absolutePath}"
       println "tpm file ${tpmFile.absolutePath}"
@@ -204,12 +210,12 @@ class ResultController {
       def obj = new JSONObject()
       obj.geneset = entries[0]
       obj.data = entries.subList(1, entries.size()) as List<Float>
-      if (i < 4) {
-        println "d: ${d}"
-        println "entries: ${entries.size()}"
-        println "geneset: ${entries[0]}"
-        println "data: ${obj.data}"
-      }
+//      if (i < 4) {
+//        println "d: ${d}"
+//        println "entries: ${entries.size()}"
+//        println "geneset: ${entries[0]}"
+//        println "data: ${obj.data}"
+//      }
       jsonArray.add(obj)
     }
 
