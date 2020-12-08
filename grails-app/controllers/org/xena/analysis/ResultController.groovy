@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import groovy.json.JsonSlurper
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
@@ -26,7 +27,7 @@ class ResultController {
   }
 
   def show(Long id) {
-    respond resultService.get(id)
+    respond resultMarshaller(resultService.get(id))
   }
 
   def test() {
@@ -63,7 +64,9 @@ class ResultController {
     JSONObject jsonObject= new JSONObject()
     jsonObject.cohort = result.cohort.name
     jsonObject.gmt = result.gmt.name
-    jsonObject.data = result.result
+    def dataObject = new JsonSlurper().parseText(result.result) as JSONObject
+    jsonObject.genesets = dataObject.data
+    jsonObject.samples = dataObject.samples
     return jsonObject
   }
 
