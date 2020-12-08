@@ -1,6 +1,10 @@
 package org.xena.analysis
 
+import grails.converters.JSON
 import grails.validation.ValidationException
+import org.grails.web.json.JSONArray
+import org.grails.web.json.JSONObject
+
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
@@ -21,6 +25,14 @@ class GmtController {
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond gmtService.list(params), model:[gmtCount: gmtService.count()]
+    }
+
+    def names(){
+      List<Gmt> gmtList = gmtService.list()
+      println "gmtlist ${gmtList}"
+      JSONArray jsonArray = new JSONArray()
+      gmtList.each( {jsonArray.add(it.name)})
+      render jsonArray as JSON
     }
 
     def show(Long id) {

@@ -55,12 +55,17 @@ class ResultController {
 
     assert inputText.contains("NULL")
     assert errorText.contains("Loading required package: Biobase")
-
-    respond([status: 200])
     return 0
 
   }
 
+  JSONObject resultMarshaller(Result result){
+    JSONObject jsonObject= new JSONObject()
+    jsonObject.cohort = result.cohort.name
+    jsonObject.gmt = result.gmt.name
+    jsonObject.data = result.result
+    return jsonObject
+  }
 
   @Transactional
   def analyze() {
@@ -98,9 +103,12 @@ class ResultController {
     println "tpm file ${tpmFile}"
     println "tpm file size ${tpmFile.size()}"
     if (tpm == null) {
-      def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
-      out << tpmUrl.toURL().openStream()
-      out.close()
+      println "tpm is null, so downloading"
+      if(!tpmFile.exists() || tpmFile.size()==0){
+        def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
+        out << tpmUrl.toURL().openStream()
+        out.close()
+      }
       tpm = new Tpm(
         cohort: cohort,
         url: tpmUrl,
@@ -122,7 +130,7 @@ class ResultController {
     // create output file
     Result outputResult = Result.findByMethodAndGmtAndCohort(method, gmt, cohort)
     if (outputResult != null) {
-      render outputResult as JSON
+      render resultMarshaller(outputResult) as JSON
       return
     }
 
@@ -150,7 +158,7 @@ class ResultController {
       println "output file ${outputFile.absolutePath}"
 
       StringBuilder stringBuffer = new StringBuilder()
-      while ((outputFile.size() == 0 || outputFile.size() > lastOutputFileSize) && waitCount < 10) {
+      while ((outputFile.size() == 0 || outputFile.size() == lastOutputFileSize) && waitCount < 10) {
         println "waiting ${outputFile.size()}"
         sleep(2000)
         ++waitCount
@@ -158,39 +166,48 @@ class ResultController {
       BufferedReader bufferedReader = new BufferedReader(new FileReader(outputFile))
       String line
       while ((line = bufferedReader.readLine()) != null) {
-        stringBuffer.append(line)
+        stringBuffer.append(line).append("\n")
       }
       String outputData = stringBuffer.toString()
+//      String outputData = outputFile.text
       println "output data ${outputData}"
-      String jsonData = convertTsv(outputData)
-      println "jsonData ${jsonData}"
+      JSONObject jsonData = convertTsv(outputData)
+//      println "jsonData"
+//      println jsonData as JSON
       Result result = new Result(
         method: method,
         gmt: gmt,
         cohort: cohort,
-        result: jsonData
+        result: jsonData.toString()
       ).save(flush: true, failOnError: true)
-      render result as JSON
+      render resultMarshaller(result) as JSON
     } else {
       throw new RuntimeException("Not sure how to handle method ${method}")
     }
   }
 
   static JSONObject convertTsv(String tsvInput) {
-//    println "tsvInput"
-//    println tsvInput
 
-    List<String> lines = tsvInput.split("\n")
+    List<String> lines = tsvInput.split("\\n")
+    println "# of lines ${lines.size()}"
     List<String> rawData = lines.subList(1, lines.size())
+    println "# of raw data ${rawData.size()}"
     List<String> data = rawData.findAll({ d ->
       d.trim().length() > 0
     })
+    println "trimmed data ${data.size()}"
     JSONArray jsonArray = new JSONArray()
-    data.each { d ->
-      List<String> entries = d.split('\t')
+    data.eachWithIndex { d,i ->
+      List<String> entries = d.split("\\t")
       def obj = new JSONObject()
       obj.geneset = entries[0]
       obj.data = entries.subList(1, entries.size()) as List<Float>
+      if(i < 4){
+        println "d: ${d}"
+        println "entries: ${entries.size()}"
+        println "geneset: ${entries[0]}"
+        println "data: ${obj.data}"
+      }
       jsonArray.add(obj)
     }
 
