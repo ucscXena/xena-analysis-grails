@@ -5,12 +5,12 @@ class Tpm {
 
   Cohort cohort
   String url
-  String data
+  String data // pointer to file
 
   static constraints = {
   }
 
-  static mapping = {
-    data type:  'blob'
-  }
+//  static mapping = {
+//    data type:  'blob'
+//  }
 }

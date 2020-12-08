@@ -93,27 +93,29 @@ class ResultController {
 
     // handl and write tpm file
     Tpm tpm = Tpm.findByCohort(cohort)
-    File tpmFile = File.createTempFile(mangledCohortName, ".tpm.gz")
+    File tpmFile = new File(mangledCohortName+ ".tpm.gz")
     println "tpm file ${tpmFile}"
     println "tpm file size ${tpmFile.size()}"
     if (tpm == null) {
       def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
       out << tpmUrl.toURL().openStream()
       out.close()
-//      def tpmReader = new BufferedInputStream()
-//      StringBuilder stringBuffer = new StringBuilder()
-//      tpmFile.readLines().each { stringBuffer.append(it) }
       tpm = new Tpm(
         cohort: cohort,
         url: tpmUrl,
-        data: tpmFile.bytes
+        data: tpmFile.absolutePath
       ).save(failOnError: true, flush: true)
       cohort.tpm = tpm
       cohort.save()
-    } else {
-      tpmFile.write(tpm.data)
-      tpmFile.deleteOnExit()
     }
+    else{
+      assert new File(tpm.data).exists()
+      // nothign to do?
+    }
+//    else {
+//      tpmFile.write(tpm.data)
+//      tpmFile.deleteOnExit()
+//    }
 
 
     // create output file
