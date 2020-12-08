@@ -135,6 +135,8 @@ class ResultController {
 
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmtDataHash}", ".tsv")
     outputFile.write("")
+    println "output file"
+    println outputFile.absolutePath
 //    outputFile.deleteOnExit()
 
     this.checkAnalysisEnvironment()
@@ -174,9 +176,9 @@ class ResultController {
     }
   }
 
-  String convertTsv(String tsvInput) {
-    println "tsvInput"
-    println tsvInput
+  static JSONObject convertTsv(String tsvInput) {
+//    println "tsvInput"
+//    println tsvInput
 
     List<String> lines = tsvInput.split("\n")
     List<String> rawData = lines.subList(1, lines.size())
@@ -192,11 +194,9 @@ class ResultController {
       jsonArray.add(obj)
     }
 
-    println "input sample string ${lines[0]}"
     List<String> sampleList = lines[0].split('\t')
-    println "input sample list ${sampleList}"
     JSONArray samplesJsonArray = new JSONArray()
-    sampleList.each {
+    sampleList.subList(1,sampleList.size()).each {
       samplesJsonArray.add(it)
     }
 

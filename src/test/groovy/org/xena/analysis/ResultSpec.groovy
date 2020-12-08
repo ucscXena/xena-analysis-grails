@@ -1,6 +1,7 @@
 package org.xena.analysis
 
 import grails.testing.gorm.DomainUnitTest
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
 class ResultSpec extends Specification implements DomainUnitTest<Result> {
@@ -21,9 +22,14 @@ class ResultSpec extends Specification implements DomainUnitTest<Result> {
 
   void "TSV converter"(){
     given:
-    String tsvInput = ""
+    String tsvInput = new File("src/test/data/input.tsv").text
+    JSONObject output = ResultController.convertTsv(tsvInput)
 
     expect:
-    true==true
+    output.getJSONArray("samples").size()==548
+    output.getJSONArray("data").size()==9
+    output.getJSONArray("data").getJSONObject(0).geneset == "Notch signaling (GO:0007219)"
+    output.getJSONArray("data").getJSONObject(0).data.size()==548
+
   }
 }
