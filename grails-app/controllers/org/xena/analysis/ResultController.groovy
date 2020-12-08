@@ -60,8 +60,8 @@ class ResultController {
 
   }
 
-  JSONObject resultMarshaller(Result result){
-    JSONObject jsonObject= new JSONObject()
+  JSONObject resultMarshaller(Result result) {
+    JSONObject jsonObject = new JSONObject()
     jsonObject.cohort = result.cohort.name
     jsonObject.gmt = result.gmt.name
     def dataObject = new JsonSlurper().parseText(result.result) as JSONObject
@@ -86,7 +86,7 @@ class ResultController {
     String gmtDataHash = gmtdata.md5()
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
-      gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata)
+      gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata, method: method)
       gmt.save(failOnError: true, flush: true)
     }
 
@@ -102,12 +102,12 @@ class ResultController {
 
     // handl and write tpm file
     Tpm tpm = Tpm.findByCohort(cohort)
-    File tpmFile = new File(TPM_DIRECTORY+mangledCohortName+ ".tpm.gz")
+    File tpmFile = new File(TPM_DIRECTORY + mangledCohortName + ".tpm.gz")
     println "tpm file ${tpmFile}"
     println "tpm file size ${tpmFile.size()}"
     if (tpm == null) {
       println "tpm is null, so downloading"
-      if(!tpmFile.exists() || tpmFile.size()==0){
+      if (!tpmFile.exists() || tpmFile.size() == 0) {
         def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
         out << tpmUrl.toURL().openStream()
         out.close()
@@ -119,8 +119,7 @@ class ResultController {
       ).save(failOnError: true, flush: true)
       cohort.tpm = tpm
       cohort.save()
-    }
-    else{
+    } else {
       assert new File(tpm.data).exists()
       // nothign to do?
     }
@@ -131,7 +130,7 @@ class ResultController {
 
 
     // create output file
-    Result outputResult = Result.findByMethodAndGmtAndCohort(method, gmt, cohort)
+    Result outputResult = Result.findByMethodAndGmtAndCohortAndMethod(method, gmt, cohort, method)
     if (outputResult != null) {
       render resultMarshaller(outputResult) as JSON
       return
@@ -200,12 +199,12 @@ class ResultController {
     })
     println "trimmed data ${data.size()}"
     JSONArray jsonArray = new JSONArray()
-    data.eachWithIndex { d,i ->
+    data.eachWithIndex { d, i ->
       List<String> entries = d.split("\\t")
       def obj = new JSONObject()
       obj.geneset = entries[0]
       obj.data = entries.subList(1, entries.size()) as List<Float>
-      if(i < 4){
+      if (i < 4) {
         println "d: ${d}"
         println "entries: ${entries.size()}"
         println "geneset: ${entries[0]}"
@@ -216,7 +215,7 @@ class ResultController {
 
     List<String> sampleList = lines[0].split('\t')
     JSONArray samplesJsonArray = new JSONArray()
-    sampleList.subList(1,sampleList.size()).each {
+    sampleList.subList(1, sampleList.size()).each {
       samplesJsonArray.add(it)
     }
 

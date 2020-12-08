@@ -3,6 +3,7 @@ package org.xena.analysis
 class Gmt {
 
   String name
+  String method
   String hash
   String data
 
