@@ -11,8 +11,19 @@ class ResultSpec extends Specification implements DomainUnitTest<Result> {
     def cleanup() {
     }
 
-    void "test something"() {
-//        expect:"fix me"
-//            true == false
+    void "get mangled name "() {
+      given:
+      String cohortName  = "TCGA Ova(rai)ngx"
+
+      expect:
+      "TCGA_Ova_rai_ngx"==cohortName.replaceAll("[ |\\(|\\)]","_")
     }
+
+  void "TSV converter"(){
+    given:
+    String tsvInput = ""
+
+    expect:
+    true==true
+  }
 }

@@ -49,8 +49,8 @@ class ResultController {
     def proc = "Rscript ${BPA_ANALYSIS_SCRIPT}".execute()
     String inputText = proc.in.text
     String errorText = proc.err.text
-    log.info("input text: ${inputText}")
-    log.info("error text: ${errorText}")
+    log.debug("input text: ${inputText}")
+    log.debug("error text: ${errorText}")
 
     assert inputText.contains("NULL")
     assert errorText.contains("Loading required package: Biobase")
@@ -65,7 +65,7 @@ class ResultController {
   def analyze() {
     println "doing analyze"
     def json = request.JSON
-    println "input json ${json as JSON}"
+//    println "input json ${json as JSON}"
     String cohortName = json.cohort
     String method = json.method
     String gmtname = json.gmtname
@@ -88,8 +88,12 @@ class ResultController {
 
     // handl and write tpm file
     Tpm tpm = Tpm.findByCohort(cohort)
+    File tpmFile = File.createTempFile(cohortName, "tpm")
     if (tpm == null) {
-      String tpmData = new URL(tpmUrl).text
+      def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
+      out << tpmUrl.toURL().openStream()
+      out.close()
+      String tpmData = tpmFile.text
       tpm = new Tpm(
         cohort: cohort,
         url: tpmUrl,
@@ -98,10 +102,14 @@ class ResultController {
       cohort.tpm = tpm
       cohort.save()
     }
+    else{
+      tpmFile.write(tpm.data)
+      tpmFile.deleteOnExit()
+    }
 
 
     // create output file
-    Result outputResult = Result.findByMethodAndGenesetAndCohort(method, gmt, cohort)
+    Result outputResult = Result.findByMethodAndGmtAndCohort(method, gmt, cohort)
     if (outputResult != null) {
       render outputResult as JSON
       return
@@ -111,11 +119,11 @@ class ResultController {
     gmtFile.write(gmtdata)
     gmtFile.deleteOnExit()
 
-    File tpmFile = File.createTempFile(tpmname, "tpm")
-    tpmFile.write(tpm.data)
-    tpmFile.deleteOnExit()
+    println "input cohort name ${cohortName}"
+    String mangledCohortName = cohortName.replaceAll("[ |\\(|\\)]","_")
+    println "output cohort name ${mangledCohortName}"
 
-    File outputFile = File.createTempFile("output-${cohort.replaceAll("[ |\\(|\\)]", '_')}${gmtDataHash}", "tsv")
+    File outputFile = File.createTempFile("output-${mangledCohortName}${gmtDataHash}", "tsv")
     outputFile.write("")
 
 
@@ -138,6 +146,9 @@ class ResultController {
   }
 
   String convertTsv(String tsvInput) {
+    println "tsvInput"
+    println tsvInput
+
     List<String> lines = tsvInput.split("\n")
     List<String> rawData = lines.subList(1, lines.size())
     List<String> data = rawData.findAll({ d ->
@@ -151,13 +162,6 @@ class ResultController {
       obj.data = entries.subList(1, entries.size()) as List<Float>
       jsonArray.add(obj)
     }
-//     data.collectEntries(  { d->
-//      def entries = d.split('\t')
-//      return {
-//        geneset: entries[0],
-//        data: entries.slice(1).map( d => parseFloat(d))
-//      }
-//    })
     return new JSONObject(
       [
         samples: (lines[0] as List<String>).subList(1, 1).split('\t')
@@ -168,8 +172,8 @@ class ResultController {
 
   void runBpaAnalysis(File gmtFile, File tpmFile, File outputFile) {
     Process process = "Rscript ${BPA_ANALYSIS_SCRIPT} ${gmtFile.absolutePath} ${tpmFile.absolutePath} ${outputFile.absolutePath} BPA".execute()
-    println "stdout ${process.in.text}"
-    println "stderr ${process.err.text}"
+    log.debug "stdout ${process.in.text}"
+    log.debug "stderr ${process.err.text}"
   }
 
   @Transactional
