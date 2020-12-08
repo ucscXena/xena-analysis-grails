@@ -10,6 +10,10 @@ class Gmt {
   }
 
   static mapping = {
-    data: 'text'
+    data type: 'text'
   }
+
+  static hasMany = [
+    results: Result,
+  ]
 }

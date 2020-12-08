@@ -5,14 +5,14 @@ class Result {
 
 
   String method
-  String geneset
-  String cohort
+  Gmt gmt
+  Cohort cohort
   String result
 
   static constraints = {
   }
 
   static mapping = {
-    result: 'text'
+    result type:  'text'
   }
 }

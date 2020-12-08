@@ -3,7 +3,7 @@ package org.xena.analysis
 class Tpm {
 
 
-  String cohort
+  Cohort cohort
   String url
   String data
 
@@ -11,6 +11,6 @@ class Tpm {
   }
 
   static mapping = {
-    data: 'text'
+    data type:  'text'
   }
 }

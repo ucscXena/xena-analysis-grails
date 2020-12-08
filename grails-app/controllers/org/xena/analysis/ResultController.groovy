@@ -1,40 +1,34 @@
 package org.xena.analysis
 
 import grails.converters.JSON
+import grails.gorm.transactions.ReadOnly
+import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
-import java.security.MessageDigest
-
-import static org.springframework.http.HttpStatus.CREATED
-import static org.springframework.http.HttpStatus.NOT_FOUND
-import static org.springframework.http.HttpStatus.NO_CONTENT
-import static org.springframework.http.HttpStatus.OK
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
-
-import grails.gorm.transactions.ReadOnly
-import grails.gorm.transactions.Transactional
+import static org.springframework.http.HttpStatus.*
 
 @ReadOnly
 class ResultController {
 
-    ResultService resultService
+  ResultService resultService
+  final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
 
-    static responseFormats = ['json', 'xml']
+  static responseFormats = ['json', 'xml']
 //    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyze: "POST", checkAnalysisEnvironment: "GET"]
 
-    def index(Integer max) {
-      println "number is ${max}"
-        params.max = Math.min(max ?: 10, 100)
-        respond resultService.list(params), model:[resultCount: resultService.count()]
-    }
+  def index(Integer max) {
+    println "number is ${max}"
+    params.max = Math.min(max ?: 10, 100)
+    respond resultService.list(params), model: [resultCount: resultService.count()]
+  }
 
-    def show(Long id) {
-        respond resultService.get(id)
-    }
+  def show(Long id) {
+    respond resultService.get(id)
+  }
 
-  def test(){
+  def test() {
     println "just testing"
     render new JSONArray() as JSON
   }
@@ -50,9 +44,19 @@ class ResultController {
     null
   }
 
-  def checkAnalysisEnvironment() {
+  def checkAnalysisEnvironment() throws Exception {
 
-    render new JSONObject() as JSON
+    def proc = "Rscript ${BPA_ANALYSIS_SCRIPT}".execute()
+    String inputText = proc.in.text
+    String errorText = proc.err.text
+    log.info("input text: ${inputText}")
+    log.info("error text: ${errorText}")
+
+    assert inputText.contains("NULL")
+    assert errorText.contains("Loading required package: Biobase")
+
+    respond([status: 200])
+    return 0
 
   }
 
@@ -62,7 +66,8 @@ class ResultController {
     println "doing analyze"
     def json = request.JSON
     println "input json ${json as JSON}"
-    String cohort = json.cohort
+    String cohortName = json.cohort
+    String method = json.method
     String gmtname = json.gmtname
     String gmtdata = json.gmtdata
     String tpmUrl = json.tpmurl
@@ -71,134 +76,154 @@ class ResultController {
     // handle and write gmt file
     String gmtDataHash = gmtdata.md5()
     Gmt gmt = Gmt.findByName(gmtname)
-    if(gmt==null){
-      gmt = new Gmt(name:gmtname,hash:gmtDataHash,data: gmtdata)
+    if (gmt == null) {
+      gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata)
       gmt.save(failOnError: true, flush: true)
     }
-    File gmtFile = File.createTempFile(gmtname,"gmt")
-    gmtFile.write(gmtdata)
-    gmtFile.deleteOnExit()
 
+    Cohort cohort = Cohort.findByName(cohortName)
+    if(cohort ==null ){
+      cohort = new Cohort(name: cohortName).save(failOnError: true, flush: true)
+    }
 
     // handl and write tpm file
     Tpm tpm = Tpm.findByCohort(cohort)
-    if(tpm == null){
+    if (tpm == null) {
       String tpmData = new URL(tpmUrl).text
       tpm = new Tpm(
         cohort: cohort,
         url: tpmUrl,
         data: tpmData
       ).save(failOnError: true, flush: true)
+      cohort.tpm = tpm
+      cohort.save()
     }
 
 
     // create output file
-    File outputFile = File.createTempFile("output-${cohort.replaceAll("[ |\\(|\\)]",'_')}${hash}","tsv")
+    Result outputResult = Result.findByMethodAndGenesetAndCohort(method, gmt, cohort)
+    if (outputResult != null) {
+      render outputResult as JSON
+      return
+    }
+
+    File gmtFile = File.createTempFile(gmtname, "gmt")
+    gmtFile.write(gmtdata)
+    gmtFile.deleteOnExit()
+
+    File tpmFile = File.createTempFile(tpmname, "tpm")
+    tpmFile.write(tpm.data)
+    tpmFile.deleteOnExit()
+
+    File outputFile = File.createTempFile("output-${cohort.replaceAll("[ |\\(|\\)]", '_')}${gmtDataHash}", "tsv")
     outputFile.write("")
-//    def outputFile = this.generateEmptyAnalysisFile(gmtFile,cohort) // TODO: write an output file based on hash of geneset and cohort
+
 
     this.checkAnalysisEnvironment()
-//    console.log(`analysis environmeent fine "${method}"`)
-//    if(method==='BPA'){
-//      if(fs.existsSync(outputFile) && fs.statSync(outputFile).size == 0 ){
-//        console.log(`exists and is blank`)
-//        fs.unlinkSync(outputFile)
-//      }
-//      if(!fs.existsSync(outputFile)){
-//        console.log('running BPA')
-//        this.runBpaAnalysis(gmtPath,tpmFile,outputFile)
-//        console.log('RAN BPA')
-//      }
-//    }
-//    else{
-//      console.log('methid is not BPA ? ',method)
-//    }
-//    console.log('reading file')
-//    const result = await fs.readFileSync(outputFile,"utf8")
-//    console.log('read file')
+    println("analysis environmeent fine ${method}")
+    if (method == 'BPA') {
+      runBpaAnalysis(gmtFile, tpmFile, outputFile)
+      String outputData = outputFile.text
+      String jsonData = convertTsv(outputData)
+      Result result = new Result(
+        method: method,
+        gmt: gmt,
+        cohort: cohort,
+        result: jsonData
+      ).save(flush: true, failOnError: true)
+      render result as JSON
+    } else {
+      throw new RuntimeException("Not sure how to handle method ${method}")
+    }
+  }
 
-//    const convertedResult = this.convertTsv(result)
-//    console.log('adding gene sets to results')
-//    console.log('result',result)
-//    this.addGeneSetResult(method,genesetName,convertedResult)
-//    console.log('added result')
-//    this.saveGeneSetState(DEFAULT_PATH)
-//    console.log('saved gene state')
-//    if (result == null) {
-//      render status: NOT_FOUND
-//      return
-//    }
-//    if (result.hasErrors()) {
-//      transactionStatus.setRollbackOnly()
-//      respond result.errors
-//      return
-//    }
-//
-//    try {
-//      resultService.save(result)
-//    } catch (ValidationException e) {
-//      respond result.errors
-//      return
-//    }
-//
-//    respond result, [status: CREATED, view:"show"]
-    Result result = new Result()
-    save(result)
+  String convertTsv(String tsvInput) {
+    List<String> lines = tsvInput.split("\n")
+    List<String> rawData = lines.subList(1, lines.size())
+    List<String> data = rawData.findAll({ d ->
+      d.trim().length() > 0
+    })
+    JSONArray jsonArray = new JSONArray()
+    data.each { d ->
+      List<String> entries = d.split('\t')
+      def obj = new JSONObject()
+      obj.geneset = entries[0]
+      obj.data = entries.subList(1, entries.size()) as List<Float>
+      jsonArray.add(obj)
+    }
+//     data.collectEntries(  { d->
+//      def entries = d.split('\t')
+//      return {
+//        geneset: entries[0],
+//        data: entries.slice(1).map( d => parseFloat(d))
+//      }
+//    })
+    return new JSONObject(
+      [
+        samples: (lines[0] as List<String>).subList(1, 1).split('\t')
+        , data : jsonArray
+      ]
+    )
+  }
 
-    render new JSONObject() as JSON
+  void runBpaAnalysis(File gmtFile, File tpmFile, File outputFile) {
+    Process process = "Rscript ${BPA_ANALYSIS_SCRIPT} ${gmtFile.absolutePath} ${tpmFile.absolutePath} ${outputFile.absolutePath} BPA".execute()
+    println "stdout ${process.in.text}"
+    println "stderr ${process.err.text}"
   }
 
   @Transactional
   def save(Result result) {
     if (result == null) {
       render status: NOT_FOUND
-            return
-        }
-        if (result.hasErrors()) {
-            transactionStatus.setRollbackOnly()
-            respond result.errors
-            return
-        }
-
-        try {
-            resultService.save(result)
-        } catch (ValidationException e) {
-            respond result.errors
-            return
-        }
-
-        respond result, [status: CREATED, view:"show"]
+      return
+    }
+    if (result.hasErrors()) {
+      transactionStatus.setRollbackOnly()
+      respond result.errors
+      return
     }
 
-    @Transactional
-    def update(Result result) {
-        if (result == null) {
-            render status: NOT_FOUND
-            return
-        }
-        if (result.hasErrors()) {
-            transactionStatus.setRollbackOnly()
-            respond result.errors
-            return
-        }
-
-        try {
-            resultService.save(result)
-        } catch (ValidationException e) {
-            respond result.errors
-            return
-        }
-
-        respond result, [status: OK, view:"show"]
+    try {
+      resultService.save(result)
+    } catch (ValidationException e) {
+      respond result.errors
+      return
     }
 
-    @Transactional
-    def delete(Long id) {
-        if (id == null || resultService.delete(id) == null) {
-            render status: NOT_FOUND
-            return
-        }
+    respond result, [status: CREATED, view: "show"]
+  }
 
-        render status: NO_CONTENT
+  @Transactional
+  def update(Result result) {
+    if (result == null) {
+      render status: NOT_FOUND
+      return
     }
+    if (result.hasErrors()) {
+      transactionStatus.setRollbackOnly()
+      respond result.errors
+      return
+    }
+
+    try {
+      resultService.save(result)
+    } catch (ValidationException e) {
+      respond result.errors
+      return
+    }
+
+    respond result, [status: OK, view: "show"]
+  }
+
+  @Transactional
+  def delete(Long id) {
+    if (id == null || resultService.delete(id) == null) {
+      render status: NOT_FOUND
+      return
+    }
+
+    render status: NO_CONTENT
+  }
+
 }
