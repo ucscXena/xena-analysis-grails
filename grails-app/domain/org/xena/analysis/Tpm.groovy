@@ -11,6 +11,6 @@ class Tpm {
   }
 
   static mapping = {
-    data type:  'text'
+    data type:  'blob'
   }
 }

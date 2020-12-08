@@ -63,7 +63,6 @@ class ResultController {
 
   @Transactional
   def analyze() {
-    println "doing analyze"
     def json = request.JSON
 //    println "input json ${json as JSON}"
     String cohortName = json.cohort
@@ -71,6 +70,7 @@ class ResultController {
     String gmtname = json.gmtname
     String gmtdata = json.gmtdata
     String tpmUrl = json.tpmurl
+    println "analyzing '${cohortName}' with method '${method}' and gmt name '${gmtname}'"
 
 
     // handle and write gmt file
@@ -82,27 +82,35 @@ class ResultController {
     }
 
     Cohort cohort = Cohort.findByName(cohortName)
-    if(cohort ==null ){
+    if (cohort == null) {
       cohort = new Cohort(name: cohortName).save(failOnError: true, flush: true)
     }
+    String mangledCohortName = cohortName.replaceAll("[ |\\(|\\)]", "_")
+
+    println "max memory: ${Runtime.getRuntime().maxMemory()}"
+    println "total memory: ${Runtime.getRuntime().totalMemory()}"
+    println "free memory: ${Runtime.getRuntime().freeMemory()}"
 
     // handl and write tpm file
     Tpm tpm = Tpm.findByCohort(cohort)
-    File tpmFile = File.createTempFile(cohortName, "tpm")
+    File tpmFile = File.createTempFile(mangledCohortName, ".tpm.gz")
+    println "tpm file ${tpmFile}"
+    println "tpm file size ${tpmFile.size()}"
     if (tpm == null) {
       def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
       out << tpmUrl.toURL().openStream()
       out.close()
-      String tpmData = tpmFile.text
+//      def tpmReader = new BufferedInputStream()
+//      StringBuilder stringBuffer = new StringBuilder()
+//      tpmFile.readLines().each { stringBuffer.append(it) }
       tpm = new Tpm(
         cohort: cohort,
         url: tpmUrl,
-        data: tpmData
+        data: tpmFile.bytes
       ).save(failOnError: true, flush: true)
       cohort.tpm = tpm
       cohort.save()
-    }
-    else{
+    } else {
       tpmFile.write(tpm.data)
       tpmFile.deleteOnExit()
     }
@@ -115,24 +123,42 @@ class ResultController {
       return
     }
 
-    File gmtFile = File.createTempFile(gmtname, "gmt")
+    File gmtFile = File.createTempFile(gmtname, ".gmt")
     gmtFile.write(gmtdata)
-    gmtFile.deleteOnExit()
+//    gmtFile.deleteOnExit()
 
     println "input cohort name ${cohortName}"
-    String mangledCohortName = cohortName.replaceAll("[ |\\(|\\)]","_")
     println "output cohort name ${mangledCohortName}"
 
-    File outputFile = File.createTempFile("output-${mangledCohortName}${gmtDataHash}", "tsv")
+    File outputFile = File.createTempFile("output-${mangledCohortName}${gmtDataHash}", ".tsv")
     outputFile.write("")
-
+//    outputFile.deleteOnExit()
 
     this.checkAnalysisEnvironment()
-    println("analysis environmeent fine ${method}")
+    println("analysis environment exists ${method}")
+    long lastOutputFileSize = 0
+    int waitCount = 0
     if (method == 'BPA') {
       runBpaAnalysis(gmtFile, tpmFile, outputFile)
-      String outputData = outputFile.text
+      println "gmt file ${gmtFile.absolutePath}"
+      println "tpm file ${tpmFile.absolutePath}"
+      println "output file ${outputFile.absolutePath}"
+
+      StringBuilder stringBuffer = new StringBuilder()
+      while ((outputFile.size() == 0 || outputFile.size() > lastOutputFileSize) && waitCount < 10) {
+        println "waiting ${outputFile.size()}"
+        sleep(2000)
+        ++waitCount
+      }
+      BufferedReader bufferedReader = new BufferedReader(new FileReader(outputFile))
+      String line
+      while ((line = bufferedReader.readLine()) != null) {
+        stringBuffer.append(line)
+      }
+      String outputData = stringBuffer.toString()
+      println "output data ${outputData}"
       String jsonData = convertTsv(outputData)
+      println "jsonData ${jsonData}"
       Result result = new Result(
         method: method,
         gmt: gmt,
@@ -162,18 +188,31 @@ class ResultController {
       obj.data = entries.subList(1, entries.size()) as List<Float>
       jsonArray.add(obj)
     }
+
+    println "input sample string ${lines[0]}"
+    List<String> sampleList = lines[0].split('\t')
+    println "input sample list ${sampleList}"
+    JSONArray samplesJsonArray = new JSONArray()
+    sampleList.each {
+      samplesJsonArray.add(it)
+    }
+
     return new JSONObject(
       [
-        samples: (lines[0] as List<String>).subList(1, 1).split('\t')
+        samples: samplesJsonArray
         , data : jsonArray
       ]
     )
   }
 
-  void runBpaAnalysis(File gmtFile, File tpmFile, File outputFile) {
+  private def runBpaAnalysis(File gmtFile, File tpmFile, File outputFile) {
     Process process = "Rscript ${BPA_ANALYSIS_SCRIPT} ${gmtFile.absolutePath} ${tpmFile.absolutePath} ${outputFile.absolutePath} BPA".execute()
-    log.debug "stdout ${process.in.text}"
-    log.debug "stderr ${process.err.text}"
+    int exitValue = process.waitFor()
+    println "exit value ${exitValue}"
+
+//    println "stdout ${process.in.text}"
+//    println "stderr ${process.err.text}"
+    return exitValue
   }
 
   @Transactional
