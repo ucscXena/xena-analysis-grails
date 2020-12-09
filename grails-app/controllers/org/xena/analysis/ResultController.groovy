@@ -136,7 +136,15 @@ class ResultController {
 
 
     // create output file
-    Result outputResult = Result.findByMethodAndGmtAndCohortAndMethod(method, gmt, cohort, method)
+    def outputResults = Result.withCriteria {
+      eq("method",method)
+      eq("cohort",cohort)
+      eq("gmtHash",gmt.hash)
+    }
+//    println "output result ${outputResult} . . ${outputResult.size()}"
+    Result outputResult = outputResults.size()>0 ?outputResults[0] : null
+//    if(resultsResults.si)
+
     if (outputResult != null) {
       render resultMarshaller(outputResult) as JSON
       return
@@ -185,6 +193,7 @@ class ResultController {
       Result result = new Result(
         method: method,
         gmt: gmt,
+        gmtHash: gmt.hash,
         cohort: cohort,
         result: jsonData.toString()
       ).save(flush: true, failOnError: true)

@@ -6,6 +6,7 @@ class Result {
 
   String method
   Gmt gmt
+  String gmtHash
   Cohort cohort
   String result
 
