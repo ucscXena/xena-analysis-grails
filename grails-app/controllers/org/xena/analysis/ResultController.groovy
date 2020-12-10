@@ -30,20 +30,17 @@ class ResultController {
     respond resultMarshaller(resultService.get(id))
   }
 
+  def findResult(String method, String geneSetName,String cohort) {
+    println "finding result with ${method},${geneSetName}, ${cohort}"
+    Gmt gmt = Gmt.findByName(geneSetName)
+    Cohort cohortResult = Cohort.findByName(cohort)
+    Result result = Result.findByMethodAndGmtAndCohort(method,gmt,cohortResult)
+    respond resultMarshaller(result)
+  }
+
   def test() {
     println "just testing"
     render new JSONArray() as JSON
-  }
-
-  Tpm generateTpmFromCohort(Object o) {
-    null
-  }
-
-  Gmt generateGmtFile(Object o1, Object o2) {
-  }
-
-  File generateEmptyAnalysisFile(Gmt gmt, Object o) {
-    null
   }
 
   def checkAnalysisEnvironment() throws Exception {

@@ -44,12 +44,14 @@ class GmtController {
 //    render jsonObject as JSON
   }
 
-  def names() {
+  def names(String method) {
+    println "method: ${method}"
+//    List<Gmt> gmtList = Gmt.findAllByMethod(method)
     List<Gmt> gmtList = gmtService.list()
-    println "gmtlist ${gmtList}"
+    println "gmtlist ${gmtList.method}"
     JSONArray jsonArray = new JSONArray()
     gmtList.each({ jsonArray.add(it.name) })
-    render jsonArray as JSON
+    render jsonArray.unique() as JSON
   }
 
   def show(Long id) {
