@@ -8,7 +8,7 @@ class Gmt {
   String data
 
   static constraints = {
-//    name blank: false, unique: true
+    name blank: false, unique: true
 //    hash blank: false, unique: true
 //    data blank: false, unique: true
   }

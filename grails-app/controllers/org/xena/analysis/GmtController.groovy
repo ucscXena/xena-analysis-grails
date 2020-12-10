@@ -58,6 +58,30 @@ class GmtController {
     respond gmtService.get(id)
   }
 
+
+  @Transactional
+  def storeGmt() {
+    String method = json.method
+    String gmtname = json.gmtname
+    String gmtDataHash = gmtdata.md5()
+    println "strong with method '${method}' and gmt name '${gmtname}'"
+    Gmt gmt = Gmt.findByName(gmtname)
+    if (gmt == null) {
+      def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
+      if(sameDataGmt){
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method)
+      }
+      else{
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata, method: method)
+      }
+      gmt.save(failOnError: true, flush: true)
+    }
+
+    respond(gmt)
+
+  }
+
+
   @Transactional
   def save(Gmt gmt) {
     if (gmt == null) {

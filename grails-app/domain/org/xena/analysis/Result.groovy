@@ -12,11 +12,11 @@ class Result {
   String samples // delimited list of samples
 
   static constraints = {
+    samples nullable: true, blank: false
   }
 
   static mapping = {
     result type:  'text'
-    samples nullable: true, blank: false
   }
 
   List<String> getSampleArray(){

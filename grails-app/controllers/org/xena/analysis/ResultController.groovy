@@ -33,8 +33,14 @@ class ResultController {
   def findResult(String method, String geneSetName,String cohort) {
     println "finding result with ${method},${geneSetName}, ${cohort}"
     Gmt gmt = Gmt.findByName(geneSetName)
+    println "gmt name ${gmt}"
     Cohort cohortResult = Cohort.findByName(cohort)
-    Result result = Result.findByMethodAndGmtAndCohort(method,gmt,cohortResult)
+    println "cohort name ${cohort}"
+    Result result = Result.findByGmtAndCohortAndMethod(gmt,cohortResult,method)
+    println "result ${result}"
+    Result.all.each {
+      println it.gmt.name +" " + it.gmt.id + " " + it.cohort.name + " " + it.method
+    }
     respond resultMarshaller(result)
   }
 
@@ -70,27 +76,15 @@ class ResultController {
   @Transactional
   def analyze() {
     def json = request.JSON
-//    println "input json ${json as JSON}"
     String cohortName = json.cohort
     String method = json.method
     String gmtname = json.gmtname
-    String gmtdata = json.gmtdata
     String tpmUrl = json.tpmurl
     println "analyzing '${cohortName}' with method '${method}' and gmt name '${gmtname}'"
 
-
-    // handle and write gmt file
-    String gmtDataHash = gmtdata.md5()
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
-      def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
-      if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method)
-      }
-      else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata, method: method)
-      }
-      gmt.save(failOnError: true, flush: true)
+      throw new RuntimeException("Gmt file not found for ${gmtname}")
     }
 
     Cohort cohort = Cohort.findByName(cohortName)
@@ -164,7 +158,7 @@ class ResultController {
     println("analysis environment exists ${method}")
     long lastOutputFileSize = 0
     int waitCount = 0
-    if (method .startsWith('BPA')) {
+    if (method=='BPA Gene Expression') {
       runBpaAnalysis(gmtFile, tpmFile, outputFile)
       println "gmt file ${gmtFile.absolutePath}"
       println "tpm file ${tpmFile.absolutePath}"
@@ -183,7 +177,7 @@ class ResultController {
       }
       String outputData = stringBuffer.toString()
 //      String outputData = outputFile.text
-      println "output data ${outputData}"
+      println "output data ${outputData?.size()}"
       JSONObject jsonData = convertTsv(outputData)
 //      println "jsonData"
 //      println jsonData as JSON
