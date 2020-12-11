@@ -142,13 +142,13 @@ class ResultController {
     }
 
     File gmtFile = File.createTempFile(gmtname, ".gmt")
-    gmtFile.write(gmtdata)
-//    gmtFile.deleteOnExit()
+    gmtFile.write(gmt.data)
+    gmtFile.deleteOnExit()
 
     println "input cohort name ${cohortName}"
     println "output cohort name ${mangledCohortName}"
 
-    File outputFile = File.createTempFile("output-${mangledCohortName}${gmtDataHash}", ".tsv")
+    File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
     println "output file"
     println outputFile.absolutePath

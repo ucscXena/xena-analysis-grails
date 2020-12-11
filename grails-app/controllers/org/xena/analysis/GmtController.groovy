@@ -60,11 +60,13 @@ class GmtController {
 
 
   @Transactional
-  def storeGmt() {
+  def store() {
+    println "A"
+    def json = request.JSON
     String method = json.method
     String gmtname = json.gmtname
-    String gmtDataHash = gmtdata.md5()
-    println "strong with method '${method}' and gmt name '${gmtname}'"
+    String gmtDataHash = json.gmtdata.md5()
+    println "strong with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
@@ -72,7 +74,7 @@ class GmtController {
         gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: gmtdata, method: method)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method)
       }
       gmt.save(failOnError: true, flush: true)
     }
