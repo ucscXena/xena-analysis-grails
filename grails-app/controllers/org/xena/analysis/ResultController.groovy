@@ -67,6 +67,7 @@ class ResultController {
     JSONObject jsonObject = new JSONObject()
     jsonObject.cohort = result.cohort.name
     jsonObject.gmt = result.gmt.name
+    jsonObject.gmtId = result.gmt.id
     def dataObject = new JsonSlurper().parseText(result.result) as JSONObject
     jsonObject.genesets = dataObject.data as List<Float>
     jsonObject.samples = dataObject.samples
