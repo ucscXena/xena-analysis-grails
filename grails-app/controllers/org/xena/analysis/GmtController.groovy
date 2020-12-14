@@ -48,7 +48,7 @@ class GmtController {
     println "method: ${method}"
 //    List<Gmt> gmtList = Gmt.findAllByMethod(method)
     List<Gmt> gmtList = gmtService.list()
-    println "gmtlist ${gmtList.method}"
+    println "gmtlist ${gmtList.name}"
     JSONArray jsonArray = new JSONArray()
     gmtList.each({ jsonArray.add(it.name) })
     render jsonArray.unique() as JSON
