@@ -57,6 +57,7 @@ dependencies {
     profile "org.grails.profiles:rest-api"
     runtime "org.glassfish.web:el-impl:2.1.2-b03"
     runtime "com.h2database:h2"
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
     runtime "org.apache.tomcat:tomcat-jdbc"
     runtime "javax.xml.bind:jaxb-api:2.3.1"
     testCompile "io.micronaut:micronaut-inject-groovy"
