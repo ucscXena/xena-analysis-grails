@@ -47,7 +47,11 @@ class GmtController {
   def names(String method) {
     println "method: ${method}"
 //    List<Gmt> gmtList = Gmt.findAllByMethod(method)
-    List<Gmt> gmtList = gmtService.list()
+    List<Gmt> gmtList = gmtService.list().sort{ a,b ->
+      if(a.name.startsWith("Default")) return -1
+      if(b.name.startsWith("Default")) return 1
+      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+    }
     println "gmtlist ${gmtList.name}"
     JSONArray jsonArray = new JSONArray()
     gmtList.each({ jsonArray.add(it.name) })
