@@ -51,7 +51,7 @@ class CompareResultController {
     String method = json.method
     String gmtname = json.geneset
     String samples = json.samples
-    String result = json.result
+//    String result = json.result
 
     println "analyzing '${cohortNameA} / ${cohortNameB} ' with method '${method}' and gmt name '${gmtname}'"
     Cohort cohortA = Cohort.findByName(cohortNameA)
@@ -68,16 +68,20 @@ class CompareResultController {
         cohortB: cohortB,
         samples: samples,
         gmt: gmt,
-        result: result,
+        result: json.result,
       ).save(failOnError: true, flush: true )
       println "saved ${compareResult}"
     }
     else{
       println "updating ${compareResult}"
-      compareResult.result = result
+      compareResult.result = json.result
       compareResult.save(failOnError: true, flush: true )
       println "updated ${compareResult}"
     }
+    OutputHandler.printMemory()
+    json = null
+    System.gc()
+    OutputHandler.printMemory()
 
     respond compareResult, [status: CREATED, view:"show"]
   }
