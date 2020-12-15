@@ -167,102 +167,35 @@ class ResultController {
       println "tpm file ${tpmFile.absolutePath}"
       println "output file ${outputFile.absolutePath}"
 
-      StringBuilder stringBuffer = new StringBuilder()
+      println "A with GC"
+      OutputHandler.printMemory()
+      System.gc()
       while ((outputFile.size() == 0 || outputFile.size() == lastOutputFileSize) && waitCount < 10) {
         println "waiting ${outputFile.size()}"
         sleep(2000)
         ++waitCount
       }
-//      BufferedReader bufferedReader = new BufferedReader(new FileReader(outputFile))
-//      String line
-//      while ((line = bufferedReader.readLine()) != null) {
-//        stringBuffer.append(line).append("\n")
-//      }
-//      String outputData = stringBuffer.toString()
-//      String outputData = outputFile.text
-//      println "output data ${outputData?.size()}"
-//      JSONObject jsonData = convertTsvFromFile(outputFile)
-      JSONObject jsonData = convertTsvFromFile(outputFile)
-//      println "jsonData"
-//      println jsonData as JSON
+      println "B"
+      OutputHandler.printMemory()
+      File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
+//      jsonFile.deleteOnExit()
+      println "C"
+      OutputHandler.printMemory()
       Result result = new Result(
         method: method,
         gmt: gmt,
         gmtHash: gmt.hash,
         cohort: cohort,
-        result: jsonData
+        result: jsonFile.text
       ).save(flush: true, failOnError: true)
+      println "D"
+      OutputHandler.printMemory()
       render resultMarshaller(result) as JSON
+      println "E"
+      OutputHandler.printMemory()
     } else {
       throw new RuntimeException("Not sure how to handle method ${method}")
     }
-  }
-
-  static JSONObject convertTsvFromFile(File inputfile) {
-
-    JSONArray jsonArray = new JSONArray()
-    JSONArray samplesJsonArray = new JSONArray()
-    inputfile.readLines().eachWithIndex {line , lineNumber->
-      if(lineNumber>0 && line.trim().length()>0){
-        List<String> entries = line.split("\\t")
-        def obj = new JSONObject()
-        obj.geneset = entries[0]
-        obj.data = entries.subList(1, entries.size()) as List<Float>
-        jsonArray.add(obj)
-      }
-      if(lineNumber==0){
-        List<String> sampleList = line.split('\t')
-        sampleList.subList(1, sampleList.size()).each {
-          samplesJsonArray.add(it)
-        }
-      }
-    }
-
-    return new JSONObject(
-      [
-        samples: samplesJsonArray
-        , data : jsonArray
-      ]
-    )
-  }
-
-  static JSONObject convertTsv(String tsvInput) {
-
-    List<String> lines = tsvInput.split("\\n")
-    println "# of lines ${lines.size()}"
-    List<String> rawData = lines.subList(1, lines.size())
-    println "# of raw data ${rawData.size()}"
-    List<String> data = rawData.findAll({ d ->
-      d.trim().length() > 0
-    })
-    println "trimmed data ${data.size()}"
-    JSONArray jsonArray = new JSONArray()
-    data.eachWithIndex { d, i ->
-      List<String> entries = d.split("\\t")
-      def obj = new JSONObject()
-      obj.geneset = entries[0]
-      obj.data = entries.subList(1, entries.size()) as List<Float>
-//      if (i < 4) {
-//        println "d: ${d}"
-//        println "entries: ${entries.size()}"
-//        println "geneset: ${entries[0]}"
-//        println "data: ${obj.data}"
-//      }
-      jsonArray.add(obj)
-    }
-
-    List<String> sampleList = lines[0].split('\t')
-    JSONArray samplesJsonArray = new JSONArray()
-    sampleList.subList(1, sampleList.size()).each {
-      samplesJsonArray.add(it)
-    }
-
-    return new JSONObject(
-      [
-        samples: samplesJsonArray
-        , data : jsonArray
-      ]
-    )
   }
 
   private def runBpaAnalysis(File gmtFile, File tpmFile, File outputFile) {

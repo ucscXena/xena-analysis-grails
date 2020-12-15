@@ -71,10 +71,12 @@ dependencies {
 bootRun {
     ignoreExitValue true
     jvmArgs(
-        '-Dspring.output.ansi.enabled=always', 
-        '-noverify', 
+        '-Dspring.output.ansi.enabled=always',
+        '-noverify',
         '-XX:TieredStopAtLevel=1',
-        '-Xmx1024m')
+        '-Xmx4g',
+        '-Xms1g',
+    )
     sourceResources sourceSets.main
     String springProfilesActive = 'spring.profiles.active'
     systemProperty springProfilesActive, System.getProperty(springProfilesActive)
@@ -82,6 +84,6 @@ bootRun {
 
 tasks.withType(GroovyCompile) {
     configure(groovyOptions) {
-        forkOptions.jvmArgs = ['-Xmx1024m']
+        forkOptions.jvmArgs = ['-Xmx4g','-Xms1g']
     }
 }

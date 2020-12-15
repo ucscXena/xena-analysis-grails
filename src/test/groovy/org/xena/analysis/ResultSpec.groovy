@@ -23,7 +23,7 @@ class ResultSpec extends Specification implements DomainUnitTest<Result> {
   void "TSV converter string"(){
     given:
     String tsvInput = new File("src/test/data/input.tsv").text
-    JSONObject output = ResultController.convertTsv(tsvInput)
+    JSONObject output = OutputHandler.convertTsv(tsvInput)
 
     expect:
     output.getJSONArray("samples").size()==548
@@ -36,7 +36,10 @@ class ResultSpec extends Specification implements DomainUnitTest<Result> {
   void "TSV converter from file "(){
     given:
     def tsvInput = new File("src/test/data/input.tsv")
-    JSONObject output = ResultController.convertTsvFromFile(tsvInput)
+    File outputFile = OutputHandler.convertTsvFromFile(tsvInput)
+    def output = new JSONObject(outputFile.text)
+    println "output as JSON"
+    println output
 
     expect:
     output.getJSONArray("samples").size()==548
