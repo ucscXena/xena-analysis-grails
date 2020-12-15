@@ -59,7 +59,14 @@ class CompareResultController {
     Gmt gmt = Gmt.findByName(gmtname)
     println "cohortA ${cohortA}, cohortB, ${cohortB}, GMT: ${gmt}"
 
+    println "storing"
+//    println json.result as JSON
+
     CompareResult compareResult = CompareResult.findByMethodAndCohortAAndCohortBAndGmt(method,cohortA,cohortB,gmt)
+//    println "save string 1:"
+//    println "[${json.result}]"
+//    println "save string 2:"
+//    println "${json.result as JSON}"
     if (compareResult == null) {
       println "trying to save"
       compareResult = new CompareResult(
@@ -68,22 +75,24 @@ class CompareResultController {
         cohortB: cohortB,
         samples: samples,
         gmt: gmt,
-        result: json.result,
+        result: "${json.result as JSON}"
       ).save(failOnError: true, flush: true )
       println "saved ${compareResult}"
     }
     else{
       println "updating ${compareResult}"
-      compareResult.result = json.result
+      compareResult.result = "${json.result as JSON}"
       compareResult.save(failOnError: true, flush: true )
       println "updated ${compareResult}"
     }
+    println "result in database is: "
+//    println compareResult.result
     OutputHandler.printMemory()
     json = null
     System.gc()
     OutputHandler.printMemory()
-
-    respond compareResult, [status: CREATED, view:"show"]
+//    respond compareResult, [status: CREATED, view:"show"]
+    respond new JSONObject(), [status: CREATED, view:"show"]
   }
 
   def findResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String samples) {
@@ -95,7 +104,12 @@ class CompareResultController {
     println "cohort name ${cohortA} / ${cohortB}"
     CompareResult result = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
     if(result){
-      respond result
+      println "retrievering result with string"
+//      println result.result
+//      respond result
+
+      response.outputStream << result.result
+      response.outputStream.flush()
     }
     else{
       respond new JSONObject()

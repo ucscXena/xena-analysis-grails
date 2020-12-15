@@ -74,7 +74,7 @@ bootRun {
         '-Dspring.output.ansi.enabled=always',
         '-noverify',
         '-XX:TieredStopAtLevel=1',
-        '-Xmx4g',
+        '-Xmx8g',
         '-Xms1g',
     )
     sourceResources sourceSets.main
