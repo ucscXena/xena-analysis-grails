@@ -46,7 +46,6 @@ class CompareResultController {
   @Transactional
   def storeResult() {
     def json = request.JSON
-//    println "abcd ${json as JSON}"
     String cohortNameA = json.cohortA
     String cohortNameB = json.cohortB
     String method = json.method
@@ -54,7 +53,6 @@ class CompareResultController {
     String samples = json.samples
     String result = json.result
 
-////    String tpmUrl = json.tpmurl
     println "analyzing '${cohortNameA} / ${cohortNameB} ' with method '${method}' and gmt name '${gmtname}'"
     Cohort cohortA = Cohort.findByName(cohortNameA)
     Cohort cohortB = Cohort.findByName(cohortNameB)
@@ -81,23 +79,6 @@ class CompareResultController {
       println "updated ${compareResult}"
     }
 
-//    if (compareResult == null) {
-//      render status: NOT_FOUND
-//      return
-//    }
-//    if (compareResult.hasErrors()) {
-//      transactionStatus.setRollbackOnly()
-//      respond compareResult.errors
-//      return
-//    }
-//
-//    try {
-//      compareResultService.save(compareResult)
-//    } catch (ValidationException e) {
-//      respond compareResult.errors
-//      return
-//    }
-//
     respond compareResult, [status: CREATED, view:"show"]
   }
 
@@ -109,11 +90,6 @@ class CompareResultController {
     Cohort cohortB = Cohort.findByName(cohortNameB)
     println "cohort name ${cohortA} / ${cohortB}"
     CompareResult result = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
-//    println "result ${result}"
-//    println "result as JSON ${result as JSON}"
-//    reusl.all.each {
-//      println it.gmt.name +" " + it.gmt.id + " " + it.cohort.name + " " + it.method
-//    }
     if(result){
       respond result
     }

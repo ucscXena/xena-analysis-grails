@@ -14,6 +14,8 @@ import static org.springframework.http.HttpStatus.*
 class ResultController {
 
   ResultService resultService
+  AnalysisService analysisService
+
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final String TPM_DIRECTORY = "data/tpm/"
 
@@ -171,15 +173,16 @@ class ResultController {
         sleep(2000)
         ++waitCount
       }
-      BufferedReader bufferedReader = new BufferedReader(new FileReader(outputFile))
-      String line
-      while ((line = bufferedReader.readLine()) != null) {
-        stringBuffer.append(line).append("\n")
-      }
-      String outputData = stringBuffer.toString()
+//      BufferedReader bufferedReader = new BufferedReader(new FileReader(outputFile))
+//      String line
+//      while ((line = bufferedReader.readLine()) != null) {
+//        stringBuffer.append(line).append("\n")
+//      }
+//      String outputData = stringBuffer.toString()
 //      String outputData = outputFile.text
-      println "output data ${outputData?.size()}"
-      JSONObject jsonData = convertTsv(outputData)
+//      println "output data ${outputData?.size()}"
+//      JSONObject jsonData = convertTsvFromFile(outputFile)
+      JSONObject jsonData = convertTsvFromFile(outputFile)
 //      println "jsonData"
 //      println jsonData as JSON
       Result result = new Result(
@@ -187,12 +190,40 @@ class ResultController {
         gmt: gmt,
         gmtHash: gmt.hash,
         cohort: cohort,
-        result: jsonData.toString()
+        result: jsonData
       ).save(flush: true, failOnError: true)
       render resultMarshaller(result) as JSON
     } else {
       throw new RuntimeException("Not sure how to handle method ${method}")
     }
+  }
+
+  static JSONObject convertTsvFromFile(File inputfile) {
+
+    JSONArray jsonArray = new JSONArray()
+    JSONArray samplesJsonArray = new JSONArray()
+    inputfile.readLines().eachWithIndex {line , lineNumber->
+      if(lineNumber>0 && line.trim().length()>0){
+        List<String> entries = line.split("\\t")
+        def obj = new JSONObject()
+        obj.geneset = entries[0]
+        obj.data = entries.subList(1, entries.size()) as List<Float>
+        jsonArray.add(obj)
+      }
+      if(lineNumber==0){
+        List<String> sampleList = line.split('\t')
+        sampleList.subList(1, sampleList.size()).each {
+          samplesJsonArray.add(it)
+        }
+      }
+    }
+
+    return new JSONObject(
+      [
+        samples: samplesJsonArray
+        , data : jsonArray
+      ]
+    )
   }
 
   static JSONObject convertTsv(String tsvInput) {
