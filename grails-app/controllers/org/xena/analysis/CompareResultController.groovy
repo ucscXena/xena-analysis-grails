@@ -2,14 +2,12 @@ package org.xena.analysis
 
 import grails.converters.JSON
 import grails.validation.ValidationException
-import groovy.json.JsonSlurper
 import org.grails.web.json.JSONObject
 
 import static org.springframework.http.HttpStatus.CREATED
 import static org.springframework.http.HttpStatus.NOT_FOUND
 import static org.springframework.http.HttpStatus.NO_CONTENT
 import static org.springframework.http.HttpStatus.OK
-import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
@@ -18,6 +16,7 @@ import grails.gorm.transactions.Transactional
 class CompareResultController {
 
     CompareResultService compareResultService
+    AnalysisService analysisService
 
     static responseFormats = ['json', 'xml']
     static allowedMethods = [storeResult: "POST",save: "POST", update: "PUT", delete: "DELETE"]
@@ -116,6 +115,46 @@ class CompareResultController {
     }
 
   }
+
+  def generateScoredResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String samples) {
+    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    Gmt gmt = Gmt.findByName(geneSetName)
+    println "gmt name ${gmt}"
+    Cohort cohortA = Cohort.findByName(cohortNameA)
+    Cohort cohortB = Cohort.findByName(cohortNameB)
+
+    if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
+    if(cohortA==null)throw new RuntimeException("Unable to find cohort for ${cohortNameA}")
+    if(cohortB==null)throw new RuntimeException("Unable to find cohort for ${cohortNameB}")
+
+
+
+
+    println "cohort name ${cohortA} / ${cohortB}"
+    CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
+    if(!result){
+      analysisService.checkAnalysisEnvironment()
+      // pull in TPM files
+
+
+
+      File gmtFile = File.createTempFile(gmt.name, ".gmt")
+      gmtFile.write(gmt.data)
+      gmtFile.deleteOnExit()
+
+      // TODO: run these in parallel if needed, or just 1?
+      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method)
+      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method)
+
+      compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
+
+    }
+    response.outputStream << compareResult.result
+    response.outputStream.flush()
+
+  }
+
+
 
   @Transactional
   def save(CompareResult compareResult) {
