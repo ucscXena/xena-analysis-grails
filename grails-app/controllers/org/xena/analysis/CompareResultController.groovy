@@ -113,15 +113,30 @@ class CompareResultController {
     else{
       respond new JSONObject()
     }
-
   }
 
-  def generateScoredResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String samples) {
-    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+  Cohort findCohort(String name,String tpmUrl){
+    Cohort cohort = Cohort.findByName(name)
+    // TODO: get cohorts, etc.
+    if(!cohort){
+      cohort = new Cohort(name: name)
+//      File tpmFile = new File(TPM_DIRECTORY + mangledCohortName + ".tpm.gz")
+    }
+
+
+    return cohort
+  }
+
+  @Transactional
+  def generateScoredResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String tpmUrls,String samples) {
+    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${tpmUrls}, ${samples}"
     Gmt gmt = Gmt.findByName(geneSetName)
     println "gmt name ${gmt}"
-    Cohort cohortA = Cohort.findByName(cohortNameA)
-    Cohort cohortB = Cohort.findByName(cohortNameB)
+    Cohort cohortA = findCohort(cohortNameA,tpmUrls)
+    Cohort cohortB = findCohort(cohortNameB,tpmUrls)
+    println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
+
+
 
     if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
     if(cohortA==null)throw new RuntimeException("Unable to find cohort for ${cohortNameA}")
@@ -132,7 +147,7 @@ class CompareResultController {
 
     println "cohort name ${cohortA} / ${cohortB}"
     CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
-    if(!result){
+    if(!compareResult){
       analysisService.checkAnalysisEnvironment()
       // pull in TPM files
 

@@ -8,6 +8,7 @@ import org.grails.web.json.JSONObject
 class AnalysisService {
 
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
+  final String TPM_DIRECTORY = "data/tpm/"
 
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method){
 
@@ -72,6 +73,7 @@ class AnalysisService {
   File getTpmFile(Cohort cohort){
 
     Tpm tpm = Tpm.findByCohort(cohort)
+    String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File tpmFile = new File(TPM_DIRECTORY + mangledCohortName + ".tpm.gz")
     println "tpm file ${tpmFile}"
     println "tpm file size ${tpmFile.size()}"

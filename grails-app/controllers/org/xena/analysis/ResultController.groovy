@@ -16,8 +16,6 @@ class ResultController {
   ResultService resultService
   AnalysisService analysisService
 
-//  final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
-  final String TPM_DIRECTORY = "data/tpm/"
 
   static responseFormats = ['json', 'xml']
 //    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyze: "POST", checkAnalysisEnvironment: "GET"]
