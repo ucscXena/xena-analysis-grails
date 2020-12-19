@@ -27,5 +27,21 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 //        def genes = service.getGeneSetNames(new JSONObject(file.text))
         println "genes: ${genes}"
     }
+
+  void "convert string array to a float array"(){
+    expect:
+    def input = [ "0.22332","5.2323424","-2.23234324"]
+    def output = input.collect{ Float.parseFloat(it) }
+    println output
+  }
+
+  void "combine arrays"(){
+    expect:
+    def a = ["a","a1"]
+    def b = ["b","b1"]
+    def c = [a,b].flatten()
+    assert c == ["a","a1","b","b1"]
+  }
+
 }
 

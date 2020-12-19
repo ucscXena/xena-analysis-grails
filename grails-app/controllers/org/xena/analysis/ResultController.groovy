@@ -15,6 +15,7 @@ class ResultController {
 
   ResultService resultService
   AnalysisService analysisService
+  final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
 
 
   static responseFormats = ['json', 'xml']

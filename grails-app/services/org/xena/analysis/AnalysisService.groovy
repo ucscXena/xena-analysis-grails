@@ -1,7 +1,9 @@
 package org.xena.analysis
 
+import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 @Transactional
@@ -160,14 +162,14 @@ class AnalysisService {
     JSONObject dataB = new JSONObject(resultB.result)
 
     def samples = [  dataA.samples,dataB.samples ]
-//    println "samples: ${samples}"
 
     def geneSetNames = getGeneSetNames(dataA)
-    println('gene set names '+geneSetNames)
-    def values = [dataA.genesets,dataB.genesets]
-    println('gene set values'+values)
+    def values = []
+    dataA.data.eachWithIndex{ it, index ->
+       def value = [it.data,dataB.data[index].data].flatten().collect{ Float.parseFloat(it)}
+      values.push(value)
+    }
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
-    println('data set per gene set'+values)
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
     println('sample zScores'+zSampleScores)
@@ -198,11 +200,13 @@ class AnalysisService {
 
   def getZSampleScores(values,dataStatisticsPerGeneSet){
     def scoreValues = []
-//    for( let index in values){
-//      const { mean, variance} = dataStatisticsPerGeneSet[index]
-//      const array = values[index].data.map( v => (v - mean)/ variance )
-//      scoreValues.push(array)
-//    }
+    for( int index in values){
+      def statistics  = dataStatisticsPerGeneSet[index] // [0] = mean, [1] = variance
+      // TODO: collect for each
+      const array = values[index].data.map( v => (v - mean)/ variance )
+      // TODO: do other collection
+      scoreValues.push(array)
+    }
     return scoreValues
   }
 
@@ -210,23 +214,54 @@ class AnalysisService {
     return inputData.data.collect{ it.geneset}
   }
 
-  List getDataStatisticsPerGeneSet(List arrayList) {
-//    console.log('data 0',data[0])
-//    console.log('data 0 - test',data[0].map(d => d.data))
-//    const dataA = data[0].map(d => d.data).map( e => e.map( f => parseFloat(f)))
-//    const dataB = data[1].map(d => d.data).map( e => e.map( f => parseFloat(f)))
-//    console.log('data A',dataA)
-//    let outputData = []
-//    for( const i in dataA){
-//      const values = dataA[i].concat(dataB[i])
-//      const {mean, variance} = getDataStatisticsForGeneSet(values)
-//      outputData.push({mean,variance})
+  List getDataStatisticsPerGeneSet(def inputData) {
+//    println "input array list"
+//    println inputData as JSON
+//    JSONArray inputDataA = inputData[0]
+//    JSONArray inputDataB = inputData[1]
+////    console.log('data 0',data[0])
+////    console.log('data 0 - test',data[0].map(d => d.data))
+////    const dataA = data[0].map(d => d.data).map( e => e.map( f => parseFloat(f)))
+////    const dataB = data[1].map(d => d.data).map( e => e.map( f => parseFloat(f)))
+////    println('data A'+inputDataA)
+////    println('data B'+inputDataB)
+    def outputData = []
+    for(int i = 0 ; i < inputData.size() ; i++ ){
+      def output = getDataStatisticsForGeneSet(inputData[i])
+      def jsonObject = new JSONObject(mean: output[0],variance: output[1])
+      outputData.push(jsonObject)
+    }
+//    inputDataA.eachWithIndex { def input, int i ->
+//
 //    }
-//    return outputData
-    return []
+//    for( const i in inputDataA){
+//      def values =
+////      const values = dataA[i].concat(dataB[i])
+////      def {mean, variance} = getDataStatisticsForGeneSet(values)
+////      outputData.push({mean,variance})
+//    }
+    return outputData
+//    return []
   }
 
-  def getDataStatisticsForGeneSet(arr){
+  def getDataStatisticsForGeneSet(List inputArray){
+    int count = inputArray.size()
+//      def total = Arrays.stream(inputArray).sum()
+    println "input array: ${inputArray}"
+    println inputArray as JSON
+    def total = 0
+    for(double a in inputArray){
+      println a
+      total += a
+    }
+    def mean = total / count
+    double temp = 0
+    for(double a in inputArray){
+      temp += (a - mean) * (a -mean)
+    }
+    def variance = temp / (inputArray.size() - 1)
+    return [mean,variance]
+
 //    function getVariance(arr, mean) {
 //      return arr.reduce(function(pre, cur) {
 //        pre = pre + Math.pow((cur - mean), 2)
