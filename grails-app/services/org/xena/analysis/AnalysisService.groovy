@@ -155,10 +155,12 @@ class AnalysisService {
 
   Map createMeanMap(Result resultA,Result resultB) {
 
+    println "mean map ${resultA} ${resultB}"
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
 
     def samples = [  dataA.samples,dataB.samples ]
+//    println "samples: ${samples}"
 
     def geneSetNames = getGeneSetNames(dataA)
     println('gene set names '+geneSetNames)
@@ -205,12 +207,7 @@ class AnalysisService {
   }
 
   List getGeneSetNames(JSONObject inputData) {
-//    return inputData.genesets.map( d => {
-//      const name = d.geneset
-//      const goIndex = name.indexOf('(GO:')
-//      return goIndex > 0 ? name.substr(0,goIndex).trim() : name.trim()
-//    })
-    return []
+    return inputData.data.collect{ it.geneset}
   }
 
   List getDataStatisticsPerGeneSet(List arrayList) {

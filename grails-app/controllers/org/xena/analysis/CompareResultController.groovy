@@ -151,8 +151,11 @@ class CompareResultController {
 
     println "cohort name ${cohortA} / ${cohortB}"
     CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
+    println "found compare result"
     if(!compareResult){
+      println "not found, check analysis environment"
       analysisService.checkAnalysisEnvironment()
+      println "analysis found"
       // pull in TPM files
 
 
