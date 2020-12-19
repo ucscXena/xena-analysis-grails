@@ -116,24 +116,28 @@ class CompareResultController {
   }
 
   Cohort findCohort(String name,String tpmUrl){
+    println "FINDING cohort: ${name}, tpmUrl: ${tpmUrl}"
     Cohort cohort = Cohort.findByName(name)
     // TODO: get cohorts, etc.
     if(!cohort){
-      cohort = new Cohort(name: name)
-//      File tpmFile = new File(TPM_DIRECTORY + mangledCohortName + ".tpm.gz")
+      cohort = new Cohort(name: name).save()
     }
-
-
+    Tpm tpm = Tpm.findByCohort(cohort)
+    if(!tpm){
+      File tpmFile = analysisService.getTpmFile(cohort,tpmUrl)
+      tpm = new Tpm(cohort: cohort,url: tpmUrl,data: tpmFile.absolutePath).save()
+    }
+    assert tpm.data.length()>0
     return cohort
   }
 
   @Transactional
-  def generateScoredResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String tpmUrls,String samples) {
-    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${tpmUrls}, ${samples}"
+  def generateScoredResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String tpmUrlA,String tpmUrlB,String samples) {
+    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${tpmUrlA},${tpmUrlB}, ${samples}"
     Gmt gmt = Gmt.findByName(geneSetName)
     println "gmt name ${gmt}"
-    Cohort cohortA = findCohort(cohortNameA,tpmUrls)
-    Cohort cohortB = findCohort(cohortNameB,tpmUrls)
+    Cohort cohortA = findCohort(cohortNameA,tpmUrlA)
+    Cohort cohortB = findCohort(cohortNameB,tpmUrlB)
     println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
 
 
@@ -158,8 +162,8 @@ class CompareResultController {
       gmtFile.deleteOnExit()
 
       // TODO: run these in parallel if needed, or just 1?
-      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method)
-      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method)
+      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA)
+      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB)
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
 

@@ -10,12 +10,12 @@ class AnalysisService {
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final String TPM_DIRECTORY = "data/tpm/"
 
-  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method){
+  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
 
     Result result = Result.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
     if(result) return result
 
-    File tpmFile = getTpmFile(cohort)
+    File tpmFile = getTpmFile(cohort,tpmUrl)
 
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
@@ -70,7 +70,7 @@ class AnalysisService {
 
   }
 
-  File getTpmFile(Cohort cohort){
+  File getTpmFile(Cohort cohort,String tpmUrl){
 
     Tpm tpm = Tpm.findByCohort(cohort)
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
@@ -114,6 +114,9 @@ class AnalysisService {
     Map meanMap = createMeanMap(resultA,resultB)
     String gmtData = gmt.data
 
+    String outputResult = null
+    // TODO: implement
+
 //    return gmtData.split('\n')
 //      .filter( l => l.split('\t').length>2)
 //      .map( line => {
@@ -136,8 +139,14 @@ class AnalysisService {
 //          secondGeneExpressionSampleActivity: meanMap.zSampleScores[1][keyIndex],
 //        }
 //      } )
-    CompareResult compareResult = new CompareResult(
 
+    CompareResult compareResult = new CompareResult(
+      method: method,
+      gmt: gmt,
+      samples: samples,
+      cohortA: resultA.cohort,
+      cohortB: resultA.cohort,
+      result: outputResult
     ).save(flush: true, failOnError: true)
 
     return compareResult
@@ -152,14 +161,14 @@ class AnalysisService {
     def samples = [  dataA.samples,dataB.samples ]
 
     def geneSetNames = getGeneSetNames(dataA)
-    println('gene set names ',geneSetNames)
+    println('gene set names '+geneSetNames)
     def values = [dataA.genesets,dataB.genesets]
-    println('gene set values',values)
+    println('gene set values'+values)
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
-    println('data set per gene set',values)
+    println('data set per gene set'+values)
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
-    println('sample zScores',zSampleScores)
+    println('sample zScores'+zSampleScores)
     // uses mean separately
     def zPathwayScores = getZPathwayScores(zSampleScores)
 
@@ -177,7 +186,7 @@ class AnalysisService {
 //      return Math.mean(d)
 //    })
 
-    retur []
+    return []
   }
 
 // eslint-disable-next-line no-unused-vars
