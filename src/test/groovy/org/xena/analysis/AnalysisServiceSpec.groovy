@@ -117,5 +117,33 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
+  void "calc z pathway scores"(){
+    expect:
+    def input = new JSONArray(new File("src/test/data/inputPathwaySampleScores.json").text) as List
+    def values = AnalysisService.getZPathwayScoresForCohort(input)
+    assert values.size()==50
+    assert values[0].size()==1
+    assert values[49].size()==1
+
+  }
+
+  void "sample z-scores"(){
+
+    expect:
+    def input = new JSONArray(new File("src/test/data/sampleZScores.json").text)
+    assert input.size()==2
+    assert input[0].size()==50
+    assert input[0][0].size()==89
+    assert input[1].size()==50
+    assert input[1][0].size()==548
+    def values = AnalysisService.getZPathwayScores(input)
+    assert values.size()==2
+    assert values[0].size()==50
+    assert values[1].size()==50
+    assert values[0][0].size()==1
+    assert values[1][0].size()==1
+
+  }
+
 }
 

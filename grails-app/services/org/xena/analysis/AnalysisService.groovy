@@ -196,12 +196,17 @@ class AnalysisService {
     println "input dataB"
     println dataB as JSON
     def values = extractValues(dataA,dataB)
+    println "output values"
+    println values
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
-    println('sample zScores'+zSampleScores)
+    println 'sample zScores'
+    println zSampleScores
     // uses mean separately
     def zPathwayScores = getZPathwayScores(zSampleScores)
+    println "z pathway scores"
+    println zPathwayScores
 
     JSONObject jsonObject = new JSONObject()
     jsonObject.put("samples",samples)
@@ -211,8 +216,12 @@ class AnalysisService {
 
     return jsonObject
   }
-
-  def getZPathwayScoresForCohort(List sampleScores){
+/**
+ * Put mean sample scores in for each entry
+ * @param sampleScores
+ * @return
+ */
+  static def getZPathwayScoresForCohort(List sampleScores){
     println "input sample scores ${sampleScores}"
 //    def returnArray = []
 //    for(List<Double> s in sampleScores){
@@ -225,7 +234,7 @@ class AnalysisService {
   }
 
 // eslint-disable-next-line no-unused-vars
-  def getZPathwayScores(sampleZScores){
+  static def getZPathwayScores(sampleZScores){
     return [getZPathwayScoresForCohort(sampleZScores[0]),getZPathwayScoresForCohort(sampleZScores[1])]
   }
 
