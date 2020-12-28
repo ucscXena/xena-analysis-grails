@@ -77,18 +77,43 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
   void "get data statistics"(){
 
     given:
-    def inputA = new JSONArray(new File("src/test/data/inputDataStats.json").text)
-    assert inputA.length()==9
-    assert inputA[0].length()==89
+    def input = new JSONArray(new File("src/test/data/fullInputDataSet.json").text)
+    assert input.length()==2
+    assert input[0].length()==9
+    assert input[0][0].length()==89
 
     when:
-    def values = AnalysisService.getDataStatisticsPerGeneSet(inputA)
+    def values = AnalysisService.getDataStatisticsPerGeneSet(input)
 
     then:
     assert values.size()==9
-    assert values[0].mean == 4.211647650561798
-    assert values[0].variance == 0.019968438525575474
+    assert values[0].mean == 4.231456808634225
+    assert values[0].variance == 0.012692699004756421
 
+  }
+
+  void "get values for index"(){
+    given:
+    def input = new JSONArray(new File("src/test/data/fullInputDataSet.json").text)
+//    def inputValues = [inputValuesA,inputValuesB]
+
+    when:
+    def values = AnalysisService.getValuesForIndex(input,0)
+
+    then:
+    assert values.size() == 89 + 548
+
+  }
+
+  void "input values"(){
+    expect:
+    def input = new JSONArray(new File("src/test/data/inputDataStats.json").text)
+    def dataStatistics = new JSONArray(new File("src/test/data/dataDats.json").text) as List
+    def values = AnalysisService.getZSampleScores(input,dataStatistics)
+    assert input.size()==9
+    assert values.size()==9
+    assert input[0].size()==89
+    assert values[0].size()==89
 
   }
 

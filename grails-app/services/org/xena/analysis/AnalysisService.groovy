@@ -12,6 +12,12 @@ class AnalysisService {
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final String TPM_DIRECTORY = "data/tpm/"
 
+  static List getValuesForIndex(JSONArray jsonArray, int i) {
+    def inputA = jsonArray[0][i]
+    def inputB = jsonArray[1][i]
+    return inputA + inputB
+  }
+
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
 
     Result result = Result.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
@@ -22,8 +28,6 @@ class AnalysisService {
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
-//    println "output file"
-//    println outputFile.absolutePath
     runBpaAnalysis(gmtFile,tpmFile,outputFile)
 
     long lastOutputFileSize = 0
@@ -225,19 +229,18 @@ class AnalysisService {
     return [getZPathwayScoresForCohort(sampleZScores[0]),getZPathwayScoresForCohort(sampleZScores[1])]
   }
 
-  def getZSampleScores(values,dataStatisticsPerGeneSet){
+  static def getZSampleScores(values,dataStatisticsPerGeneSet){
     def scoreValues = []
-    println "input values: ${values}"
-    println "data stats : ${dataStatisticsPerGeneSet}"
     values.eachWithIndex { def value , int index ->
       def statistics  = dataStatisticsPerGeneSet[index] // [0] = mean, [1] = variance
-      println "statistiscs: ${statistics}"
-      println "values: ${values}"
-      println "values index: ${value}"
       // TODO: collect for each
 //      const array = values[index].data.map( v => (v - mean)/ variance )
       // TODO: do other collection
-      scoreValues.push( (value - statistics.mean) / statistics.variance )
+      def entryValue = []
+      value.each{
+        entryValue.push( (it - statistics.mean) / statistics.variance )
+      }
+      scoreValues.push(entryValue)
     }
     return scoreValues
   }
@@ -247,44 +250,20 @@ class AnalysisService {
   }
 
   static List getDataStatisticsPerGeneSet(def inputData) {
-//    println "input data PER gene set"
-//    println inputData as JSON
-//    println inputData
-//    JSONArray inputDataA = inputData[0]
-//    JSONArray inputDataB = inputData[1]
-////    console.log('data 0',data[0])
-////    console.log('data 0 - test',data[0].map(d => d.data))
-////    const dataA = data[0].map(d => d.data).map( e => e.map( f => parseFloat(f)))
-////    const dataB = data[1].map(d => d.data).map( e => e.map( f => parseFloat(f)))
-////    println('data A'+inputDataA)
-////    println('data B'+inputDataB)
     def outputData = []
-    for(int i = 0 ; i < inputData.size() ; i++ ){
-      def output = getDataStatisticsForGeneSet(inputData[i])
+    for(int i = 0 ; i < inputData[0].size() ; i++ ){
+      def valuesForIndex = getValuesForIndex(inputData,i)
+      def output = getDataStatisticsForGeneSet(valuesForIndex)
       def jsonObject = new JSONObject(mean: output[0],variance: output[1])
       outputData.push(jsonObject)
     }
-//    inputDataA.eachWithIndex { def input, int i ->
-//
-//    }
-//    for( const i in inputDataA){
-//      def values =
-////      const values = dataA[i].concat(dataB[i])
-////      def {mean, variance} = getDataStatisticsForGeneSet(values)
-////      outputData.push({mean,variance})
-//    }
     return outputData
-//    return []
   }
 
   static def getDataStatisticsForGeneSet(List inputArray){
     int count = inputArray.size()
-//      def total = Arrays.stream(inputArray).sum()
-//    println "input array: ${inputArray}"
-//    println inputArray as JSON
     def total = 0
     for(double a in inputArray){
-//      println a
       total += a
     }
     def mean = total / count
@@ -295,21 +274,5 @@ class AnalysisService {
     def variance = temp / (inputArray.size() - 1)
     return [mean,variance]
 
-//    function getVariance(arr, mean) {
-//      return arr.reduce(function(pre, cur) {
-//        pre = pre + Math.pow((cur - mean), 2)
-//        return pre
-//      }, 0)
-//    }
-//
-//    const meanTot = arr.reduce(function(pre, cur) {
-//      return pre + cur
-//    })
-//    const total = getVariance(arr, meanTot / arr.length)
-//
-//    return {
-//      mean:meanTot / arr.length,
-//      variance: total / arr.length,
-//    }
   }
 }
