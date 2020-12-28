@@ -113,11 +113,16 @@ class AnalysisService {
    * @return
    */
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
+    println "custom gene set activity ${gmt}, ${resultA}, ${resultB}"
     Map meanMap = createMeanMap(resultA,resultB)
+    println "mean map output ${meanMap}"
     String gmtData = gmt.data
+    println "gmt data: ${gmtData}"
 
     String outputResult = null
     // TODO: implement
+
+//    gmtData.split("\n").findAll{ it.split('\\').length>2}
 
 //    return gmtData.split('\n')
 //      .filter( l => l.split('\t').length>2)
@@ -155,6 +160,24 @@ class AnalysisService {
 
   }
 
+  // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
+  // each value has to be parsed to double from string as well
+  static def extractValuesByCohort(JSONObject input){
+
+    def values = []
+    input.data.eachWithIndex { def entry, int i ->
+      def converted = entry.data.collect { Float.parseFloat(it)}
+      values.add(converted )
+    }
+    return values
+  }
+
+  // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
+  // each value has to be parsed to double from string as well
+  static JSONArray extractValues(JSONObject inputA,JSONObject inputB){
+    return [extractValuesByCohort(inputA),extractValuesByCohort(inputB)]
+  }
+
   Map createMeanMap(Result resultA,Result resultB) {
 
     println "mean map ${resultA} ${resultB}"
@@ -164,11 +187,11 @@ class AnalysisService {
     def samples = [  dataA.samples,dataB.samples ]
 
     def geneSetNames = getGeneSetNames(dataA)
-    def values = []
-    dataA.data.eachWithIndex{ it, index ->
-       def value = [it.data,dataB.data[index].data].flatten().collect{ Float.parseFloat(it)}
-      values.push(value)
-    }
+    println "input dataA"
+    println dataA as JSON
+    println "input dataB"
+    println dataB as JSON
+    def values = extractValues(dataA,dataB)
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
@@ -186,11 +209,15 @@ class AnalysisService {
   }
 
   def getZPathwayScoresForCohort(List sampleScores){
-//    return sampleScores.map( d => {
-//      return Math.mean(d)
-//    })
-
-    return []
+    println "input sample scores ${sampleScores}"
+//    def returnArray = []
+//    for(List<Double> s in sampleScores){
+//      println "input s: ${s}"
+//      returnArray.push( s.sum()/s.size()  )
+//    }
+//    println "return array ${returnArray}"
+//    return returnArray
+    return (sampleScores as List ).sum() / sampleScores.size()
   }
 
 // eslint-disable-next-line no-unused-vars
@@ -200,12 +227,17 @@ class AnalysisService {
 
   def getZSampleScores(values,dataStatisticsPerGeneSet){
     def scoreValues = []
-    for( int index in values){
+    println "input values: ${values}"
+    println "data stats : ${dataStatisticsPerGeneSet}"
+    values.eachWithIndex { def value , int index ->
       def statistics  = dataStatisticsPerGeneSet[index] // [0] = mean, [1] = variance
+      println "statistiscs: ${statistics}"
+      println "values: ${values}"
+      println "values index: ${value}"
       // TODO: collect for each
-      const array = values[index].data.map( v => (v - mean)/ variance )
+//      const array = values[index].data.map( v => (v - mean)/ variance )
       // TODO: do other collection
-      scoreValues.push(array)
+      scoreValues.push( (value - statistics.mean) / statistics.variance )
     }
     return scoreValues
   }
@@ -214,9 +246,10 @@ class AnalysisService {
     return inputData.data.collect{ it.geneset}
   }
 
-  List getDataStatisticsPerGeneSet(def inputData) {
-//    println "input array list"
+  static List getDataStatisticsPerGeneSet(def inputData) {
+//    println "input data PER gene set"
 //    println inputData as JSON
+//    println inputData
 //    JSONArray inputDataA = inputData[0]
 //    JSONArray inputDataB = inputData[1]
 ////    console.log('data 0',data[0])
@@ -244,14 +277,14 @@ class AnalysisService {
 //    return []
   }
 
-  def getDataStatisticsForGeneSet(List inputArray){
+  static def getDataStatisticsForGeneSet(List inputArray){
     int count = inputArray.size()
 //      def total = Arrays.stream(inputArray).sum()
-    println "input array: ${inputArray}"
-    println inputArray as JSON
+//    println "input array: ${inputArray}"
+//    println inputArray as JSON
     def total = 0
     for(double a in inputArray){
-      println a
+//      println a
       total += a
     }
     def mean = total / count

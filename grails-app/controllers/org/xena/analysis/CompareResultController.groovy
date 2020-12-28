@@ -151,7 +151,7 @@ class CompareResultController {
 
     println "cohort name ${cohortA} / ${cohortB}"
     CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
-    println "found compare result"
+    println "found compare result ${compareResult}"
     if(!compareResult){
       println "not found, check analysis environment"
       analysisService.checkAnalysisEnvironment()
@@ -164,11 +164,18 @@ class CompareResultController {
       gmtFile.write(gmt.data)
       gmtFile.deleteOnExit()
 
+      println "gmt file ${gmtFile} . . exists ${gmtFile.exists()}, size: ${gmtFile.size()}"
+
       // TODO: run these in parallel if needed, or just 1?
       Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA)
+      println "result A: ${resultA}"
+
+
       Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB)
+      println "result B: ${resultB}"
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
+      println "compare result: ${compareResult}"
 
     }
     response.outputStream << compareResult.result
