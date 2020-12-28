@@ -122,9 +122,6 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     def input = new JSONArray(new File("src/test/data/inputPathwaySampleScores.json").text) as List
     def values = AnalysisService.getZPathwayScoresForCohort(input)
     assert values.size()==50
-    assert values[0].size()==1
-    assert values[49].size()==1
-
   }
 
   void "sample z-scores"(){
@@ -140,8 +137,6 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert values.size()==2
     assert values[0].size()==50
     assert values[1].size()==50
-    assert values[0][0].size()==1
-    assert values[1][0].size()==1
 
   }
 

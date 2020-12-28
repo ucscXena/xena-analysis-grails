@@ -222,15 +222,21 @@ class AnalysisService {
  * @return
  */
   static def getZPathwayScoresForCohort(List sampleScores){
-    println "input sample scores ${sampleScores}"
-//    def returnArray = []
+//    println "input sample scores ${sampleScores}"
+    def returnArray = []
+
+    sampleScores.each {
+      returnArray.push(it.sum() / it.size())
+    }
+    return returnArray
+
 //    for(List<Double> s in sampleScores){
 //      println "input s: ${s}"
 //      returnArray.push( s.sum()/s.size()  )
 //    }
 //    println "return array ${returnArray}"
 //    return returnArray
-    return (sampleScores as List ).sum() / sampleScores.size()
+//    return (sampleScores as List ).sum() / sampleScores.size()
   }
 
 // eslint-disable-next-line no-unused-vars
