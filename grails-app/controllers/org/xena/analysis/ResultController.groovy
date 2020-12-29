@@ -15,9 +15,8 @@ class ResultController {
 
   ResultService resultService
   AnalysisService analysisService
-
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
-  final String TPM_DIRECTORY = "data/tpm/"
+
 
   static responseFormats = ['json', 'xml']
 //    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyze: "POST", checkAnalysisEnvironment: "GET"]
@@ -49,20 +48,6 @@ class ResultController {
   def test() {
     println "just testing"
     render new JSONArray() as JSON
-  }
-
-  def checkAnalysisEnvironment() throws Exception {
-
-    def proc = "Rscript ${BPA_ANALYSIS_SCRIPT}".execute()
-    String inputText = proc.in.text
-    String errorText = proc.err.text
-    log.debug("input text: ${inputText}")
-    log.debug("error text: ${errorText}")
-
-    assert inputText.contains("NULL")
-    assert errorText.contains("Loading required package: Biobase")
-    return 0
-
   }
 
   JSONObject resultMarshaller(Result result) {
@@ -100,43 +85,18 @@ class ResultController {
     println "total memory: ${Runtime.getRuntime().totalMemory()}"
     println "free memory: ${Runtime.getRuntime().freeMemory()}"
 
-    // handl and write tpm file
-    Tpm tpm = Tpm.findByCohort(cohort)
-    File tpmFile = new File(TPM_DIRECTORY + mangledCohortName + ".tpm.gz")
-    println "tpm file ${tpmFile}"
-    println "tpm file size ${tpmFile.size()}"
-    if (tpm == null) {
-      println "tpm is null, so downloading"
-      if (!tpmFile.exists() || tpmFile.size() == 0) {
-        def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
-        out << tpmUrl.toURL().openStream()
-        out.close()
-      }
-      tpm = new Tpm(
-        cohort: cohort,
-        url: tpmUrl,
-        data: tpmFile.absolutePath
-      ).save(failOnError: true, flush: true)
-      cohort.tpm = tpm
-      cohort.save()
-    } else {
-      assert new File(tpm.data).exists()
-      // nothign to do?
-    }
-//    else {
-//      tpmFile.write(tpm.data)
-//      tpmFile.deleteOnExit()
-//    }
+    File tpmFile = analysisService.getTpmFile(cohort,tpmUrl)
 
 
     // create output file
-    def outputResults = Result.withCriteria {
-      eq("method",method)
-      eq("cohort",cohort)
-      eq("gmtHash",gmt.hash)
-    }
+//    def outputResults = Result.withCriteria {
+//      eq("method",method)
+//      eq("cohort",cohort)
+//      eq("gmtHash",gmt.hash)
+//    }
 //    println "output result ${outputResult} . . ${outputResult.size()}"
-    Result outputResult = outputResults.size()>0 ?outputResults[0] : null
+//    Result outputResult = outputResults.size()>0 ?outputResults[0] : null
+    Result outputResult = Result.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
 //    if(resultsResults.si)
 
     if (outputResult != null) {
@@ -157,7 +117,7 @@ class ResultController {
     println outputFile.absolutePath
 //    outputFile.deleteOnExit()
 
-    this.checkAnalysisEnvironment()
+    analysisService.checkAnalysisEnvironment()
     println("analysis environment exists ${method}")
     long lastOutputFileSize = 0
     int waitCount = 0
