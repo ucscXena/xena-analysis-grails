@@ -106,8 +106,29 @@ class AnalysisService {
   }
 
 
-  void generateResult(String s1, Cohort cohort, String s2) {
+  static JSONArray generateResult(String gmtData,Map meanMap) {
+    JSONArray outputArray = new JSONArray()
+    def geneList = gmtData.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")}
+    for(List gene in geneList){
+        def keyIndex = meanMap.geneSetNames.findIndexOf { it==gene[0]}
+        keyIndex = keyIndex >=0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it=="${gene[0]} (${gene[1]})" }
+        JSONObject jsonObject = new JSONObject()
+        jsonObject.golabel = gene[0]
+        jsonObject.goid = gene[1]
 
+        jsonObject.gene = gene.subList(2,gene.size())
+        jsonObject.firstSamples= meanMap.samples[0]
+        jsonObject.secondSamples= meanMap.samples[1]
+        jsonObject.firstGeneExpressionPathwayActivity= meanMap.zPathwayScores[0][keyIndex]
+        jsonObject.secondGeneExpressionPathwayActivity= meanMap.zPathwayScores[1][keyIndex]
+        jsonObject.firstGeneExpressionSampleActivity= meanMap.zSampleScores[0][keyIndex]
+        jsonObject.secondGeneExpressionSampleActivity= meanMap.zSampleScores[1][keyIndex]
+
+        outputArray.add(jsonObject)
+    }
+//    println "output: ${outputArray}"
+
+    return outputArray
   }
 
   /**
@@ -120,36 +141,16 @@ class AnalysisService {
     println "custom gene set activity ${gmt}, ${resultA}, ${resultB}"
     Map meanMap = createMeanMap(resultA,resultB)
     println "mean map output ${meanMap}"
+    println meanMap as JSON
     String gmtData = gmt.data
     println "gmt data: ${gmtData}"
 
-    String outputResult = null
+//    String outputResult = null
     // TODO: implement
+    JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
 
-//    gmtData.split("\n").findAll{ it.split('\\').length>2}
-
-//    return gmtData.split('\n')
-//      .filter( l => l.split('\t').length>2)
-//      .map( line => {
-//        const entries = line.split('\t')
-//
-//        // we need to handle the space encoding
-//        // this fails test due to an outdated library I think
-//        let keyIndex = meanMap.geneSetNames.indexOf(entries[0])
-//        keyIndex = keyIndex >=0 ? keyIndex : meanMap.geneSetNames.indexOf(`${entries[0]} (${entries[1]})` )
-//        // console.log('key index',keyIndex,'entries',entries[0],'entries 1',entries[1],entries[0] + ' ' + entries[1])
-//        return {
-//          golabel: entries[0],
-//          goid: entries[1],
-//          gene: entries.slice(2),
-//          firstSamples: meanMap.samples[0], // TODO: probably a better way to handle this
-//          secondSamples: meanMap.samples[1],
-//          firstGeneExpressionPathwayActivity: meanMap.zPathwayScores[0][keyIndex],
-//          secondGeneExpressionPathwayActivity: meanMap.zPathwayScores[1][keyIndex],
-//          firstGeneExpressionSampleActivity: meanMap.zSampleScores[0][keyIndex],
-//          secondGeneExpressionSampleActivity: meanMap.zSampleScores[1][keyIndex],
-//        }
-//      } )
+//    println "input array"
+//    println inputArray as JSON
 
     CompareResult compareResult = new CompareResult(
       method: method,
@@ -157,7 +158,7 @@ class AnalysisService {
       samples: samples,
       cohortA: resultA.cohort,
       cohortB: resultA.cohort,
-      result: outputResult
+      result:inputArray.toString()
     ).save(flush: true, failOnError: true)
 
     return compareResult
@@ -183,30 +184,18 @@ class AnalysisService {
   }
 
   Map createMeanMap(Result resultA,Result resultB) {
-
-    println "mean map ${resultA} ${resultB}"
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
 
     def samples = [  dataA.samples,dataB.samples ]
 
     def geneSetNames = getGeneSetNames(dataA)
-    println "input dataA"
-    println dataA as JSON
-    println "input dataB"
-    println dataB as JSON
     def values = extractValues(dataA,dataB)
-    println "output values"
-    println values
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
-    println 'sample zScores'
-    println zSampleScores
     // uses mean separately
     def zPathwayScores = getZPathwayScores(zSampleScores)
-    println "z pathway scores"
-    println zPathwayScores
 
     JSONObject jsonObject = new JSONObject()
     jsonObject.put("samples",samples)
@@ -222,21 +211,11 @@ class AnalysisService {
  * @return
  */
   static def getZPathwayScoresForCohort(List sampleScores){
-//    println "input sample scores ${sampleScores}"
     def returnArray = []
-
     sampleScores.each {
       returnArray.push(it.sum() / it.size())
     }
     return returnArray
-
-//    for(List<Double> s in sampleScores){
-//      println "input s: ${s}"
-//      returnArray.push( s.sum()/s.size()  )
-//    }
-//    println "return array ${returnArray}"
-//    return returnArray
-//    return (sampleScores as List ).sum() / sampleScores.size()
   }
 
 // eslint-disable-next-line no-unused-vars

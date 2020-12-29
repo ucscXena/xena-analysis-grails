@@ -140,5 +140,18 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
+  void "handle gmt data"(){
+
+    expect:
+    def gmtData = new File("src/test/data/gmtData.gmt").text
+    def meanMap = new JSONObject(new File("src/test/data/meanMap.json").text) as Map
+    println "0"
+    JSONArray outputArray = AnalysisService.generateResult(gmtData,meanMap)
+    println "1"
+    assert outputArray.length()==9
+
+
+  }
+
 }
 
