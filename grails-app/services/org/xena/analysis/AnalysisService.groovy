@@ -126,8 +126,6 @@ class AnalysisService {
 
         outputArray.add(jsonObject)
     }
-//    println "output: ${outputArray}"
-
     return outputArray
   }
 
@@ -138,19 +136,10 @@ class AnalysisService {
    * @return
    */
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
-    println "custom gene set activity ${gmt}, ${resultA}, ${resultB}"
     Map meanMap = createMeanMap(resultA,resultB)
-    println "mean map output"
-    println meanMap as JSON
     String gmtData = gmt.data
-    println "gmt data: ${gmtData}"
-
-//    String outputResult = null
     // TODO: implement
     JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
-
-//    println "input array"
-//    println inputArray as JSON
 
     CompareResult compareResult = new CompareResult(
       method: method,
@@ -190,24 +179,12 @@ class AnalysisService {
     def samples = [  dataA.samples,dataB.samples ]
 
     def geneSetNames = getGeneSetNames(dataA)
-    println "data A"
-    println dataA as JSON
-    println "data B"
-    println dataB as JSON
     def values = extractValues(dataA,dataB)
-    println "cross values"
-    println values
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
-    println "data stats per gene set"
-    println dataStatisticsPerGeneSet
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
-    println "z sample scores"
-    println zSampleScores
     // uses mean separately
     def zPathwayScores = getZPathwayScores(zSampleScores)
-    println "z pathway scores"
-    println zPathwayScores
 
     JSONObject jsonObject = new JSONObject()
     jsonObject.put("samples",samples)
