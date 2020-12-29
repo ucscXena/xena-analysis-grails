@@ -140,7 +140,7 @@ class AnalysisService {
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
     println "custom gene set activity ${gmt}, ${resultA}, ${resultB}"
     Map meanMap = createMeanMap(resultA,resultB)
-    println "mean map output ${meanMap}"
+    println "mean map output"
     println meanMap as JSON
     String gmtData = gmt.data
     println "gmt data: ${gmtData}"
@@ -190,12 +190,24 @@ class AnalysisService {
     def samples = [  dataA.samples,dataB.samples ]
 
     def geneSetNames = getGeneSetNames(dataA)
+    println "data A"
+    println dataA as JSON
+    println "data B"
+    println dataB as JSON
     def values = extractValues(dataA,dataB)
+    println "cross values"
+    println values
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
+    println "data stats per gene set"
+    println dataStatisticsPerGeneSet
     // calculates cohorts separately
     def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
+    println "z sample scores"
+    println zSampleScores
     // uses mean separately
     def zPathwayScores = getZPathwayScores(zSampleScores)
+    println "z pathway scores"
+    println zPathwayScores
 
     JSONObject jsonObject = new JSONObject()
     jsonObject.put("samples",samples)
@@ -249,7 +261,7 @@ class AnalysisService {
       def valuesForIndex = getValuesForIndex(inputData,i)
       def output = getDataStatisticsForGeneSet(valuesForIndex)
       def jsonObject = new JSONObject(mean: output[0],variance: output[1])
-      outputData.push(jsonObject)
+      outputData.add(jsonObject)
     }
     return outputData
   }

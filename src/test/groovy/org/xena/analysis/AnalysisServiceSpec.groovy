@@ -87,8 +87,41 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
     then:
     assert values.size()==9
-    assert values[0].mean == 4.231456808634225
-    assert values[0].variance == 0.012692699004756421
+    assert values[0].mean == 4.023820362794343
+    assert values[0].variance == 0.04648461144922637
+
+  }
+
+  void "small data statistics"(){
+
+    given:
+    def input = new JSONArray(new File("src/test/data/smallInputData.json").text)
+    assert input.length()==2
+    assert input[0].length()==2
+    assert input[0][0].length()==3
+    assert input[1].length()==2
+    assert input[1][0].length()==3
+
+    when:
+    def values0 = AnalysisService.getValuesForIndex(input,0)
+    def values1 = AnalysisService.getValuesForIndex(input,1)
+    println "values 0 $values0"
+    println "values 1 $values1"
+
+    then:
+    assert values0==[3,4,5,7,-2,3]
+    assert values1==[-1,-2,-3,-8,-9,-10]
+
+    when:
+    def values = AnalysisService.getDataStatisticsPerGeneSet(input)
+    println values
+
+    then:
+    assert values.size()==2
+    assert Math.abs(values[0].mean - (3 + 4 + 5 + 7 -2 +3 ) / 6.0) < 0.01
+    assert Math.abs(values[0].variance - 9.06666666) < 0.01
+    assert Math.abs(values[1].mean - (-1-2-3 -8-9-10) / 6.0) < 0.01
+    assert Math.abs(values[1].variance - 15.5) < 0.01
 
   }
 
