@@ -146,7 +146,7 @@ class AnalysisService {
       gmt: gmt,
       samples: samples,
       cohortA: resultA.cohort,
-      cohortB: resultA.cohort,
+      cohortB: resultB.cohort,
       result:inputArray.toString()
     ).save(flush: true, failOnError: true)
 

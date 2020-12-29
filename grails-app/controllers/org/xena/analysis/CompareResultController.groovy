@@ -149,9 +149,22 @@ class CompareResultController {
 
 
 
-    println "cohort name ${cohortA} / ${cohortB}"
+//    println "method: ${method}"
+//    println "gmt: ${gmt.name} / ${gmt.hash}"
+//    println "cohort name ${cohortA.name} / ${cohortB.name}"
     CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
-    println "found compare result ${compareResult}"
+//    println "found compare result ${compareResult}"
+
+//    CompareResult.all.each {
+//      println "it.method: ${it.method}"
+//      println "it.gmt: ${it.gmt.name} / ${it.gmt.hash}"
+//      println "it.cohort name ${it.cohortA.name} / ${it.cohortB.name}"
+//      println "method == ${it.method == method}"
+//      println "gmt == ${it.gmt == gmt}"
+//      println "cohort A == ${it.cohortA == cohortA}"
+//      println "cohort B == ${it.cohortB == cohortB}"
+//    }
+
     if(!compareResult){
       println "not found, check analysis environment"
       analysisService.checkAnalysisEnvironment()
