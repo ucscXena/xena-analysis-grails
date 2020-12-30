@@ -139,8 +139,8 @@ class AnalysisService {
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
 
     Map meanMap = createMeanMap(resultA,resultB)
-    println "output mean map"
-    println new JSONObject(meanMap) as JSON
+//    println "output mean map"
+//    println new JSONObject(meanMap) as JSON
 
 
     String gmtData = gmt.data
@@ -208,7 +208,7 @@ class AnalysisService {
   static def getZPathwayScoresForCohort(List sampleScores){
     def returnArray = []
     sampleScores.each {
-      returnArray.push(it.sum() / it.size())
+      returnArray.add(it.sum() / it.size())
     }
     return returnArray
   }
