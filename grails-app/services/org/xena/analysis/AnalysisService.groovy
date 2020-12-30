@@ -137,6 +137,11 @@ class AnalysisService {
    */
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
     Map meanMap = createMeanMap(resultA,resultB)
+    println "output mean map"
+    println meanMap
+    println new JSONObject(meanMap) as JSON
+
+
     String gmtData = gmt.data
     // TODO: implement
     JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
@@ -221,9 +226,9 @@ class AnalysisService {
       // TODO: do other collection
       def entryValue = []
       value.each{
-        entryValue.push( (it - statistics.mean) / statistics.variance )
+        entryValue.add( (it - statistics.mean) / statistics.variance )
       }
-      scoreValues.push(entryValue)
+      scoreValues.add(entryValue)
     }
     return scoreValues
   }
