@@ -138,14 +138,8 @@ class AnalysisService {
    */
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
 
-    println "result A"
-    println resultA.result
-    println "result B"
-    println resultB.result
-
     Map meanMap = createMeanMap(resultA,resultB)
     println "output mean map"
-    println meanMap
     println new JSONObject(meanMap) as JSON
 
 
