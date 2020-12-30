@@ -153,7 +153,7 @@ class CompareResultController {
 //    println "gmt: ${gmt.name} / ${gmt.hash}"
 //    println "cohort name ${cohortA.name} / ${cohortB.name}"
     CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
-//    println "found compare result ${compareResult}"
+    println "found compare result ${compareResult}"
 
 //    CompareResult.all.each {
 //      println "it.method: ${it.method}"
@@ -166,7 +166,7 @@ class CompareResultController {
 //    }
 
     if(!compareResult){
-      println "not found, check analysis environment"
+      println "prior result not found running analysis -> check analysis environment"
       analysisService.checkAnalysisEnvironment()
       println "analysis found"
       // pull in TPM files

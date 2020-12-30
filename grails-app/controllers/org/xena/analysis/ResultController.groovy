@@ -127,7 +127,6 @@ class ResultController {
       println "tpm file ${tpmFile.absolutePath}"
       println "output file ${outputFile.absolutePath}"
 
-      println "A with GC"
       OutputHandler.printMemory()
       System.gc()
       while ((outputFile.size() == 0 || outputFile.size() == lastOutputFileSize) && waitCount < 10) {
@@ -135,11 +134,9 @@ class ResultController {
         sleep(2000)
         ++waitCount
       }
-      println "B"
       OutputHandler.printMemory()
       File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
 //      jsonFile.deleteOnExit()
-      println "C"
       OutputHandler.printMemory()
       Result result = new Result(
         method: method,
@@ -148,10 +145,8 @@ class ResultController {
         cohort: cohort,
         result: jsonFile.text
       ).save(flush: true, failOnError: true)
-      println "D"
       OutputHandler.printMemory()
       render resultMarshaller(result) as JSON
-      println "E"
       OutputHandler.printMemory()
     } else {
       throw new RuntimeException("Not sure how to handle method ${method}")
