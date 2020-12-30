@@ -12,6 +12,7 @@ class AnalysisService {
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final String TPM_DIRECTORY = "data/tpm/"
 
+  @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {
     def inputA = jsonArray[0][i]
     def inputB = jsonArray[1][i]
@@ -106,6 +107,7 @@ class AnalysisService {
   }
 
 
+  @NotTransactional
   static JSONArray generateResult(String gmtData,Map meanMap) {
     JSONArray outputArray = new JSONArray()
     def geneList = gmtData.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")}
@@ -124,7 +126,7 @@ class AnalysisService {
         jsonObject.firstGeneExpressionSampleActivity= meanMap.zSampleScores[0][keyIndex]
         jsonObject.secondGeneExpressionSampleActivity= meanMap.zSampleScores[1][keyIndex]
 
-        outputArray.add(jsonObject)
+        outputArray.push(jsonObject)
     }
     return outputArray
   }
@@ -136,7 +138,12 @@ class AnalysisService {
    * @return
    */
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
+
     Map meanMap = createMeanMap(resultA,resultB)
+//    println "output mean map"
+//    println new JSONObject(meanMap) as JSON
+
+
     String gmtData = gmt.data
     // TODO: implement
     JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
@@ -156,6 +163,7 @@ class AnalysisService {
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
+  @NotTransactional
   static def extractValuesByCohort(JSONObject input){
 
     def values = []
@@ -168,6 +176,7 @@ class AnalysisService {
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
+  @NotTransactional
   static JSONArray extractValues(JSONObject inputA,JSONObject inputB){
     return [extractValuesByCohort(inputA),extractValuesByCohort(inputB)]
   }
@@ -199,19 +208,22 @@ class AnalysisService {
  * @param sampleScores
  * @return
  */
+  @NotTransactional
   static def getZPathwayScoresForCohort(List sampleScores){
     def returnArray = []
     sampleScores.each {
-      returnArray.push(it.sum() / it.size())
+      returnArray.add(it.sum() / it.size())
     }
     return returnArray
   }
 
 // eslint-disable-next-line no-unused-vars
+  @NotTransactional
   static def getZPathwayScores(sampleZScores){
     return [getZPathwayScoresForCohort(sampleZScores[0]),getZPathwayScoresForCohort(sampleZScores[1])]
   }
 
+  @NotTransactional
   static def getZSampleScores(values,dataStatisticsPerGeneSet){
     def scoreValues = []
     values.eachWithIndex { def value , int index ->
@@ -221,9 +233,11 @@ class AnalysisService {
       // TODO: do other collection
       def entryValue = []
       value.each{
-        entryValue.push( (it - statistics.mean) / statistics.variance )
+        def convertedValue = (it - statistics.mean) / statistics.variance
+//        println "input value ($it - $statistics.mean) / $statistics.variance = $convertedValue "
+        entryValue.add( convertedValue )
       }
-      scoreValues.push(entryValue)
+      scoreValues.add(entryValue)
     }
     return scoreValues
   }
@@ -232,10 +246,13 @@ class AnalysisService {
     return inputData.data.collect{ it.geneset}
   }
 
+  @NotTransactional
   static List getDataStatisticsPerGeneSet(def inputData) {
     def outputData = []
     for(int i = 0 ; i < inputData[0].size() ; i++ ){
       def valuesForIndex = getValuesForIndex(inputData,i)
+//      println "values for index $i"
+//      println valuesForIndex
       def output = getDataStatisticsForGeneSet(valuesForIndex)
       def jsonObject = new JSONObject(mean: output[0],variance: output[1])
       outputData.add(jsonObject)
@@ -243,6 +260,7 @@ class AnalysisService {
     return outputData
   }
 
+  @NotTransactional
   static def getDataStatisticsForGeneSet(List inputArray){
     int count = inputArray.size()
     def total = 0

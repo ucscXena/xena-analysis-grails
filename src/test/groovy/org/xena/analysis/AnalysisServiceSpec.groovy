@@ -81,14 +81,20 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert input.length()==2
     assert input[0].length()==9
     assert input[0][0].length()==89
+    assert input[1].length()==9
+    assert input[1][0].length()==548
 
     when:
     def values = AnalysisService.getDataStatisticsPerGeneSet(input)
 
     then:
     assert values.size()==9
-    assert values[0].mean == 4.023820362794343
-    assert values[0].variance == 0.04648461144922637
+    assert Math.abs(values[0].mean - 4.023820362794348) < 0.00001
+    assert Math.abs(values[0].variance - 0.0464846114492264) < 0.00001
+    assert Math.abs(values[5].mean - 2.0414515651491367) < 0.00001
+    assert Math.abs(values[5].variance - 0.05060722132448916) < 0.00001
+    assert Math.abs(values[8].mean - 4.231456808634223) < 0.00001
+    assert Math.abs(values[8].variance - 0.012692699004756416) < 0.00001
 
   }
 
@@ -147,6 +153,9 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert values.size()==9
     assert input[0].size()==89
     assert values[0].size()==89
+    assert Math.abs(values[0][0]+15.37768369837939) < 0.0001
+    assert Math.abs(values[0][1]+33.00384044872373) < 0.0001
+    assert Math.abs(values[0][88]+32.813116629986624) < 0.0001
 
   }
 

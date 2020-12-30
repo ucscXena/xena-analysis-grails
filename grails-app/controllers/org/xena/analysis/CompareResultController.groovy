@@ -58,14 +58,10 @@ class CompareResultController {
     Gmt gmt = Gmt.findByName(gmtname)
     println "cohortA ${cohortA}, cohortB, ${cohortB}, GMT: ${gmt}"
 
-    println "storing"
+//    println "storing"
 //    println json.result as JSON
 
     CompareResult compareResult = CompareResult.findByMethodAndCohortAAndCohortBAndGmt(method,cohortA,cohortB,gmt)
-//    println "save string 1:"
-//    println "[${json.result}]"
-//    println "save string 2:"
-//    println "${json.result as JSON}"
     if (compareResult == null) {
       println "trying to save"
       compareResult = new CompareResult(
@@ -181,11 +177,11 @@ class CompareResultController {
 
       // TODO: run these in parallel if needed, or just 1?
       Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA)
-      println "result A: ${resultA}"
+//      println "result A: ${resultA}"
 
 
       Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB)
-      println "result B: ${resultB}"
+//      println "result B: ${resultB}"
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
       println "compare result: ${compareResult}"

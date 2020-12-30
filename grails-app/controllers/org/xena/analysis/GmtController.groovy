@@ -22,26 +22,7 @@ class GmtController {
     println "method: ${method}"
     println "max: ${max}"
 
-    // TODO: BPA nd BPA method need to be resolved
-//    if(params.method){
-//
-//    }
-//    params.max = Math.min(max ?: 10, 100)
-//    def gmts = gmtService.list(params)
-//    Set<String> methods = new HashSet<>()
-//    gmts.each {methods.add(it.method) }
-//    println "method list: ${gmts.each { println it}}"
-//
-//    JSONObject jsonObject = new JSONObject()
-//    Gmt.all.each {
-//      if(!jsonObject.containsKey(it.method)){
-//        jsonObject.put(it.method,new JSONArray())
-//      }
-//      JSONArray geneSets = jsonObject.getJSONArray(it.method)
-//      geneSets.add()
-//      respond gmtService.list(params), model:[gmtCount: gmtService.count()]
       respond gmtService.list(params)
-//    render jsonObject as JSON
   }
 
   def names(String method) {
@@ -65,12 +46,11 @@ class GmtController {
 
   @Transactional
   def store() {
-    println "A"
     def json = request.JSON
     String method = json.method
     String gmtname = json.gmtname
     String gmtDataHash = json.gmtdata.md5()
-    println "strong with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
+    println "stroring with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
