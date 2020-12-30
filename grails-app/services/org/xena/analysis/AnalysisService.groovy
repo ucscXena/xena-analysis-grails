@@ -241,6 +241,8 @@ class AnalysisService {
     def outputData = []
     for(int i = 0 ; i < inputData[0].size() ; i++ ){
       def valuesForIndex = getValuesForIndex(inputData,i)
+//      println "values for index $i"
+//      println valuesForIndex
       def output = getDataStatisticsForGeneSet(valuesForIndex)
       def jsonObject = new JSONObject(mean: output[0],variance: output[1])
       outputData.add(jsonObject)
