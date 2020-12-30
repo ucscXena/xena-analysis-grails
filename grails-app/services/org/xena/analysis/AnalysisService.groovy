@@ -226,9 +226,16 @@ class AnalysisService {
       // TODO: do other collection
       def entryValue = []
       value.each{
-        entryValue.add( (it - statistics.mean) / statistics.variance )
+        def convertedValue = (it - statistics.mean) / statistics.variance
+//        println "input value ($it - $statistics.mean) / $statistics.variance = $convertedValue "
+        entryValue.add( convertedValue )
       }
       scoreValues.add(entryValue)
+      if(index==1){
+        println statistics
+        println value
+        println entryValue
+      }
     }
     return scoreValues
   }
