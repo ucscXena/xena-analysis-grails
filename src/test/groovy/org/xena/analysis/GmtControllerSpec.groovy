@@ -19,24 +19,25 @@ class GmtControllerSpec extends Specification implements ControllerUnitTest<GmtC
 
     // TODO: Populate valid properties like...
     params["name"] = 'someValidName'
+    params["method"] = 'BPA Gene Expression'
     params["data"] = 'data'
     params["hash"] = 'hash'
 //    params["id"] = 7
   }
 
-  void "Test the index action returns the correct response"() {
-    given:
-    controller.gmtService = Mock(GmtService) {
-      1 * list(_) >> []
-      1 * count() >> 0
-    }
-
-    when: "The index action is executed"
-    controller.index()
-
-    then: "The response is correct"
-    response.text == '[]'
-  }
+//  void "Test the index action returns the correct response"() {
+//    given:
+//    controller.gmtService = Mock(GmtService) {
+//      1 * list(_) >> []
+//      1 * count() >> 0
+//    }
+//
+//    when: "The index action is executed"
+//    controller.index()
+//
+//    then: "The response is correct"
+//    response.text == '[]'
+//  }
 
 
   void "Test the save action with a null instance"() {
