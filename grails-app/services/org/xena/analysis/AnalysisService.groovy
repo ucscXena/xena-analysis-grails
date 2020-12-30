@@ -231,11 +231,6 @@ class AnalysisService {
         entryValue.add( convertedValue )
       }
       scoreValues.add(entryValue)
-      if(index==1){
-        println statistics
-        println value
-        println entryValue
-      }
     }
     return scoreValues
   }
