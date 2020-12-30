@@ -12,6 +12,7 @@ class AnalysisService {
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final String TPM_DIRECTORY = "data/tpm/"
 
+  @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {
     def inputA = jsonArray[0][i]
     def inputB = jsonArray[1][i]
@@ -162,6 +163,7 @@ class AnalysisService {
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
+  @NotTransactional
   static def extractValuesByCohort(JSONObject input){
 
     def values = []
@@ -174,6 +176,7 @@ class AnalysisService {
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
+  @NotTransactional
   static JSONArray extractValues(JSONObject inputA,JSONObject inputB){
     return [extractValuesByCohort(inputA),extractValuesByCohort(inputB)]
   }
@@ -205,6 +208,7 @@ class AnalysisService {
  * @param sampleScores
  * @return
  */
+  @NotTransactional
   static def getZPathwayScoresForCohort(List sampleScores){
     def returnArray = []
     sampleScores.each {
@@ -214,10 +218,12 @@ class AnalysisService {
   }
 
 // eslint-disable-next-line no-unused-vars
+  @NotTransactional
   static def getZPathwayScores(sampleZScores){
     return [getZPathwayScoresForCohort(sampleZScores[0]),getZPathwayScoresForCohort(sampleZScores[1])]
   }
 
+  @NotTransactional
   static def getZSampleScores(values,dataStatisticsPerGeneSet){
     def scoreValues = []
     values.eachWithIndex { def value , int index ->
@@ -240,6 +246,7 @@ class AnalysisService {
     return inputData.data.collect{ it.geneset}
   }
 
+  @NotTransactional
   static List getDataStatisticsPerGeneSet(def inputData) {
     def outputData = []
     for(int i = 0 ; i < inputData[0].size() ; i++ ){
@@ -253,6 +260,7 @@ class AnalysisService {
     return outputData
   }
 
+  @NotTransactional
   static def getDataStatisticsForGeneSet(List inputArray){
     int count = inputArray.size()
     def total = 0

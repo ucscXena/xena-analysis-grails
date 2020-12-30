@@ -58,14 +58,10 @@ class CompareResultController {
     Gmt gmt = Gmt.findByName(gmtname)
     println "cohortA ${cohortA}, cohortB, ${cohortB}, GMT: ${gmt}"
 
-    println "storing"
+//    println "storing"
 //    println json.result as JSON
 
     CompareResult compareResult = CompareResult.findByMethodAndCohortAAndCohortBAndGmt(method,cohortA,cohortB,gmt)
-//    println "save string 1:"
-//    println "[${json.result}]"
-//    println "save string 2:"
-//    println "${json.result as JSON}"
     if (compareResult == null) {
       println "trying to save"
       compareResult = new CompareResult(
