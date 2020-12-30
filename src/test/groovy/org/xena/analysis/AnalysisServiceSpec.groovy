@@ -149,8 +149,6 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     def input = new JSONArray(new File("src/test/data/inputDataStats.json").text)
     def dataStatistics = new JSONArray(new File("src/test/data/dataDats.json").text) as List
     def values = AnalysisService.getZSampleScores(input,dataStatistics)
-//    println "output values"
-//    println values
     assert input.size()==9
     assert values.size()==9
     assert input[0].size()==89

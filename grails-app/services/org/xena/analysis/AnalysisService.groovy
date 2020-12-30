@@ -231,7 +231,7 @@ class AnalysisService {
 //        println "input value ($it - $statistics.mean) / $statistics.variance = $convertedValue "
         entryValue.add( convertedValue )
       }
-      scoreValues.push(entryValue)
+      scoreValues.add(entryValue)
     }
     return scoreValues
   }
