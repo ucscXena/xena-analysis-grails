@@ -106,6 +106,7 @@ class AnalysisService {
   }
 
 
+  @NotTransactional
   static JSONArray generateResult(String gmtData,Map meanMap) {
     JSONArray outputArray = new JSONArray()
     def geneList = gmtData.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")}
@@ -124,7 +125,7 @@ class AnalysisService {
         jsonObject.firstGeneExpressionSampleActivity= meanMap.zSampleScores[0][keyIndex]
         jsonObject.secondGeneExpressionSampleActivity= meanMap.zSampleScores[1][keyIndex]
 
-        outputArray.add(jsonObject)
+        outputArray.push(jsonObject)
     }
     return outputArray
   }
@@ -136,6 +137,12 @@ class AnalysisService {
    * @return
    */
   CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
+
+    println "result A"
+    println resultA.result
+    println "result B"
+    println resultB.result
+
     Map meanMap = createMeanMap(resultA,resultB)
     println "output mean map"
     println meanMap
@@ -230,7 +237,7 @@ class AnalysisService {
 //        println "input value ($it - $statistics.mean) / $statistics.variance = $convertedValue "
         entryValue.add( convertedValue )
       }
-      scoreValues.add(entryValue)
+      scoreValues.push(entryValue)
     }
     return scoreValues
   }
