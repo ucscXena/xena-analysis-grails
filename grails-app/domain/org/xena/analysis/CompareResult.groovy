@@ -17,6 +17,7 @@ class CompareResult {
 
   static mapping = {
     result type:  'text'
+    samples type:  'text'
   }
 
   List<String> getSampleArray(){
