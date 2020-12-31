@@ -19,7 +19,7 @@ class CompareResultController {
     AnalysisService analysisService
 
     static responseFormats = ['json', 'xml']
-    static allowedMethods = [storeResult: "POST",save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [storeResult: "POST",save: "POST", update: "PUT", delete: "DELETE",generateScoredResult:"POST"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -32,13 +32,7 @@ class CompareResultController {
 
   JSONObject resultMarshaller(CompareResult result) {
     JSONObject jsonObject = new JSONObject()
-//    jsonObject.cohortA = result.cohortA.name
-//    jsonObject.cohortB = result.cohortA.name
-//    jsonObject.gmt = result.gmt.name
-//    jsonObject.gmtId = result.gmt.id
-//    def dataObject = new JsonSlurper().parseText(result.result) as JSONObject
     jsonObject.genesets = dataObject.data as List<Float>
-//    jsonObject.samples = dataObject.samples
     return jsonObject
   }
 
@@ -128,7 +122,18 @@ class CompareResultController {
   }
 
   @Transactional
-  def generateScoredResult(String method, String geneSetName,String cohortNameA,String cohortNameB,String tpmUrlA,String tpmUrlB,String samples) {
+  def generateScoredResult(){
+
+    def json = request.JSON
+
+    String method = json.method
+    String geneSetName = json.geneSetName
+    String cohortNameA = json.cohortNameA
+    String cohortNameB = json.cohortNameB
+    String tpmUrlA = json.tpmUrlA
+    String tpmUrlB = json.tpmUrlB
+    String samples = json.samples
+
     println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${tpmUrlA},${tpmUrlB}, ${samples}"
     Gmt gmt = Gmt.findByName(geneSetName)
     println "gmt name ${gmt}"
