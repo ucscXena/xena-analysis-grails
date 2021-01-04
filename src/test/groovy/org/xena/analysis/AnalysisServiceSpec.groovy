@@ -211,16 +211,27 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
     given:
     def inputTpmFile = new File("src/test/data/inputTpmFile.tpm")
-    def outputTpmFile = new File("src/test/data/filteredTpmFile.tpm")
+    def expectedTpmFile = new File("src/test/data/filteredTpmFile.tpm")
     JSONArray samplesArray = new JSONArray("['TCGA-FA-8693-01','TCGA-G8-6909-01','TCGA-VB-A8QN-01']")
 
     when:
-    String outputFilter = AnalysisService.filterTpmForSamples(inputTpmFile,samplesArray)
-    println "outputFiler"
-    println outputFilter
+    String testFilteredText = AnalysisService.filterTpmForSamples(inputTpmFile,samplesArray)
+    String expectedFileText = expectedTpmFile.text
+    println "test filtered text"
+    println testFilteredText
+
+    println "expected filtered text"
+    println expectedFileText
 
     then:
-    assert outputFilter == outputTpmFile.text
+
+    List<String> expectedLines = expectedTpmFile.readLines()
+    def testLines = testFilteredText.split("\n") as List<String>
+
+    assert expectedLines.size()== testLines.size()
+    expectedLines.eachWithIndex { String entry, int i ->
+      assert expectedLines[i]== testLines[i]
+    }
 
   }
 
