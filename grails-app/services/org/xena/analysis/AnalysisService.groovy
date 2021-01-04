@@ -105,6 +105,7 @@ class AnalysisService {
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl,JSONArray samples){
 
     Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method,cohort,gmt.hash,samples.toString())
+    println "result found ${result} for ${cohort.name} and $gmt.name "
     if(result) return result
 
     File originalTpmFile = getOriginalTpmFile(cohort,tpmUrl)
@@ -130,7 +131,8 @@ class AnalysisService {
       gmt: gmt,
       gmtHash: gmt.hash,
       cohort: cohort,
-      result: jsonFile.text
+      result: jsonFile.text,
+      samples: samples.toString()
     ).save(flush: true, failOnError: true)
     return result
   }

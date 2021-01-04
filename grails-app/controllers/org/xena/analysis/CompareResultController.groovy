@@ -187,12 +187,12 @@ class CompareResultController {
       try {
         if(samples){
           JSONArray samplesJsonArray = new JSONArray(samples)
-          println "samples json array "
-          println samplesJsonArray as JSON
+//          println "samples json array "
+//          println samplesJsonArray as JSON
           samplesA = samplesJsonArray.getJSONArray(0)
-          println samplesA as JSON
+//          println samplesA as JSON
           samplesB = samplesJsonArray.getJSONArray(1)
-          println samplesB as JSON
+//          println samplesB as JSON
   //      println "result A: ${resultA}"
         }
       } catch (e) {
