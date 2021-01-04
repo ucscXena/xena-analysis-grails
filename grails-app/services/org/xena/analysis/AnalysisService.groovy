@@ -1,11 +1,8 @@
 package org.xena.analysis
 
-
+import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import org.apache.commons.compress.archivers.ArchiveInputStream
-import org.apache.commons.compress.archivers.ArchiveStreamFactory
-import org.apache.commons.compress.compressors.CompressorInputStream
 import org.apache.commons.compress.compressors.CompressorOutputStream
 import org.apache.commons.compress.compressors.CompressorStreamFactory
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -58,14 +55,11 @@ class AnalysisService {
     println "newNameDecomprssed: '${newNameDecompressed}'"
 
     // delete ot make sure it doesn't exist
-    assert newFileCompressed.delete()
-    assert newFileDecompressed.delete()
-
-//    // copy file
-//    newFileCompressed << originalFile.bytes
+    assert !newFileCompressed.exists() || newFileCompressed.delete()
+    assert !newFileDecompressed.exists() || newFileDecompressed.delete()
 
     // unzip to new location
-    GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(newFileCompressed))
+    GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(originalFile))
 //    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream))
 
     FileOutputStream fileOutputStream = new FileOutputStream(newFileDecompressed)
@@ -81,7 +75,7 @@ class AnalysisService {
 //    tempFile.deleteOnExit()
 
     // filter for samples
-    String filteredTpmSampleString = filterTpmForSamples( newFileDecompressed.text,samples)
+    String filteredTpmSampleString = filterTpmForSamples( newFileDecompressed,samples)
 //    assert newFileDecompressed.delete()
     newFileDecompressed.write ""
 
@@ -94,13 +88,12 @@ class AnalysisService {
 
 
     FileOutputStream compressedFileOutputStream = new FileOutputStream(newFileCompressed)
-    CompressorOutputStream gzippedOut = new CompressorStreamFactory()
+    CompressorOutputStream compressorOutputStream = new CompressorStreamFactory()
       .createCompressorOutputStream(CompressorStreamFactory.GZIP, compressedFileOutputStream)
-//    ArchiveInputStream input = new ArchiveStreamFactory()
-//      .createArchiveInputStream(new FileInputStream(newFileDecompressed));
-    CompressorInputStream input = new CompressorStreamFactory()
-      .createCompressorInputStream(new FileInputStream(newFileDecompressed))
-    IOUtils.copy(input,gzippedOut)
+    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(newFileDecompressed))
+    IOUtils.copy(inputStream,compressorOutputStream)
+    compressorOutputStream.close()
+    inputStream.close()
 
     assert newFileCompressed.exists()
     assert newFileCompressed.size() > 0
@@ -112,6 +105,7 @@ class AnalysisService {
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl,JSONArray samples){
 
     Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method,cohort,gmt.hash,samples.toString())
+    println "result found ${result} for ${cohort.name} and $gmt.name "
     if(result) return result
 
     File originalTpmFile = getOriginalTpmFile(cohort,tpmUrl)
@@ -120,7 +114,7 @@ class AnalysisService {
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
-    runBpaAnalysis(gmtFile,originalTpmFile,outputFile)
+    runBpaAnalysis(gmtFile,tpmFile,outputFile)
 
     long lastOutputFileSize = 0
     int waitCount = 0
@@ -137,7 +131,8 @@ class AnalysisService {
       gmt: gmt,
       gmtHash: gmt.hash,
       cohort: cohort,
-      result: jsonFile.text
+      result: jsonFile.text,
+      samples: samples.toString()
     ).save(flush: true, failOnError: true)
     return result
   }
@@ -202,6 +197,11 @@ class AnalysisService {
   static JSONArray generateResult(String gmtData,Map meanMap) {
     JSONArray outputArray = new JSONArray()
     def geneList = gmtData.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")}
+
+//    println "mean map"
+//    println new JSONObject(meanMap) as JSON
+//    println "gene set names"
+//    println meanMap.geneSetNames
     for(List gene in geneList){
         def keyIndex = meanMap.geneSetNames.findIndexOf { it==gene[0]}
         keyIndex = keyIndex >=0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it=="${gene[0]} (${gene[1]})" }
@@ -369,11 +369,37 @@ class AnalysisService {
   }
 
   @NotTransactional
-  static String filterTpmForSamples(String originalTpmFile, JSONArray samplesArray) {
+  static String filterTpmForSamples(File originalTpmFile, JSONArray samplesArray) {
     if(samplesArray.size()==0) return originalTpmFile
 
-    return null
+    List<String> sampleList = samplesArray as List<String>
 
+    String tpmText = originalTpmFile.text
+
+    List<String> tpmEntries = tpmText.split("\n") as List<String>
+
+    String[] availableSamples = tpmEntries.get(0).split("\t")
+    List<String> availableSamplesList = (availableSamples as List).subList(0,availableSamples.length)
+
+    // find columns with matching samples
+    List<String> intersectingLists = sampleList.intersect(availableSamplesList)
+    List<Integer> matchingIndices = []
+    intersectingLists.eachWithIndex { String entry, int index ->
+      matchingIndices.add(availableSamplesList.indexOf(entry))
+    }
+
+    // for each line in tpmEntries, write out columns
+    StringBuffer stringBuffer = new StringBuffer()
+    for(String tpmEntry in tpmEntries){
+      String[] inputValues = tpmEntry.split("\t")
+      List<String> outputArray = [inputValues[0]]
+      matchingIndices.each {
+        outputArray.add(inputValues[it])
+      }
+      stringBuffer.append(outputArray.join("\t")).append("\n")
+    }
+
+    return stringBuffer.toString()
 
   }
 }

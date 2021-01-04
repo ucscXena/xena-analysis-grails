@@ -187,12 +187,12 @@ class CompareResultController {
       try {
         if(samples){
           JSONArray samplesJsonArray = new JSONArray(samples)
-          println "samples json array "
-          println samplesJsonArray as JSON
+//          println "samples json array "
+//          println samplesJsonArray as JSON
           samplesA = samplesJsonArray.getJSONArray(0)
-          println samplesA as JSON
+//          println samplesA as JSON
           samplesB = samplesJsonArray.getJSONArray(1)
-          println samplesB as JSON
+//          println samplesB as JSON
   //      println "result A: ${resultA}"
         }
       } catch (e) {
@@ -200,8 +200,9 @@ class CompareResultController {
       }
 
       Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA,samplesA)
+      println "result A: ${resultA}"
       Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB,samplesB)
-//      println "result B: ${resultB}"
+      println "result B: ${resultB}"
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
       println "compare result: ${compareResult}"
