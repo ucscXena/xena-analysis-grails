@@ -62,9 +62,6 @@ class AnalysisService {
     assert !newFileCompressed.exists() || newFileCompressed.delete()
     assert !newFileDecompressed.exists() || newFileDecompressed.delete()
 
-//    // copy file
-//    newFileCompressed << originalFile.bytes
-
     // unzip to new location
     GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(originalFile))
 //    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream))
@@ -95,13 +92,8 @@ class AnalysisService {
 
 
     FileOutputStream compressedFileOutputStream = new FileOutputStream(newFileCompressed)
-//    CompressorOutputStream cout = new GzipCompressorOutputStream(compressedFileOutputStream);
     CompressorOutputStream compressorOutputStream = new CompressorStreamFactory()
       .createCompressorOutputStream(CompressorStreamFactory.GZIP, compressedFileOutputStream)
-//    ArchiveInputStream input = new ArchiveStreamFactory()
-//      .createArchiveInputStream(new FileInputStream(newFileDecompressed));
-//    CompressorInputStream input = new CompressorStreamFactory()
-//      .createCompressorInputStream(new FileInputStream(newFileDecompressed))
     BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(newFileCompressed))
     IOUtils.copy(inputStream,compressorOutputStream)
 
@@ -123,7 +115,7 @@ class AnalysisService {
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
-    runBpaAnalysis(gmtFile,originalTpmFile,outputFile)
+    runBpaAnalysis(gmtFile,tpmFile,outputFile)
 
     long lastOutputFileSize = 0
     int waitCount = 0
