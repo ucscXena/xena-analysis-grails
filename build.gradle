@@ -67,6 +67,11 @@ dependencies {
     testCompile "org.grails:grails-web-testing-support"
     testCompile "org.grails:views-json-testing-support"
     testCompile "org.hibernate.validator:hibernate-validator:6.0.20.Final"
+
+    // added
+    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.20'
+    compile group: 'commons-io', name: 'commons-io', version: '2.8.0'
+
 }
 
 bootRun {

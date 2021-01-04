@@ -1,8 +1,15 @@
 package org.xena.analysis
 
-import grails.converters.JSON
+
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import org.apache.commons.compress.archivers.ArchiveInputStream
+import org.apache.commons.compress.archivers.ArchiveStreamFactory
+import org.apache.commons.compress.compressors.CompressorInputStream
+import org.apache.commons.compress.compressors.CompressorOutputStream
+import org.apache.commons.compress.compressors.CompressorStreamFactory
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.utils.IOUtils
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
@@ -19,17 +26,101 @@ class AnalysisService {
     return inputA + inputB
   }
 
-  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
+//  /Users/nathandunn/repositories/XENA/xena-analysis-grails/data/tpm/TCGA_Ovarian_Cancer__OV_.tpm.gz
+  @NotTransactional
+  static String getNewFileName(File originalFile,String sampleHash){
+    String TPM_SUFFIX = ".tpm.gz"
+    String root = originalFile.getParent()
+    String name  = originalFile.getName()
+    int suffixIndex = name.indexOf(TPM_SUFFIX)
+    return root + "/" + name.substring(0,suffixIndex) + sampleHash + TPM_SUFFIX
+  }
 
-    Result result = Result.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
+  File getTpmFileForSamples(File originalFile, JSONArray samples) {
+    if(samples==null || samples.size()==0) return originalFile
+
+    String samplesHash = samples.toString().md5()
+
+    println "original file '${originalFile.name}' and '${originalFile.absolutePath}'"
+    println "sample hash ${samplesHash}"
+
+    String newName = getNewFileName(originalFile,samplesHash)
+    println "new name ${newName}"
+
+    File newFileCompressed = new File(newName)
+    // does file exist with sample hash name?
+    if(newFileCompressed.exists() && newFileCompressed.size()>0)  return newFileCompressed
+
+
+
+    String newNameDecompressed = newName.substring(0,newName.length()-(".gz".length()))
+    File newFileDecompressed = new File(newNameDecompressed)
+    println "newNameDecomprssed: '${newNameDecompressed}'"
+
+    // delete ot make sure it doesn't exist
+    assert newFileCompressed.delete()
+    assert newFileDecompressed.delete()
+
+//    // copy file
+//    newFileCompressed << originalFile.bytes
+
+    // unzip to new location
+    GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(newFileCompressed))
+//    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream))
+
+    FileOutputStream fileOutputStream = new FileOutputStream(newFileDecompressed)
+    IOUtils.copy(gzipInputStream,fileOutputStream)
+    gzipInputStream.close()
+    fileOutputStream.close()
+
+    // check that it exists
+    assert newFileDecompressed.exists()
+    assert newFileDecompressed.size()>0
+
+//    File tempFile = File.createTempFile("tpm-working",".tpm")
+//    tempFile.deleteOnExit()
+
+    // filter for samples
+    String filteredTpmSampleString = filterTpmForSamples( newFileDecompressed.text,samples)
+//    assert newFileDecompressed.delete()
+    newFileDecompressed.write ""
+
+    assert newFileDecompressed.exists()
+    assert newFileDecompressed.size()==0
+
+    newFileDecompressed.write(filteredTpmSampleString)
+
+    // rezip to new location with sampleHash file
+
+
+    FileOutputStream compressedFileOutputStream = new FileOutputStream(newFileCompressed)
+    CompressorOutputStream gzippedOut = new CompressorStreamFactory()
+      .createCompressorOutputStream(CompressorStreamFactory.GZIP, compressedFileOutputStream)
+//    ArchiveInputStream input = new ArchiveStreamFactory()
+//      .createArchiveInputStream(new FileInputStream(newFileDecompressed));
+    CompressorInputStream input = new CompressorStreamFactory()
+      .createCompressorInputStream(new FileInputStream(newFileDecompressed))
+    IOUtils.copy(input,gzippedOut)
+
+    assert newFileCompressed.exists()
+    assert newFileCompressed.size() > 0
+
+    return newFileCompressed
+  }
+
+
+  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl,JSONArray samples){
+
+    Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method,cohort,gmt.hash,samples.toString())
     if(result) return result
 
-    File tpmFile = getTpmFile(cohort,tpmUrl)
+    File originalTpmFile = getOriginalTpmFile(cohort,tpmUrl)
+    File tpmFile = getTpmFileForSamples(originalTpmFile,samples)
 
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
-    runBpaAnalysis(gmtFile,tpmFile,outputFile)
+    runBpaAnalysis(gmtFile,originalTpmFile,outputFile)
 
     long lastOutputFileSize = 0
     int waitCount = 0
@@ -77,7 +168,7 @@ class AnalysisService {
 
   }
 
-  File getTpmFile(Cohort cohort,String tpmUrl){
+  File getOriginalTpmFile(Cohort cohort, String tpmUrl){
 
     Tpm tpm = Tpm.findByCohort(cohort)
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
@@ -274,6 +365,15 @@ class AnalysisService {
     }
     def variance = temp / (inputArray.size() - 1)
     return [mean,variance]
+
+  }
+
+  @NotTransactional
+  static String filterTpmForSamples(String originalTpmFile, JSONArray samplesArray) {
+    if(samplesArray.size()==0) return originalTpmFile
+
+    return null
+
 
   }
 }

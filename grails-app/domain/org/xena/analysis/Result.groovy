@@ -17,6 +17,7 @@ class Result {
 
   static mapping = {
     result type:  'text'
+    samples type:  'text'
   }
 
   List<String> getSampleArray(){

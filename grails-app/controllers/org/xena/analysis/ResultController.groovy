@@ -85,7 +85,7 @@ class ResultController {
     println "total memory: ${Runtime.getRuntime().totalMemory()}"
     println "free memory: ${Runtime.getRuntime().freeMemory()}"
 
-    File tpmFile = analysisService.getTpmFile(cohort,tpmUrl)
+    File tpmFile = analysisService.getOriginalTpmFile(cohort,tpmUrl)
 
 
     // create output file

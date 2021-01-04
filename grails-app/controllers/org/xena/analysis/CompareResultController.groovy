@@ -2,6 +2,7 @@ package org.xena.analysis
 
 import grails.converters.JSON
 import grails.validation.ValidationException
+import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 import static org.springframework.http.HttpStatus.CREATED
@@ -114,7 +115,7 @@ class CompareResultController {
     }
     Tpm tpm = Tpm.findByCohort(cohort)
     if(!tpm){
-      File tpmFile = analysisService.getTpmFile(cohort,tpmUrl)
+      File tpmFile = analysisService.getOriginalTpmFile(cohort,tpmUrl)
       tpm = new Tpm(cohort: cohort,url: tpmUrl,data: tpmFile.absolutePath).save()
     }
     assert tpm.data.length()>0
@@ -153,7 +154,7 @@ class CompareResultController {
 //    println "method: ${method}"
 //    println "gmt: ${gmt.name} / ${gmt.hash}"
 //    println "cohort name ${cohortA.name} / ${cohortB.name}"
-    CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortB(method,gmt,cohortA,cohortB)
+    CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortBAndSamples(method,gmt,cohortA,cohortB,samples)
     println "found compare result ${compareResult}"
 
 //    CompareResult.all.each {
@@ -181,11 +182,25 @@ class CompareResultController {
       println "gmt file ${gmtFile} . . exists ${gmtFile.exists()}, size: ${gmtFile.size()}"
 
       // TODO: run these in parallel if needed, or just 1?
-      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA)
-//      println "result A: ${resultA}"
+      JSONArray samplesA = null
+      JSONArray samplesB = null
+      try {
+        if(samples){
+          JSONArray samplesJsonArray = new JSONArray(samples)
+          println "samples json array "
+          println samplesJsonArray as JSON
+          samplesA = samplesJsonArray.getJSONArray(0)
+          println samplesA as JSON
+          samplesB = samplesJsonArray.getJSONArray(1)
+          println samplesB as JSON
+  //      println "result A: ${resultA}"
+        }
+      } catch (e) {
+        log.error(e)
+      }
 
-
-      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB)
+      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA,samplesA)
+      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB,samplesB)
 //      println "result B: ${resultB}"
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
