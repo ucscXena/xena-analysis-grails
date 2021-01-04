@@ -1,15 +1,11 @@
 package org.xena.analysis
 
-
+import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import org.apache.commons.compress.archivers.ArchiveInputStream
-import org.apache.commons.compress.archivers.ArchiveStreamFactory
-import org.apache.commons.compress.compressors.CompressorInputStream
 import org.apache.commons.compress.compressors.CompressorOutputStream
 import org.apache.commons.compress.compressors.CompressorStreamFactory
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.utils.IOUtils
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
@@ -94,8 +90,10 @@ class AnalysisService {
     FileOutputStream compressedFileOutputStream = new FileOutputStream(newFileCompressed)
     CompressorOutputStream compressorOutputStream = new CompressorStreamFactory()
       .createCompressorOutputStream(CompressorStreamFactory.GZIP, compressedFileOutputStream)
-    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(newFileCompressed))
+    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(newFileDecompressed))
     IOUtils.copy(inputStream,compressorOutputStream)
+    compressorOutputStream.close()
+    inputStream.close()
 
     assert newFileCompressed.exists()
     assert newFileCompressed.size() > 0
@@ -197,6 +195,11 @@ class AnalysisService {
   static JSONArray generateResult(String gmtData,Map meanMap) {
     JSONArray outputArray = new JSONArray()
     def geneList = gmtData.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")}
+
+//    println "mean map"
+//    println new JSONObject(meanMap) as JSON
+//    println "gene set names"
+//    println meanMap.geneSetNames
     for(List gene in geneList){
         def keyIndex = meanMap.geneSetNames.findIndexOf { it==gene[0]}
         keyIndex = keyIndex >=0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it=="${gene[0]} (${gene[1]})" }
