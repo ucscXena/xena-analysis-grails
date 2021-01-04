@@ -9,6 +9,7 @@ import org.apache.commons.compress.compressors.CompressorInputStream
 import org.apache.commons.compress.compressors.CompressorOutputStream
 import org.apache.commons.compress.compressors.CompressorStreamFactory
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.utils.IOUtils
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
@@ -58,14 +59,14 @@ class AnalysisService {
     println "newNameDecomprssed: '${newNameDecompressed}'"
 
     // delete ot make sure it doesn't exist
-    assert newFileCompressed.delete()
-    assert newFileDecompressed.delete()
+    assert !newFileCompressed.exists() || newFileCompressed.delete()
+    assert !newFileDecompressed.exists() || newFileDecompressed.delete()
 
 //    // copy file
 //    newFileCompressed << originalFile.bytes
 
     // unzip to new location
-    GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(newFileCompressed))
+    GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(originalFile))
 //    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream))
 
     FileOutputStream fileOutputStream = new FileOutputStream(newFileDecompressed)
@@ -94,13 +95,15 @@ class AnalysisService {
 
 
     FileOutputStream compressedFileOutputStream = new FileOutputStream(newFileCompressed)
-    CompressorOutputStream gzippedOut = new CompressorStreamFactory()
+//    CompressorOutputStream cout = new GzipCompressorOutputStream(compressedFileOutputStream);
+    CompressorOutputStream compressorOutputStream = new CompressorStreamFactory()
       .createCompressorOutputStream(CompressorStreamFactory.GZIP, compressedFileOutputStream)
 //    ArchiveInputStream input = new ArchiveStreamFactory()
 //      .createArchiveInputStream(new FileInputStream(newFileDecompressed));
-    CompressorInputStream input = new CompressorStreamFactory()
-      .createCompressorInputStream(new FileInputStream(newFileDecompressed))
-    IOUtils.copy(input,gzippedOut)
+//    CompressorInputStream input = new CompressorStreamFactory()
+//      .createCompressorInputStream(new FileInputStream(newFileDecompressed))
+    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(newFileCompressed))
+    IOUtils.copy(inputStream,compressorOutputStream)
 
     assert newFileCompressed.exists()
     assert newFileCompressed.size() > 0
