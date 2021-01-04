@@ -215,7 +215,9 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     JSONArray samplesArray = new JSONArray("['TCGA-FA-8693-01','TCGA-G8-6909-01','TCGA-VB-A8QN-01']")
 
     when:
-    String outputFilter = AnalysisService.filterTpmForSamples(inputTpmFile.text,samplesArray)
+    String outputFilter = AnalysisService.filterTpmForSamples(inputTpmFile,samplesArray)
+    println "outputFiler"
+    println outputFilter
 
     then:
     assert outputFilter == outputTpmFile.text

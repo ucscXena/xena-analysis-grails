@@ -81,7 +81,7 @@ class AnalysisService {
 //    tempFile.deleteOnExit()
 
     // filter for samples
-    String filteredTpmSampleString = filterTpmForSamples( newFileDecompressed.text,samples)
+    String filteredTpmSampleString = filterTpmForSamples( newFileDecompressed,samples)
 //    assert newFileDecompressed.delete()
     newFileDecompressed.write ""
 
@@ -369,11 +369,37 @@ class AnalysisService {
   }
 
   @NotTransactional
-  static String filterTpmForSamples(String originalTpmFile, JSONArray samplesArray) {
+  static String filterTpmForSamples(File originalTpmFile, JSONArray samplesArray) {
     if(samplesArray.size()==0) return originalTpmFile
 
-    return null
+    List<String> sampleList = samplesArray as List<String>
 
+    String tpmText = originalTpmFile.text
+
+    List<String> tpmEntries = tpmText.split("\n") as List<String>
+
+    String[] availableSamples = tpmEntries.get(0).split("\t")
+    List<String> availableSamplesList = (availableSamples as List).subList(0,availableSamples.length)
+
+    // find columns with matching samples
+    List<String> intersectingLists = sampleList.intersect(availableSamplesList)
+    List<Integer> matchingIndices = []
+    intersectingLists.eachWithIndex { String entry, int index ->
+      matchingIndices.add(availableSamplesList.indexOf(entry))
+    }
+
+    // for each line in tpmEntries, write out columns
+    StringBuffer stringBuffer = new StringBuffer()
+    for(String tpmEntry in tpmEntries){
+      String[] inputValues = tpmEntry.split("\t")
+      List<String> outputArray = [inputValues[0]]
+      matchingIndices.each {
+        outputArray.add(inputValues[it])
+      }
+      stringBuffer.append(outputArray.join("\t")).append("\n")
+    }
+
+    return stringBuffer.toString()
 
   }
 }
