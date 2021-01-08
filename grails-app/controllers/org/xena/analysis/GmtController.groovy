@@ -35,7 +35,15 @@ class GmtController {
     }
     println "gmtlist ${gmtList.name}"
     JSONArray jsonArray = new JSONArray()
-    gmtList.each({ jsonArray.add(it.name) })
+    gmtList.each {
+      def obj = new JSONObject()
+      obj.name = it.name
+      obj.geneCount = it.geneCount
+      obj.hash = it.hash
+      obj.id = it.id
+      obj.method = it.method
+      jsonArray.add(obj)
+    }
     render jsonArray.unique() as JSON
   }
 
@@ -50,15 +58,18 @@ class GmtController {
     String method = json.method
     String gmtname = json.gmtname
     String gmtDataHash = json.gmtdata.md5()
+    def geneCount = json.gmtdata.split("\n").findAll{it.split("\t").size()>2 }.size()
+
+
     println "stroring with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
       if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method,geneCount: geneCount)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method,geneCount: geneCount)
       }
       gmt.save(failOnError: true, flush: true)
     }

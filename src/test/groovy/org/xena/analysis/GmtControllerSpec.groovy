@@ -114,7 +114,7 @@ class GmtControllerSpec extends Specification implements ControllerUnitTest<GmtC
 
     then: "A model is populated containing the domain instance"
     response.status == OK.value()
-    response.json == [:]
+    response.json == [geneCount:0]
   }
 
   void "Test the update action with a null instance"() {
