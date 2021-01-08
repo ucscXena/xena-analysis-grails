@@ -6,6 +6,7 @@ class Gmt {
   String method
   String hash
   String data
+  int geneCount
 
   static constraints = {
     name blank: false, unique: true
