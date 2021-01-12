@@ -15,7 +15,7 @@ class GmtController {
   GmtService gmtService
 
   static responseFormats = ['json', 'xml']
-  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyzeGmt: "POST"]
 
   def index(Integer max,String method) {
 
@@ -23,6 +23,53 @@ class GmtController {
     println "max: ${max}"
 
       respond gmtService.list(params)
+  }
+
+  /**
+   * Loads all TPM files for cohorts
+   */
+  def loadAllCohorts(){
+    def json = request.JSON
+    def requestedCohorts = json.cohorts as JSONObject
+    def cohortNames = requestedCohorts.name  as List<String>
+    def foundCohortList = Cohort.findAllByNameInList(cohortNames) as List<Cohort>
+    def foundCohortNames = foundCohortList.name
+
+    // add any cohorts that are not yet found
+    def missingCohortNameList = cohortNames - foundCohortNames
+    missingCohortNameList.eachParallel {
+      Cohort cohort = new Cohort(
+        name: it,
+        remoteUrl: requestedCohorts[it],
+      )
+      if(! new File(cohort.localFile).exists() ){
+         // download to local file
+      }
+      cohort.save(failOnError: true,flush:true)
+    }
+    foundCohortList.eachParallel { Cohort it ->
+      if(! new File(it.localFile).exists()){
+        // download to local file
+      }
+    }
+
+
+
+  }
+
+  /**
+   * Analyzes loaded GMT files
+   */
+  def analyzeGmt(){
+    def json = request.JSON
+    String method = json.method
+    String gmtname = json.gmtname
+    println "analyzing with method '${method}' and gmt name '${gmtname}'"
+    Gmt gmt = Gmt.findByName(gmtname)
+    if (gmt == null) {
+      throw new RuntimeException("Gmt file not found for ${gmtname}")
+    }
+
   }
 
   def names(String method) {

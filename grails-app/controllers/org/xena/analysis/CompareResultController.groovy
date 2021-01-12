@@ -33,7 +33,7 @@ class CompareResultController {
 
   JSONObject resultMarshaller(CompareResult result) {
     JSONObject jsonObject = new JSONObject()
-    jsonObject.genesets = dataObject.data as List<Float>
+    jsonObject.genesets = dataObject.localFile as List<Float>
     return jsonObject
   }
 
@@ -116,9 +116,9 @@ class CompareResultController {
     Tpm tpm = Tpm.findByCohort(cohort)
     if(!tpm){
       File tpmFile = analysisService.getOriginalTpmFile(cohort,tpmUrl)
-      tpm = new Tpm(cohort: cohort,url: tpmUrl,data: tpmFile.absolutePath).save()
+      tpm = new Tpm(cohort: cohort,url: tpmUrl, localFile: tpmFile.absolutePath).save()
     }
-    assert tpm.data.length()>0
+    assert tpm.localFile.length()>0
     return cohort
   }
 

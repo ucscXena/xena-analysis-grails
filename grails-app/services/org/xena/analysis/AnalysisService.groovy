@@ -1,6 +1,6 @@
 package org.xena.analysis
 
-import grails.converters.JSON
+
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import org.apache.commons.compress.compressors.CompressorOutputStream
@@ -180,12 +180,12 @@ class AnalysisService {
       tpm = new Tpm(
         cohort: cohort,
         url: tpmUrl,
-        data: tpmFile.absolutePath
+        localFile: tpmFile.absolutePath
       ).save(failOnError: true, flush: true)
       cohort.tpm = tpm
       cohort.save()
     } else {
-      assert new File(tpm.data).exists()
+      assert new File(tpm.localFile).exists()
       // nothign to do?
     }
     return tpmFile
@@ -259,7 +259,7 @@ class AnalysisService {
 
     def values = []
     input.data.eachWithIndex { def entry, int i ->
-      def converted = entry.data.collect { Float.parseFloat(it)}
+      def converted = entry.localFile.collect { Float.parseFloat(it)}
       values.add(converted )
     }
     return values
