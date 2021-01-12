@@ -12,6 +12,9 @@ import static org.springframework.http.HttpStatus.*
 @ReadOnly
 class GmtController {
 
+  private globalMean
+  private globalVariance
+
   GmtService gmtService
   AnalysisService analysisService
 
@@ -59,7 +62,11 @@ class GmtController {
     // assert that the input matches the output cohort names
     assert cohortNames.sort() == Cohort.all.name.sort()
 
-    Tpm globalTpm = analysisService.assembleTpmForAllCohorts()
+    def stats = analysisService.calculateMeanAndVariance()
+    globalMean = stats[0]
+    globalVariance = stats[1]
+
+//    analysisService.createZScores(globalMean,globalVariance)
 
   }
 

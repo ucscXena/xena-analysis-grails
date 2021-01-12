@@ -408,9 +408,42 @@ class AnalysisService {
 
   }
 
-  Tpm assembleTpmForAllCohorts() {
-    Cohort.all.each {
 
-    }
+  /**
+   * Extract TPM
+   * @param cohort
+   * @return
+   */
+  Collection<Double> getTpmData(Cohort cohort) {
+    // TODO:
+    return []
   }
+
+  /**
+   * TODO: calculate mean and variance
+   */
+  def calculateMeanAndVariance() {
+    int size = 0
+    List<Double> inputData = []
+
+    // TODO: / populate inputData
+    Cohort.all.eachParallel {
+      inputData.addAll( getTpmData( it))
+    }
+
+    double total = inputData.sumParallel()
+    double mean = total /  inputData.size()
+
+    double variance = 0
+    inputData.eachParallel {
+      variance += Math.pow(it - mean,2.0)
+    }
+    variance = variance / inputData.size()
+    return [mean,variance]
+  }
+
+//  // TODO:
+//  def createZScores(double mean, double variance) {
+//    null
+//  }
 }
