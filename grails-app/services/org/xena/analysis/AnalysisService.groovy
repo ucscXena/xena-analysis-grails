@@ -1,6 +1,6 @@
 package org.xena.analysis
 
-
+import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import org.apache.commons.compress.compressors.CompressorOutputStream
@@ -31,6 +31,23 @@ class AnalysisService {
     String name  = originalFile.getName()
     int suffixIndex = name.indexOf(TPM_SUFFIX)
     return root + "/" + name.substring(0,suffixIndex) + sampleHash + TPM_SUFFIX
+  }
+
+
+  static String generateTpmLocalUrl(JSONObject cohortObject){
+    println "cohort to update"
+    println cohortObject.toString()
+//    return `${selectedCohort['geneExpression'].host}/download/${selectedCohort['geneExpression'].dataset}.gz`
+
+    return "${cohortObject['gene expression'].host}/download/${cohortObject['gene expression'].dataset}.gz"
+  }
+
+  static String generateTpmRemoteUrl(JSONObject cohortObject){
+    println "cohort to update"
+    println cohortObject.toString()
+//    return `${selectedCohort['geneExpression'].host}/download/${selectedCohort['geneExpression'].dataset}.gz`
+
+    return "${cohortObject['gene expression'].host}/download/${cohortObject['gene expression'].dataset}.gz"
   }
 
   File getTpmFileForSamples(File originalFile, JSONArray samples) {
