@@ -407,4 +407,10 @@ class AnalysisService {
     return stringBuffer.toString()
 
   }
+
+  Tpm assembleTpmForAllCohorts() {
+    Cohort.all.each {
+
+    }
+  }
 }

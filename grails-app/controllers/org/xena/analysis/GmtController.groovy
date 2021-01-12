@@ -59,6 +59,8 @@ class GmtController {
     // assert that the input matches the output cohort names
     assert cohortNames.sort() == Cohort.all.name.sort()
 
+    Tpm globalTpm = analysisService.assembleTpmForAllCohorts()
+
   }
 
   /**
