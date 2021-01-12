@@ -15,7 +15,7 @@ class Cohort {
 
   static constraints = {
     name blank: false,nullable: false
-    remoteUrl
+//    remoteUrl
 //    tpm nullable: true
   }
 

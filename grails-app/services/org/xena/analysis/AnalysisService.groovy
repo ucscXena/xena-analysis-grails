@@ -14,7 +14,7 @@ import org.grails.web.json.JSONObject
 class AnalysisService {
 
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
-  final String TPM_DIRECTORY = "data/tpm/"
+  final static String TPM_DIRECTORY = "data/tpm/"
 
   @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {
