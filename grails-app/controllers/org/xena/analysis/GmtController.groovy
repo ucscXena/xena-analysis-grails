@@ -13,6 +13,7 @@ import static org.springframework.http.HttpStatus.*
 class GmtController {
 
   GmtService gmtService
+  AnalysisService analysisService
 
   static responseFormats = ['json', 'xml']
   static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyzeGmt: "POST"]
@@ -44,16 +45,19 @@ class GmtController {
       )
       if(! new File(cohort.localFile).exists() ){
          // download to local file
+        analysisService.getOriginalTpmFile(it)
       }
       cohort.save(failOnError: true,flush:true)
     }
     foundCohortList.eachParallel { Cohort it ->
       if(! new File(it.localFile).exists()){
-        // download to local file
+        analysisService.getOriginalTpmFile(it)
       }
     }
 
-
+    // assert that all cohorts are there
+    // assert that the input matches the output cohort names
+    assert cohortNames.sort() == Cohort.all.name.sort()
 
   }
 

@@ -163,32 +163,37 @@ class AnalysisService {
 
   }
 
-  File getOriginalTpmFile(Cohort cohort, String tpmUrl){
+  Cohort getOriginalTpmFile(Cohort cohort){
 
-    Tpm tpm = Tpm.findByCohort(cohort)
+//    Tpm tpm = Tpm.findByCohort(cohort)
+    if(cohort.localFile !=null && new File(cohort.localFile).exists() && cohort.remoteUrl == tpmUrl){
+      println "is good ${cohort.name}"
+      return cohort
+    }
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File tpmFile = new File(TPM_DIRECTORY + mangledCohortName + ".tpm.gz")
     println "tpm file ${tpmFile}"
     println "tpm file size ${tpmFile.size()}"
-    if (tpm == null) {
-      println "tpm is null, so downloading"
-      if (!tpmFile.exists() || tpmFile.size() == 0) {
-        def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
-        out << tpmUrl.toURL().openStream()
-        out.close()
-      }
-      tpm = new Tpm(
-        cohort: cohort,
-        url: tpmUrl,
-        localFile: tpmFile.absolutePath
-      ).save(failOnError: true, flush: true)
-      cohort.tpm = tpm
-      cohort.save()
-    } else {
-      assert new File(tpm.localFile).exists()
-      // nothign to do?
+//    if (tpm == null) {
+    println "tpm is null, so downloading"
+    if (!tpmFile.exists() || tpmFile.size() == 0) {
+      def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
+      out << tpmUrl.toURL().openStream()
+      out.close()
     }
-    return tpmFile
+    cohort.localFile = tpmFile.absolutePath
+//      tpm = new Tpm(
+//        cohort: cohort,
+//        url: tpmUrl,
+//        localFile: tpmFile.absolutePath
+//      ).save(failOnError: true, flush: true)
+//      cohort.tpm = tpm
+      cohort.save(failOnError: true, flush:true)
+//  else {
+      assert new File(cohort.localFile).exists()
+      // nothign to do?
+//    }
+//    return tpmFile
 
   }
 
