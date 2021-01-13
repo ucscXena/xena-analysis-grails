@@ -80,17 +80,18 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
         List<String> samples = []
         List<String> genes = AnalysisService.getGenesFromTpm(fileMap.iterator().next().getValue())
         // map<gene, map<sample,value>>
-        Map<String,Map<String,Double>> cohortData = [:]
+//        Map<String,Map<String,Double>> cohortData = [:]
+        List<TpmData> cohortData  = []
 
         cohorts.keySet().each{
 //          JSONObject cohortObject = cohorts.get(it)
-          Map<String,Double> tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
+          TpmData tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
           // TODO: construct the TPM file
-          cohortData.put(it,tpmData)
+          cohortData.add(tpmData)
         }
 
         // write out TPM file
-        AnalysisService.writeTpmAllFile(cohortData,allTpmFile)
+        AnalysisService.writeTpmAllFile(cohortData,allTpmFile,genes)
       }
 
       then:

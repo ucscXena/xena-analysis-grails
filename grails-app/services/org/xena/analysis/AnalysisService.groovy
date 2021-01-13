@@ -48,15 +48,41 @@ class AnalysisService {
     return fullList.subList(1,fullList.size())
   }
 
-  static Map<String,Double> getTpmDataFromFile(File file,List<String> genes){
-    TreeMap<String,TreeMap<String,Double>> tpmMap = new TreeMap<>()
-
-
-    return tpmMap
+  static TpmData getTpmDataFromFile(File file,List<String> genes){
+    TpmData tpmData = new TpmData()
+    List<String> samplesIndex = []
+    int index = 0
+    file.text.splitEachLine("\t"){
+      if(index==0){
+        samplesIndex = it.subList(1,it.size())
+        tpmData.setSamples(samplesIndex)
+      }
+      else{
+        String gene = it[0]
+        tpmData.geneData.put(gene,it.subList(1,it.size()))
+      }
+      ++index
+    }
+    assert genes.size()==tpmData.geneData.size()
+    return tpmData
   }
 
-  static void writeTpmAllFile(Map<String, Map<String, Double>> stringMapMap, File file) {
+  static List<String> getAllSamples(List<TpmData> tpmDataList){
 
+  }
+
+  static void writeTpmAllFile(List<TpmData> tpmDataList, File file,List<String> genes) {
+    List<String> samples = getAllSamples(tpmDataList)
+    file.write(samples.join("\t"))
+    file.write("\n")
+
+    genes.each { String gene ->
+      tpmDataList.each {TpmData tpmData ->
+        def sampleData = tpmData.geneData.get(gene)
+        file.write(sampleData.join("\t"))
+      }
+      file.write("\n")
+    }
   }
 
 
