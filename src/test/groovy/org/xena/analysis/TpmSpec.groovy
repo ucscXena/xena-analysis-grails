@@ -78,29 +78,56 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
 
         List<String> genes = AnalysisService.getGenesFromTpm(fileMap.iterator().next().getValue())
         println "# of genes to process ${genes.size()} . . . ${genes.subList(0,10).join("\t")}"
+
+//        // lets process the samples first
+//        List<String> allSamples = []
+//        fileMap.values().each {File tpmFile ->
+//        }
+//        allTpmFile.write(" \t"+allSamples.join("\t"))
+//
+//
+//
+//
+//
+//        // process gene by gene
+//        genes.each {
+//          // process each file
+//        }
+//
+//
+
         // map<gene, map<sample,value>>
 //        Map<String,Map<String,Double>> cohortData = [:]
-        List<TpmData> cohortData  = []
-
-        cohorts.keySet().each{
-          println "memory 1"
-          System.gc()
-          OutputHandler.printMemory()
-          TpmData tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
-          println "memory 2"
-          System.gc()
-          OutputHandler.printMemory()
-          println "assembling TPM file ${it}"
-          // TODO: construct the TPM file
-//          cohortData.add(tpmData)
-          println "memory 3"
-          System.gc()
-          OutputHandler.printMemory()
-        }
-
-        // write out TPM file
-        println "writing TPM data to file"
-        AnalysisService.writeTpmAllFile(cohortData,allTpmFile,genes)
+//        List<File> cohortDataFiles  = []
+//
+//        cohorts.keySet().eachWithIndex{ def it , int index ->
+//          println "memory 1"
+//          System.gc()
+//          OutputHandler.printMemory()
+//
+//          String tpmLocalFile = "${AnalysisService.TPM_DIRECTORY}
+//          File tpmDataFile = new File()
+//            TpmData tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
+//          FileOutputStream fileOutputStream = new FileOutputStream(tpmDataFile)
+//          ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
+//          objectOutputStream.writeObject(tpmData)
+//          objectOutputStream.close()
+//          cohortDataFiles.add(tpmDataFile)
+//
+//          println "memory 2"
+//          System.gc()
+//          OutputHandler.printMemory()
+//          println "assembling TPM file ${it}"
+//          // TODO: construct the TPM file
+////          cohortData.add(tpmData)
+//          println "memory 3"
+//          System.gc()
+//          OutputHandler.printMemory()
+//        }
+//
+//        // write out TPM file
+//        println "writing TPM data to file"
+//        AnalysisService.writeTpmAllFile(cohortDataFiles,allTpmFile,genes)
       }
 
       then:

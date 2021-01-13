@@ -67,28 +67,46 @@ class AnalysisService {
     return tpmData
   }
 
-  static List<String> getAllSamples(List<TpmData> tpmDataList){
+  static List<String> getAllSamples(List<File> tpmSerializedDataFileList){
     List<String> samples = []
-    tpmDataList.each {TpmData tpmData ->
-      tpmDataList.addAll(tpmData.samples)
+    tpmSerializedDataFileList.each {File tpmDataFile->
+      TpmData tpmData = getSerializedTpmDataFromFile(tpmDataFile)
+      samples.addAll(tpmData.samples)
     }
     return samples
   }
 
-  static void writeTpmAllFile(List<TpmData> tpmDataList, File file,List<String> genes) {
-    List<String> samples = getAllSamples(tpmDataList)
-    println "samples list ${samples.size()} . . . .${samples.subList(0,20).join("\t")}"
-    file.write(samples.join("\t"))
-    file.write("\n")
+  static TpmData getSerializedTpmDataFromFile(File file){
+    FileInputStream fis = new FileInputStream(file);
+    ObjectInputStream ois = new ObjectInputStream(fis);
+    TpmData tpmData = (TpmData) ois.readObject();
+    ois.close()
+    return tpmData
+  }
 
-    genes.each { String gene ->
-      println "writing gene ${gene}"
-      tpmDataList.each {TpmData tpmData ->
-        def sampleData = tpmData.geneData.get(gene)
-        file.write(sampleData.join("\t"))
-      }
-      file.write("\n")
-    }
+  static void writeTpmAllFile(List<File> tpmSerializedDataFileList, File outputAllTpmFile,List<String> genes) {
+    println "memory pre-samples"
+    System.gc()
+    OutputHandler.printMemory()
+    List<String> samples = getAllSamples(tpmSerializedDataFileList)
+    println "got samples"
+    System.gc()
+    OutputHandler.printMemory()
+    println "samples list ${samples.size()} . . . .${samples.subList(0,20).join("\t")}"
+    outputAllTpmFile.write(samples.join("\t"))
+    outputAllTpmFile.write("\n")
+    println "wrote samples "
+    System.gc()
+    OutputHandler.printMemory()
+
+//    genes.each { String gene ->
+//      println "writing gene ${gene}"
+//      tpmDataFileList.each {TpmData tpmData ->
+//        def sampleData = tpmData.geneData.get(gene)
+//        file.write(sampleData.join("\t"))
+//      }
+//      file.write("\n")
+//    }
   }
 
 
