@@ -34,21 +34,20 @@ class AnalysisService {
   }
 
 
-  static String generateTpmLocalUrl(JSONObject cohortObject){
-    println "cohort to update"
-    println cohortObject.toString()
-//    return `${selectedCohort['geneExpression'].host}/download/${selectedCohort['geneExpression'].dataset}.gz`
-
-    return "${cohortObject['gene expression'].host}/download/${cohortObject['gene expression'].dataset}.gz"
+  static String generateTpmLocalUrl(String cohortName){
+    return cohortName.replaceAll("[ |\\(|\\)]", "_")
   }
 
   static String generateTpmRemoteUrl(JSONObject cohortObject){
-    println "cohort to update"
-    println cohortObject.toString()
-//    return `${selectedCohort['geneExpression'].host}/download/${selectedCohort['geneExpression'].dataset}.gz`
-
     return "${cohortObject['gene expression'].host}/download/${cohortObject['gene expression'].dataset}.gz"
   }
+
+  static List<String> getGenesFromTpm(File inputTpmFile) {
+    String inputText = inputTpmFile.text
+    def fullList = inputText.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")[0]}
+    return fullList.subList(1,fullList.size())
+  }
+
 
   File getTpmFileForSamples(File originalFile, JSONArray samples) {
     if(samples==null || samples.size()==0) return originalFile
@@ -118,6 +117,18 @@ class AnalysisService {
     return newFileCompressed
   }
 
+  static File decompressFile(File localCompressedTpmFile, File unzippedTpmFile) {
+    GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(localCompressedTpmFile))
+    FileOutputStream fileOutputStream = new FileOutputStream(unzippedTpmFile)
+    IOUtils.copy(gzipInputStream,fileOutputStream)
+    gzipInputStream.close()
+    fileOutputStream.close()
+
+    assert unzippedTpmFile.exists()
+    assert unzippedTpmFile.size()>0
+    return unzippedTpmFile
+  }
+
 
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl,JSONArray samples){
 
@@ -178,6 +189,12 @@ class AnalysisService {
     assert errorText.contains("Loading required package: Biobase")
     return 0
 
+  }
+
+  static def retrieveTpmFile(File tpmFile,String tpmUrl){
+    def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
+    out << tpmUrl.toURL().openStream()
+    out.close()
   }
 
   Cohort getOriginalTpmFile(Cohort cohort){
