@@ -45,15 +45,16 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
       String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
       File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
       println "abs path: ${allTpmFile.absolutePath}"
+      def cohorts = new JSONObject(new URL(cohortUrl).text)
+      println "keys size: ${cohorts.size()}"
 
-      when:
+    when:
       if(!allTpmFile.exists() || allTpmFile.size()==0 && allTpmFile.text.split("\n").size() < 5000 ){
 
         // cohort name, local file
         Map<String,File> fileMap = new TreeMap<>()
 
         allTpmFile.write("")
-        def cohorts = new JSONObject(new URL(cohortUrl).text)
         cohorts.keySet().each{
           JSONObject cohortObject = cohorts.get(it)
 //          println "cohort object ${cohortObject.toString()}"
