@@ -64,33 +64,41 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
           println "local file name ${localFileName}"
           File localCompressedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm.gz")
           // TODO: if file exists then note, if not then download
-          if(!allTpmFile.exists() || allTpmFile.size()==0){
+          if(!localCompressedTpmFile.exists() || localCompressedTpmFile.size()==0){
             allTpmFile.write("")
+            println "retrieving remote file"
             AnalysisService.retrieveTpmFile(localCompressedTpmFile,AnalysisService.generateTpmRemoteUrl(cohortObject))
+          }
+          else{
+            println "file exists"
           }
           File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
           if(!unzippedTpmFile.exists() || unzippedTpmFile.size()==0) {
             unzippedTpmFile.delete()
             AnalysisService.decompressFile(localCompressedTpmFile,unzippedTpmFile)
+            println "decompressing file ${unzippedTpmFile.absolutePath}"
+          }
+          else{
+            println "decompressed file exists ${unzippedTpmFile.absolutePath}"
           }
           fileMap.put(it,unzippedTpmFile)
-//          final String allTpmFile = "${AnalysisService.TPM_DIRECTORY}/TCGA_ALL.tpm"
         }
 
-        List<String> samples = []
         List<String> genes = AnalysisService.getGenesFromTpm(fileMap.iterator().next().getValue())
+        println "# of genes to process ${genes.size()} . . . ${genes.subList(0,10).join("\t")}"
         // map<gene, map<sample,value>>
 //        Map<String,Map<String,Double>> cohortData = [:]
         List<TpmData> cohortData  = []
 
         cohorts.keySet().each{
-//          JSONObject cohortObject = cohorts.get(it)
           TpmData tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
+          println "assembling TPM file ${it}"
           // TODO: construct the TPM file
           cohortData.add(tpmData)
         }
 
         // write out TPM file
+        println "writing TPM data to file"
         AnalysisService.writeTpmAllFile(cohortData,allTpmFile,genes)
       }
 

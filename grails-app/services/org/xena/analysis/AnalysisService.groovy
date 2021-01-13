@@ -68,15 +68,21 @@ class AnalysisService {
   }
 
   static List<String> getAllSamples(List<TpmData> tpmDataList){
-
+    List<String> samples = []
+    tpmDataList.each {TpmData tpmData ->
+      tpmDataList.addAll(tpmData.samples)
+    }
+    return samples
   }
 
   static void writeTpmAllFile(List<TpmData> tpmDataList, File file,List<String> genes) {
     List<String> samples = getAllSamples(tpmDataList)
+    println "samples list ${samples.size()} . . . .${samples.subList(0,20).join("\t")}"
     file.write(samples.join("\t"))
     file.write("\n")
 
     genes.each { String gene ->
+      println "writing gene ${gene}"
       tpmDataList.each {TpmData tpmData ->
         def sampleData = tpmData.geneData.get(gene)
         file.write(sampleData.join("\t"))
