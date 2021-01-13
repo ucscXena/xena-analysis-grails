@@ -15,6 +15,7 @@ class AnalysisService {
 
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final static String TPM_DIRECTORY = "data/tpm/"
+  final static String ALL_TPM_FILE_STRING = "${TPM_DIRECTORY}/TCGA_ALL.tpm"
 
   @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {

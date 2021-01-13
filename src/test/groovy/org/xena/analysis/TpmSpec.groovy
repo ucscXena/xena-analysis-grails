@@ -7,7 +7,6 @@ import spock.lang.Specification
 
 class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
 
-  final String allTpmFile = "${AnalysisService.TPM_DIRECTORY}/TCGA_ALL.tpm"
 
   def setup() {
     }
@@ -44,7 +43,7 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
   void "generate global TPM file"() {
       given:
       String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
-      File allTpmFile  = new File(this.allTpmFile)
+      File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
       println "abs path: ${allTpmFile.absolutePath}"
 
       when:
