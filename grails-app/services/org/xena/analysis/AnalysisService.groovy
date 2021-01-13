@@ -1,6 +1,5 @@
 package org.xena.analysis
 
-import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import org.apache.commons.compress.compressors.CompressorOutputStream

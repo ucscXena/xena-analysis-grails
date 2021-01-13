@@ -55,30 +55,23 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
         allTpmFile.write("")
         def cohorts = new JSONObject(new URL(cohortUrl).text)
         cohorts.keySet().each{
-          println "key ${it}"
           JSONObject cohortObject = cohorts.get(it)
 //          println "cohort object ${cohortObject.toString()}"
           // TODO: get local name for EACH TPM file
           String localFileName = AnalysisService.generateTpmLocalUrl(it)
-          println "local file name ${localFileName}"
           File localCompressedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm.gz")
           // TODO: if file exists then note, if not then download
           if(!localCompressedTpmFile.exists() || localCompressedTpmFile.size()==0){
             allTpmFile.write("")
-            println "retrieving remote file"
-            AnalysisService.retrieveTpmFile(localCompressedTpmFile,AnalysisService.generateTpmRemoteUrl(cohortObject))
-          }
-          else{
-            println "file exists"
+            String remoteurl = AnalysisService.generateTpmRemoteUrl(cohortObject)
+            println "retrieving remote file ${remoteurl} for ${it}"
+            AnalysisService.retrieveTpmFile(localCompressedTpmFile,remoteurl)
           }
           File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
           if(!unzippedTpmFile.exists() || unzippedTpmFile.size()==0) {
             unzippedTpmFile.delete()
             AnalysisService.decompressFile(localCompressedTpmFile,unzippedTpmFile)
             println "decompressing file ${unzippedTpmFile.absolutePath}"
-          }
-          else{
-            println "decompressed file exists ${unzippedTpmFile.absolutePath}"
           }
           fileMap.put(it,unzippedTpmFile)
         }
@@ -90,10 +83,19 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
         List<TpmData> cohortData  = []
 
         cohorts.keySet().each{
+          println "memory 1"
+          System.gc()
+          OutputHandler.printMemory()
           TpmData tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
+          println "memory 2"
+          System.gc()
+          OutputHandler.printMemory()
           println "assembling TPM file ${it}"
           // TODO: construct the TPM file
-          cohortData.add(tpmData)
+//          cohortData.add(tpmData)
+          println "memory 3"
+          System.gc()
+          OutputHandler.printMemory()
         }
 
         // write out TPM file
