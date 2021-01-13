@@ -55,6 +55,10 @@ class AnalysisService {
     return tpmMap
   }
 
+  static void writeTpmAllFile(Map<String, Map<String, Double>> stringMapMap, File file) {
+
+  }
+
 
   File getTpmFileForSamples(File originalFile, JSONArray samples) {
     if(samples==null || samples.size()==0) return originalFile

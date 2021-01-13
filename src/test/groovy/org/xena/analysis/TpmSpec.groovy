@@ -88,6 +88,9 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
           // TODO: construct the TPM file
           cohortData.put(it,tpmData)
         }
+
+        // write out TPM file
+        AnalysisService.writeTpmAllFile(cohortData,allTpmFile)
       }
 
       then:
