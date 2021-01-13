@@ -51,7 +51,7 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
       if(!allTpmFile.exists() || allTpmFile.size()==0 && allTpmFile.text.split("\n").size() < 5000 ){
 
         // cohort name, local file
-        Map<String,File> fileMap = new HashMap<>()
+        Map<String,File> fileMap = new TreeMap<>()
 
         allTpmFile.write("")
         def cohorts = new JSONObject(new URL(cohortUrl).text)
@@ -81,12 +81,12 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
         List<String> genes = AnalysisService.getGenesFromTpm(fileMap.iterator().next().getValue())
         // map<gene, map<sample,value>>
         Map<String,Map<String,Double>> cohortData = [:]
-        JSONObject firstCohort = cohorts.get(cohorts.keySet().first())
-        // TODO: get all the gene names
 
         cohorts.keySet().each{
-          JSONObject cohortObject = cohorts.get(it)
+//          JSONObject cohortObject = cohorts.get(it)
+          Map<String,Double> tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
           // TODO: construct the TPM file
+          cohortData.put(it,tpmData)
         }
       }
 

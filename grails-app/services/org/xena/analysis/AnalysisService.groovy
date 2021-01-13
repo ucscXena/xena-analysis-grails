@@ -48,6 +48,13 @@ class AnalysisService {
     return fullList.subList(1,fullList.size())
   }
 
+  static Map<String,Double> getTpmDataFromFile(File file,List<String> genes){
+    TreeMap<String,TreeMap<String,Double>> tpmMap = new TreeMap<>()
+
+
+    return tpmMap
+  }
+
 
   File getTpmFileForSamples(File originalFile, JSONArray samples) {
     if(samples==null || samples.size()==0) return originalFile
