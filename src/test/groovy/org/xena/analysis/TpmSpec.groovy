@@ -58,7 +58,7 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
         cohorts.keySet().each{
           println "key ${it}"
           JSONObject cohortObject = cohorts.get(it)
-          println "cohort object ${cohortObject.toString()}"
+//          println "cohort object ${cohortObject.toString()}"
           // TODO: get local name for EACH TPM file
           String localFileName = AnalysisService.generateTpmLocalUrl(it)
           println "local file name ${localFileName}"
