@@ -15,12 +15,22 @@ class AnalysisService {
   final String BPA_ANALYSIS_SCRIPT = "src/main/rlang/bpa-analysis.R"
   final static String TPM_DIRECTORY = "data/tpm/"
   final static String ALL_TPM_FILE_STRING = "${TPM_DIRECTORY}/TCGA_ALL.tpm"
+  // Count: 642665709
+  // Total: 7.80789496160133E8
+  final static Double TCGA_ALL_TPM_MEAN = 1.2149232255989761
+  final static Double TCGA_ALL_TPM_VARIANCE = 2.3314200093496904
+  final static Double TCGA_ALL_TPM_STD= Math.sqrt(TCGA_ALL_TPM_VARIANCE)
 
   @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {
     def inputA = jsonArray[0][i]
     def inputB = jsonArray[1][i]
     return inputA + inputB
+  }
+
+  @NotTransactional
+  static Double getZScore(Double rawScore) {
+    return (rawScore - TCGA_ALL_TPM_MEAN) / TCGA_ALL_TPM_STD
   }
 
 //  /Users/nathandunn/repositories/XENA/xena-analysis-grails/data/tpm/TCGA_Ovarian_Cancer__OV_.tpm.gz
