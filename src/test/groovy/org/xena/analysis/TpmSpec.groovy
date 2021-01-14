@@ -49,7 +49,7 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
       println "keys size: ${cohorts.size()}"
 
     when:
-      if(!allTpmFile.exists() || allTpmFile.size()==0 && allTpmFile.text.split("\n").size() < 5000 ){
+      if(!allTpmFile.exists() || allTpmFile.size()==0 ){
 
         // cohort name, local file
         Map<String,File> fileMap = new TreeMap<>()
