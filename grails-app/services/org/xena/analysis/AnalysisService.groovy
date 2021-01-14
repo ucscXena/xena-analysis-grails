@@ -29,7 +29,7 @@ class AnalysisService {
   }
 
   @NotTransactional
-  static Double getZScore(Double rawScore) {
+  static Double getGlobalTpmZScore(Double rawScore) {
     return (rawScore - TCGA_ALL_TPM_MEAN) / TCGA_ALL_TPM_STD
   }
 
