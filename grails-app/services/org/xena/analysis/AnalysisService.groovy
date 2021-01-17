@@ -200,6 +200,49 @@ class AnalysisService {
     return unzippedTpmFile
   }
 
+//  TpmGmtAnalysisJob doBpaAnalysis2(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
+    TpmGmtAnalysisJob doBpaAnalysis2(TpmGmtAnalysisJob analysisJob){
+//      Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl
+      Cohort cohort = analysisJob.cohort
+      Gmt gmt = analysisJob.gmt
+      String method = analysisJob.method
+      String tpmUrl = cohort.tpmUrl
+
+    TpmGmtResult result = TpmGmtResult.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
+    println "result found ${result} for ${cohort.name} and $gmt.name "
+    if(result) return result
+
+    File tpmFile = getOriginalTpmFile(cohort,tpmUrl)
+//    File tpmFile = getTpmFileForSamples(originalTpmFile,samples)
+
+    String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
+    File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
+    outputFile.write("")
+    runBpaAnalysis(gmtFile,tpmFile,outputFile)
+
+    long lastOutputFileSize = 0
+    int waitCount = 0
+    while ((outputFile.size() == 0 || outputFile.size() == lastOutputFileSize) && waitCount < 10) {
+      println "waiting ${outputFile.size()}"
+      sleep(2000)
+      ++waitCount
+    }
+
+
+    File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
+    result = new TpmGmtResult(
+      method: method,
+      gmt: gmt,
+      gmtHash: gmt.hash,
+      cohort: cohort,
+      result: jsonFile.text,
+    ).save(failOnError: true)
+
+      analysisJob.runState = RunState.FINISHED
+      analysisJob.save(flush: true)
+
+    return result
+  }
 
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl,JSONArray samples){
 
@@ -271,7 +314,7 @@ class AnalysisService {
   Cohort getOriginalTpmFile(Cohort cohort){
 
 //    Tpm tpm = Tpm.findByCohort(cohort)
-    if(cohort.localFile !=null && new File(cohort.localFile).exists() && cohort.remoteUrl == tpmUrl){
+    if(cohort.localTpmFile !=null && new File(cohort.localTpmFile).exists() && cohort.remoteUrl == tpmUrl){
       println "is good ${cohort.name}"
       return cohort
     }
@@ -286,7 +329,7 @@ class AnalysisService {
       out << tpmUrl.toURL().openStream()
       out.close()
     }
-    cohort.localFile = tpmFile.absolutePath
+    cohort.localTpmFile = tpmFile.absolutePath
 //      tpm = new Tpm(
 //        cohort: cohort,
 //        url: tpmUrl,
@@ -295,7 +338,7 @@ class AnalysisService {
 //      cohort.tpm = tpm
       cohort.save(failOnError: true, flush:true)
 //  else {
-      assert new File(cohort.localFile).exists()
+      assert new File(cohort.localTpmFile).exists()
       // nothign to do?
 //    }
 //    return tpmFile
@@ -369,7 +412,7 @@ class AnalysisService {
 
     def values = []
     input.data.eachWithIndex { def entry, int i ->
-      def converted = entry.localFile.collect { Float.parseFloat(it)}
+      def converted = entry.localTpmFile.collect { Float.parseFloat(it)}
       values.add(converted )
     }
     return values
@@ -547,8 +590,4 @@ class AnalysisService {
     return [mean,variance]
   }
 
-//  // TODO:
-//  def createZScores(double mean, double variance) {
-//    null
-//  }
 }

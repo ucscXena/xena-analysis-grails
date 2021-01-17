@@ -7,13 +7,13 @@ class Gmt {
   String hash
   String data
   int geneCount
-  int availableTpm // count from defaultGeneSet on initial load
+  int availableTpmCount // count from defaultGeneSet on initial load
 
   Double mean  // calculated when
   Double variance
 
   Boolean ready(){
-    return availableTpm == getLoadedResultCount() && mean != null && variance != null
+    return availableTpmCount == getLoadedResultCount() && mean != null && variance != null
   }
 
   int getLoadedResultCount(){
@@ -32,6 +32,6 @@ class Gmt {
 
   static hasMany = [
 //    results: Result,
-    results: TpmResult,
+    results: TpmGmtResult,
   ]
 }

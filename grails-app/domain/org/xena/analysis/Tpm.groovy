@@ -1,5 +1,8 @@
 package org.xena.analysis
 
+/**
+ * deprecated
+ */
 class Tpm {
 
 

@@ -33,7 +33,7 @@ class CompareResultController {
 
   JSONObject resultMarshaller(CompareResult result) {
     JSONObject jsonObject = new JSONObject()
-    jsonObject.genesets = dataObject.localFile as List<Float>
+    jsonObject.genesets = dataObject.localTpmFile as List<Float>
     return jsonObject
   }
 

@@ -17,6 +17,7 @@ class GmtController {
 
   GmtService gmtService
   AnalysisService analysisService
+  TpmAnalysisService tpmAnalysisService
 
   static responseFormats = ['json', 'xml']
   static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyzeGmt: "POST"]
@@ -46,14 +47,14 @@ class GmtController {
         name: it,
         remoteUrl: requestedCohorts[it],
       )
-      if(! new File(cohort.localFile).exists() ){
+      if(! new File(cohort.localTpmFile).exists() ){
          // download to local file
         analysisService.getOriginalTpmFile(it)
       }
       cohort.save(failOnError: true,flush:true)
     }
     foundCohortList.eachParallel { Cohort it ->
-      if(! new File(it.localFile).exists()){
+      if(! new File(it.localTpmFile).exists()){
         analysisService.getOriginalTpmFile(it)
       }
     }
@@ -133,6 +134,12 @@ class GmtController {
       }
       gmt.save(failOnError: true, flush: true)
     }
+
+    File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    gmt.availableTpmCount = cohorts.keySet().size()
+
+    tpmAnalysisService.loadTpmForGmtFiles(gmt)
 
     respond(gmt)
 
