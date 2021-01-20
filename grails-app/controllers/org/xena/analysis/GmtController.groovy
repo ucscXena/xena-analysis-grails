@@ -136,7 +136,7 @@ class GmtController {
     }
 
     File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
-    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    def cohorts = new JSONObject(new URL(CohortService.COHORT_URL).text)
     gmt.availableTpmCount = cohorts.keySet().size()
 
     tpmAnalysisService.loadTpmForGmtFiles(gmt)

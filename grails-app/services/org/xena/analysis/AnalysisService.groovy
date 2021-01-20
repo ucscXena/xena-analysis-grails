@@ -44,7 +44,7 @@ class AnalysisService {
   }
 
 
-  static String generateTpmLocalUrl(String cohortName){
+  static String generateTpmName(String cohortName){
     return cohortName.replaceAll("[ |\\(|\\)]", "_")
   }
 

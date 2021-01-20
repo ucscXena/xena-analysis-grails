@@ -22,6 +22,8 @@ class Gmt {
 
   static constraints = {
     name blank: false, unique: true
+    variance nullable: true
+    mean nullable: true
 //    hash blank: false, unique: true
 //    data blank: false, unique: true
   }

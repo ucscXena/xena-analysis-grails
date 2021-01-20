@@ -59,7 +59,7 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
           JSONObject cohortObject = cohorts.get(it)
 //          println "cohort object ${cohortObject.toString()}"
           // TODO: get local name for EACH TPM file
-          String localFileName = AnalysisService.generateTpmLocalUrl(it)
+          String localFileName = AnalysisService.generateTpmName(it)
           File localCompressedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm.gz")
           // TODO: if file exists then note, if not then download
           if(!localCompressedTpmFile.exists() || localCompressedTpmFile.size()==0){

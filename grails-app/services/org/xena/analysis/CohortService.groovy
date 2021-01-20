@@ -6,22 +6,28 @@ import org.grails.web.json.JSONObject
 @Transactional
 class CohortService {
 
-    Boolean validateCohorts() {
 
-      String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+  final static String COHORT_URL = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+
+  Boolean validateCohorts() {
+
 //      File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
-      def cohorts = new JSONObject(new URL(cohortUrl).text)
+      def cohorts = new JSONObject(new URL(COHORT_URL).text)
 //      Map<String,File> fileMap = new TreeMap<>()
       cohorts.keySet().each{
-        println "-----------------------"
-        println "processing cohort ${it}"
+//        println "-----------------------"
+//        println "processing cohort ${it}"
         Cohort cohort = Cohort.findByName(it)
 //        println "cohort found ${cohort}"
 
-        String localFileName = AnalysisService.generateTpmLocalUrl(it)
-        File testFile = new File(localFileName)
-        println "local file name ${localFileName}, ${cohort?.localTpmFile}, ${testFile.exists()}, ${testFile.size()}"
-        if(!cohort || cohort?.localTpmFile != localFileName || !testFile.exists() || testFile.size()==0){
+//        File testFile = new File(localFileName)
+        File testFile = null
+        if(cohort && cohort.localTpmFile){
+          testFile = new File(cohort.localTpmFile)
+        }
+
+        if(!cohort  || !testFile.exists() || testFile.size()==0){
+          println "local file name ${cohort}: ${cohort?.localTpmFile}, ${testFile?.exists()}, ${testFile?.size()}"
           println "Cohort not downloaded so processing"
           JSONObject cohortObject = cohorts.get(it)
           if(cohort == null ){
@@ -29,6 +35,7 @@ class CohortService {
               name: it
             )
           }
+          String localFileName = AnalysisService.generateTpmName(it)
           // TODO: get local name for EACH TPM file
           File localCompressedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm.gz")
           String remoteUrl = AnalysisService.generateTpmRemoteUrl(cohortObject)
@@ -56,12 +63,13 @@ class CohortService {
           cohort.save(failOnError: true,flush: true)
 //          fileMap.put(it,unzippedTpmFile)
         }
-        else{
-          println "Cohort exists $it"
-        }
-        println "-----------------------"
-
+//        else{
+//          println "Cohort exists $it"
+//        }
+//        println "-----------------------"
       }
+
+      println "Valid cohorts: ${Cohort.count}"
 
 
     }
