@@ -202,7 +202,7 @@ class AnalysisService {
 
 
 //  TpmGmtAnalysisJob doBpaAnalysis2(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
-    TpmGmtAnalysisJob doBpaAnalysis2(TpmGmtAnalysisJob analysisJob){
+    def doBpaAnalysis2(TpmGmtAnalysisJob analysisJob){
 
       println "doing BPA analysis with ${analysisJob}"
 
