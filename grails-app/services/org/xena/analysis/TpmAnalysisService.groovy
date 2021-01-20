@@ -13,7 +13,7 @@ import static grails.async.Promises.task
 
 
 @Slf4j
-@CompileStatic
+//@CompileStatic
 @Transactional
 class TpmAnalysisService {
 

@@ -206,13 +206,13 @@ class AnalysisService {
       Cohort cohort = analysisJob.cohort
       Gmt gmt = analysisJob.gmt
       String method = analysisJob.method
-      String tpmUrl = cohort.tpmUrl
+//      String tpmUrl = cohort.tpmUrl
 
     TpmGmtResult result = TpmGmtResult.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
     println "result found ${result} for ${cohort.name} and $gmt.name "
     if(result) return result
 
-    File tpmFile = getOriginalTpmFile(cohort,tpmUrl)
+    File tpmFile = getOriginalTpmFile(cohort)
 //    File tpmFile = getTpmFileForSamples(originalTpmFile,samples)
 
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
@@ -244,13 +244,13 @@ class AnalysisService {
     return result
   }
 
-  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl,JSONArray samples){
+  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,JSONArray samples){
 
     Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method,cohort,gmt.hash,samples.toString())
     println "result found ${result} for ${cohort.name} and $gmt.name "
     if(result) return result
 
-    File originalTpmFile = getOriginalTpmFile(cohort,tpmUrl)
+    File originalTpmFile = getOriginalTpmFile(cohort)
     File tpmFile = getTpmFileForSamples(originalTpmFile,samples)
 
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")

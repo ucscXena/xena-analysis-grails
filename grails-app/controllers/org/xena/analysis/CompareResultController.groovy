@@ -106,8 +106,8 @@ class CompareResultController {
     }
   }
 
-  Cohort findCohort(String name,String tpmUrl){
-    println "FINDING cohort: ${name}, tpmUrl: ${tpmUrl}"
+  Cohort findCohort(String name){
+    println "FINDING cohort: ${name}"
     Cohort cohort = Cohort.findByName(name)
     // TODO: get cohorts, etc.
     if(!cohort){
@@ -115,8 +115,8 @@ class CompareResultController {
     }
     Tpm tpm = Tpm.findByCohort(cohort)
     if(!tpm){
-      File tpmFile = analysisService.getOriginalTpmFile(cohort,tpmUrl)
-      tpm = new Tpm(cohort: cohort,url: tpmUrl, localFile: tpmFile.absolutePath).save()
+      File tpmFile = analysisService.getOriginalTpmFile(cohort)
+//      tpm = new Tpm(cohort: cohort,url: tpmUrl, localFile: tpmFile.absolutePath).save()
     }
     assert tpm.localFile.length()>0
     return cohort
@@ -131,15 +131,15 @@ class CompareResultController {
     String geneSetName = json.geneSetName
     String cohortNameA = json.cohortNameA
     String cohortNameB = json.cohortNameB
-    String tpmUrlA = json.tpmUrlA
-    String tpmUrlB = json.tpmUrlB
+//    String tpmUrlA = json.tpmUrlA
+//    String tpmUrlB = json.tpmUrlB
     String samples = json.samples
 
-    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${tpmUrlA},${tpmUrlB}, ${samples}"
+    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
     Gmt gmt = Gmt.findByName(geneSetName)
     println "gmt name ${gmt}"
-    Cohort cohortA = findCohort(cohortNameA,tpmUrlA)
-    Cohort cohortB = findCohort(cohortNameB,tpmUrlB)
+    Cohort cohortA = findCohort(cohortNameA)
+    Cohort cohortB = findCohort(cohortNameB)
     println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
 
 
@@ -199,9 +199,9 @@ class CompareResultController {
         log.error(e)
       }
 
-      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA,samplesA)
+      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,samplesA)
       println "result A: ${resultA}"
-      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB,samplesB)
+      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,samplesB)
       println "result B: ${resultB}"
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
