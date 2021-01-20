@@ -314,7 +314,7 @@ class AnalysisService {
   Cohort getOriginalTpmFile(Cohort cohort){
 
 //    Tpm tpm = Tpm.findByCohort(cohort)
-    if(cohort.localTpmFile !=null && new File(cohort.localTpmFile).exists() && cohort.remoteUrl == tpmUrl){
+    if(cohort.localTpmFile !=null && new File(cohort.localTpmFile).exists()){
       println "is good ${cohort.name}"
       return cohort
     }

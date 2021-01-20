@@ -135,7 +135,7 @@ class CompareResultController {
 //    String tpmUrlB = json.tpmUrlB
     String samples = json.samples
 
-    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
     Gmt gmt = Gmt.findByName(geneSetName)
     println "gmt name ${gmt}"
     Cohort cohortA = findCohort(cohortNameA)
