@@ -103,6 +103,9 @@ class GmtController {
       obj.hash = it.hash
       obj.id = it.id
       obj.method = it.method
+      obj.readyCount = it.getLoadedResultCount()
+      obj.availableCount = it.availableTpmCount
+      obj.ready = it.ready()
       jsonArray.add(obj)
     }
     render jsonArray.unique() as JSON
