@@ -132,12 +132,13 @@ class GmtController {
       else{
         gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method,geneCount: geneCount)
       }
-      gmt.save(failOnError: true, flush: true)
+      gmt.save(failOnError: true)
     }
 
-    File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
+//    File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
     def cohorts = new JSONObject(new URL(CohortService.COHORT_URL).text)
     gmt.availableTpmCount = cohorts.keySet().size()
+    gmt.save(failOnError: true, flush: true)
 
     tpmAnalysisService.loadTpmForGmtFiles(gmt)
 

@@ -205,10 +205,13 @@ class AnalysisService {
 //      Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl
       Cohort cohort = analysisJob.cohort
       Gmt gmt = analysisJob.gmt
-      String method = analysisJob.method
+      analysisJob.runState = RunState.RUNNING
+      analysisJob.lastUpdated = new Date()
+      analysisJob.save()
+//      String method = analysisJob.method
 //      String tpmUrl = cohort.tpmUrl
 
-    TpmGmtResult result = TpmGmtResult.findByMethodAndCohortAndGmtHash(method,cohort,gmt.hash)
+    TpmGmtResult result = TpmGmtResult.findByCohortAndGmtHash(cohort,gmt.hash)
     println "result found ${result} for ${cohort.name} and $gmt.name "
     if(result) return result
 
