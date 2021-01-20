@@ -200,8 +200,12 @@ class AnalysisService {
     return unzippedTpmFile
   }
 
+
 //  TpmGmtAnalysisJob doBpaAnalysis2(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
     TpmGmtAnalysisJob doBpaAnalysis2(TpmGmtAnalysisJob analysisJob){
+
+      println "doing BPA analysis with ${analysisJob}"
+
 //      Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl
       Cohort cohort = analysisJob.cohort
       Gmt gmt = analysisJob.gmt
@@ -211,12 +215,15 @@ class AnalysisService {
 //      String method = analysisJob.method
 //      String tpmUrl = cohort.tpmUrl
 
-    TpmGmtResult result = TpmGmtResult.findByCohortAndGmtHash(cohort,gmt.hash)
+    TpmGmtResult result = TpmGmtResult.findByCohortAndGmtHashAndMethod(cohort,gmt.hash,gmt.method)
     println "result found ${result} for ${cohort.name} and $gmt.name "
     if(result) return result
 
-    File tpmFile = getOriginalTpmFile(cohort)
-//    File tpmFile = getTpmFileForSamples(originalTpmFile,samples)
+    File tpmFile = new File(cohort.localTpmFile)
+
+
+    File gmtFile = File.createTempFile("gmt-${gmt.name}${gmt.hash}", ".gmt")
+    gmtFile.write(gmt.data)
 
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
@@ -233,20 +240,69 @@ class AnalysisService {
 
 
     File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
+      println "output returned $jsonFile"
     result = new TpmGmtResult(
-      method: method,
+      method: gmt.method,
       gmt: gmt,
       gmtHash: gmt.hash,
       cohort: cohort,
       result: jsonFile.text,
     ).save(failOnError: true)
 
+      println "result saved $jsonFile"
+
       analysisJob.runState = RunState.FINISHED
       analysisJob.save(flush: true)
+
+      // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
+      int possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()
+      int resultCount = TpmGmtResult.countByGmt(gmt)
+      if(resultCount == possibleCohortCount){
+        // 1. get sum and count
+        def results = getSumAndTotalForGmt(gmt)
+        def count = results[1] as Long
+        def sum = results[0]
+        double mean = sum / count
+        gmt.mean = mean
+        // 2. calculate variance
+
+        def variance = getVarianceForGmt(gmt,mean,count)
+        gmt.variance = variance
+        gmt.save(flush: true, failOnError: true)
+      }
+      // count all
 
     return result
   }
 
+  def getVarianceForGmt(Gmt gmt, double mean, long count){
+    double variance = 0
+    TpmGmtResult.findAllByGmt(gmt).each {
+      println "data: ${it.result}"
+    }
+    return variance
+  }
+
+  def getSumAndTotalForGmt(Gmt gmt){
+    double total = 0
+    long count = 0
+    TpmGmtResult.findAllByGmt(gmt).each {
+      println "data: ${it.result}"
+    }
+    return [total,count]
+  }
+
+  /**
+   * @deprecated
+   *
+   *
+   * @param cohort
+   * @param gmtFile
+   * @param gmt
+   * @param method
+   * @param samples
+   * @return
+   */
   Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,JSONArray samples){
 
     Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method,cohort,gmt.hash,samples.toString())

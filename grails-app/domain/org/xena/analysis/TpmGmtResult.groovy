@@ -15,6 +15,7 @@ class TpmGmtResult {
   }
 
   static mapping = {
-    result type:  'blob'
+//    result type:  'blob'
+    result type:  'text'
   }
 }
