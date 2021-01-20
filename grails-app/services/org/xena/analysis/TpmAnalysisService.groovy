@@ -20,6 +20,7 @@ class TpmAnalysisService {
   static lazyInit = false
 //  static List<TpmGmtAnalysisJob> analysisServiceJobs = []
   final int MAX_JOB_SIZE =  1
+  int counter = 0
 
   AnalysisService analysisService
 
@@ -30,7 +31,8 @@ class TpmAnalysisService {
 
   @Scheduled(fixedDelay = 10000L)
   void checkJobQueue() {
-    log.info("checking job queue")
+    log.info("checking job queue: "+ counter)
+    ++counter
 
     int jobsRunning = TpmGmtAnalysisJob.countByRunState(RunState.RUNNING)
     log.info("jobs running: ${jobsRunning} vs $MAX_JOB_SIZE")
@@ -45,9 +47,9 @@ class TpmAnalysisService {
     if(jobToRun){
       log.info "running job, $jobToRun.cohort.name and $jobToRun.gmt.name"
 
-      Promise p = task {
+//      Promise p = task {
         analysisService.doBpaAnalysis2(jobToRun)
-      }
+//      }
 
     }
     else{

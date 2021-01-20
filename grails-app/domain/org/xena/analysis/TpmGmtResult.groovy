@@ -8,7 +8,7 @@ class TpmGmtResult {
   Cohort cohort
 //  String url
   String gmtHash
-  String localFile // pointer to file
+//  String localFile // pointer to file
   String result
 
   static constraints = {
