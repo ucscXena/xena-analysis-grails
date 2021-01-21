@@ -6,7 +6,7 @@ class Gmt {
   String method
   String hash
   String data
-  int geneCount
+  int geneSetCount
   int availableTpmCount // count from defaultGeneSet on initial load
 
   Double mean  // calculated when

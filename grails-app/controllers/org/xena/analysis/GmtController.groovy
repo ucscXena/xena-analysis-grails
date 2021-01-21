@@ -99,7 +99,7 @@ class GmtController {
     gmtList.each {
       def obj = new JSONObject()
       obj.name = it.name
-      obj.geneCount = it.geneCount
+      obj.geneCount = it.geneSetCount
       obj.hash = it.hash
       obj.id = it.id
       obj.method = it.method
@@ -130,10 +130,10 @@ class GmtController {
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
       if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method,geneCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method,geneCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount)
       }
       gmt.save(failOnError: true)
     }

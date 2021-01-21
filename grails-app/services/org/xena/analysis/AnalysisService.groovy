@@ -210,11 +210,11 @@ class AnalysisService {
 //      Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl
       Cohort cohort = analysisJob.cohort
       Gmt gmt = analysisJob.gmt
-      TpmGmtAnalysisJob.withNewTransaction{
+//      TpmGmtAnalysisJob.withNewTransaction{
         analysisJob.runState = RunState.RUNNING
         analysisJob.lastUpdated = new Date()
         analysisJob.save(flush: true, failOnError: true)
-      }
+//      }
 //      String method = analysisJob.method
 //      String tpmUrl = cohort.tpmUrl
 
@@ -245,7 +245,7 @@ class AnalysisService {
 
     File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
       println "output returned $jsonFile"
-      TpmGmtResult.withNewTransaction {
+//      TpmGmtResult.withNewTransaction {
         result = new TpmGmtResult(
           method: gmt.method,
           gmt: gmt,
@@ -258,7 +258,7 @@ class AnalysisService {
 
         analysisJob.runState = RunState.FINISHED
         analysisJob.save(flush: true)
-      }
+//      }
 
       // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
       int possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()

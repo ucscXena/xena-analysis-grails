@@ -1,6 +1,7 @@
 package org.xena.analysis
 
 import grails.async.Promise
+import grails.async.PromiseList
 import grails.gorm.transactions.Transactional
 import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
@@ -19,7 +20,7 @@ class TpmAnalysisService {
 
   static lazyInit = false
 //  static List<TpmGmtAnalysisJob> analysisServiceJobs = []
-  final int MAX_JOB_SIZE =  5
+  final int MAX_JOB_SIZE =  1
   int counter = 0
 
   AnalysisService analysisService
