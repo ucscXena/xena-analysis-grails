@@ -19,7 +19,7 @@ class TpmAnalysisService {
 
   static lazyInit = false
 //  static List<TpmGmtAnalysisJob> analysisServiceJobs = []
-  final int MAX_JOB_SIZE =  1
+  final int MAX_JOB_SIZE =  5
   int counter = 0
 
   AnalysisService analysisService

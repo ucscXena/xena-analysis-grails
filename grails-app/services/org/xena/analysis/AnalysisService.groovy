@@ -254,7 +254,7 @@ class AnalysisService {
           result: jsonFile.text,
         ).save(failOnError: true)
 
-        println "result saved $jsonFile.text"
+//        println "result saved $jsonFile.text"
 
         analysisJob.runState = RunState.FINISHED
         analysisJob.save(flush: true)
@@ -262,21 +262,30 @@ class AnalysisService {
 
       // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
       int possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()
+      println "possible cohort count: ${possibleCohortCount}"
       int resultCount = TpmGmtResult.countByGmt(gmt)
+      println "result count: ${resultCount}"
       if(resultCount == possibleCohortCount){
         // 1. get sum and count
+        println "same"
         def results = getSumAndTotalForGmt(gmt)
         def count = results[0] as Long
         def sum = results[1] as Double
+        println "results: $results, $count, $sum"
         double mean = sum / count
         gmt.mean = mean
+        println "$gmt"
         // 2. calculate variance
 
         def variance = getVarianceForGmt(gmt,mean,count)
+        println "variance: $variance"
         gmt.variance = variance
+        println "gmt: $gmt"
         gmt.save(flush: true, failOnError: true)
+        println "saved and lfushed gmt"
       }
       // count all
+      println "returnning "
 
     return result
   }
@@ -284,10 +293,10 @@ class AnalysisService {
   def getVarianceForGmt(Gmt gmt, double mean, long count){
     double variance = 0
     TpmGmtResult.findAllByGmt(gmt).each {
-      println "data: ${it.result}"
+//      println "data: ${it.result}"
       def tpmResult = getVarianceForResult(it.result,mean,count)
       variance += tpmResult
-      println "data: ${it.result}"
+//      println "data: ${it.result}"
     }
     return variance
   }
@@ -668,6 +677,7 @@ class AnalysisService {
 
   /**
    * Extract TPM
+   * @deprecated
    * @param cohort
    * @return
    */
@@ -678,6 +688,7 @@ class AnalysisService {
 
   /**
    * TODO: calculate mean and variance
+   * @deprecated
    */
   def calculateMeanAndVariance() {
     int size = 0
