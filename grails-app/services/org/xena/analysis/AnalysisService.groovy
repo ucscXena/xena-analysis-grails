@@ -1,5 +1,6 @@
 package org.xena.analysis
 
+import grails.converters.JSON
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
 import org.apache.commons.compress.compressors.CompressorOutputStream
@@ -253,7 +254,7 @@ class AnalysisService {
           result: jsonFile.text,
         ).save(failOnError: true)
 
-        println "result saved $jsonFile"
+        println "result saved $jsonFile.text"
 
         analysisJob.runState = RunState.FINISHED
         analysisJob.save(flush: true)
@@ -265,8 +266,8 @@ class AnalysisService {
       if(resultCount == possibleCohortCount){
         // 1. get sum and count
         def results = getSumAndTotalForGmt(gmt)
-        def count = results[1] as Long
-        def sum = results[0]
+        def count = results[0] as Long
+        def sum = results[1] as Double
         double mean = sum / count
         gmt.mean = mean
         // 2. calculate variance
@@ -284,17 +285,61 @@ class AnalysisService {
     double variance = 0
     TpmGmtResult.findAllByGmt(gmt).each {
       println "data: ${it.result}"
+      def tpmResult = getVarianceForResult(it.result,mean,count)
+      variance += tpmResult
+      println "data: ${it.result}"
     }
     return variance
   }
 
+  @NotTransactional
+  def getSumAndCountForResult(String resultData){
+//    println "input resultData "
+//    println resultData
+
+    def object = JSON.parse(resultData)
+    JSONArray dataArray = object.data as JSONArray
+//    println "data size: ${dataArray.size()}"
+//    println "parsed object"
+//    println object.toString()
+    long count = 0
+    double sum = 0d
+    for(int i = 0 ; i < dataArray.size() ; i++){
+      def sampleData = dataArray.get(i).data
+//      println "sample data: $sampleData"
+      def doubleData = sampleData as List<Double>
+//      println "double data: $doubleData"
+      count += doubleData.size()
+      doubleData.sum{ sum += Double.parseDouble(it) }
+    }
+
+    return [count,sum]
+  }
+
+  @NotTransactional
+  def getVarianceForResult(String resultData,double mean, long count){
+    def object = JSON.parse(resultData)
+    JSONArray dataArray = object.data as JSONArray
+    double variance = 0d
+    for(int i = 0 ; i < dataArray.size() ; i++){
+      def sampleData = dataArray.get(i).data
+      def doubleData = sampleData as List<Double>
+      doubleData.sum{
+        variance += Math.pow(Double.parseDouble(it) - mean,2.0)
+      }
+    }
+    return variance / count
+  }
+
   def getSumAndTotalForGmt(Gmt gmt){
-    double total = 0
+    double sum = 0
     long count = 0
     TpmGmtResult.findAllByGmt(gmt).each {
-      println "data: ${it.result}"
+      def tpmResult = getSumAndCountForResult(it.result)
+      sum += tpmResult[0]
+      count += tpmResult[1]
     }
-    return [total,count]
+    return [sum,count]
   }
 
   /**
