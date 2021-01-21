@@ -214,6 +214,69 @@ class CompareResultController {
   }
 
 
+  @Transactional
+  def retrieveScoredResult(){
+
+    def json = request.JSON
+
+    String method = json.method
+    String geneSetName = json.geneSetName
+    String cohortNameA = json.cohortNameA
+    String cohortNameB = json.cohortNameB
+    String samples = json.samples
+
+//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}"
+    Gmt gmt = Gmt.findByName(geneSetName)
+    println "gmt name ${gmt}"
+    Cohort cohortA = Cohort.findByName(cohortNameA)
+    Cohort cohortB = Cohort.findByName(cohortNameB)
+    println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
+
+
+    if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
+    if(cohortA==null)throw new RuntimeException("Unable to find cohort for ${cohortNameA}")
+    if(cohortB==null)throw new RuntimeException("Unable to find cohort for ${cohortNameB}")
+
+
+
+    TpmGmtResult resultA = TpmGmtResult.findByMethodAndCohortAndGmt(method,cohortA,gmt)
+    TpmGmtResult resultB = TpmGmtResult.findByMethodAndCohortAndGmt(method,cohortB,gmt)
+
+    println "resultA: $resultA"
+    println "resultB: $resultB"
+
+    println "mean $gmt.mean"
+    println "variance $gmt.variance"
+
+    if(resultA==null)throw new RuntimeException("No results available for $method ${cohortNameA} $gmt.name")
+    if(resultB==null)throw new RuntimeException("No results available for $method ${cohortNameB} $gmt.name")
+
+    if(gmt.mean == null || gmt.variance == null){
+      throw new RuntimeException("Analysis not yet calculated for $method  $gmt.name")
+    }
+
+    JSONObject returnObject = new JSONObject()
+    JSONObject gmtObject= new JSONObject()
+    gmtObject.name = gmt.name
+    gmtObject.hash = gmt.hash
+    gmtObject.mean = gmt.mean
+    gmtObject.variance = gmt.variance
+
+    returnObject.put("gmt",gmtObject)
+//    returnObject.put("gmtName",gmt.name)
+//    returnObject.put("gmtName",gmt.name)
+    JSONArray returnArray = new JSONObject()
+    returnArray.add(JSON.parse(resultA.result))
+    returnArray.add(JSON.parse(resultB.result))
+
+
+    returnObject.data = returnArray
+
+    response.outputStream << returnObject.toString()
+    response.outputStream.flush()
+
+  }
 
   @Transactional
   def generateScoredResult(){
