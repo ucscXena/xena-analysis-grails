@@ -27,7 +27,7 @@ class GmtController {
     println "method: ${method}"
     println "max: ${max}"
 
-      respond gmtService.list(params)
+    respond Gmt.list(params)
   }
 
   /**

@@ -1,16 +1,11 @@
 package org.xena.analysis
 
-import grails.async.Promise
-import grails.async.PromiseList
 import grails.gorm.transactions.Transactional
-import groovy.transform.CompileStatic
+//import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 //import org.grails.web.json.JSONObject
 import org.springframework.scheduling.annotation.Scheduled
-
 import java.text.SimpleDateFormat
-
-import static grails.async.Promises.task
 
 
 @Slf4j
@@ -35,28 +30,31 @@ class TpmAnalysisService {
     log.info("checking job queue: "+ counter)
     ++counter
 
-    int jobsRunning = TpmGmtAnalysisJob.countByRunState(RunState.RUNNING)
-    log.info("jobs running: ${jobsRunning} vs $MAX_JOB_SIZE")
+    int jobsRunning = TpmGmtAnalysisJob.executeQuery("select count(*) from TpmGmtAnalysisJob t where t.runState = :runState",[runState:RunState.RUNNING])[0] as int
+    log.debug("jobs running: ${jobsRunning} vs $MAX_JOB_SIZE")
     if(jobsRunning>=MAX_JOB_SIZE) {
       log.info("already have "+jobsRunning + " max allowed is $MAX_JOB_SIZE")
       return
     }
-    int numJobsToRun = TpmGmtAnalysisJob.countByRunState(RunState.NOT_STARTED)
+    int numJobsToRun = TpmGmtAnalysisJob.executeQuery("select count(*) from TpmGmtAnalysisJob t where t.runState = :runState",[runState:RunState.NOT_STARTED])[0] as int
     log.info("number of jobs to run $numJobsToRun")
-    TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findByRunState(RunState.NOT_STARTED)
-    log.info("job to run: $jobToRun")
-    if(jobToRun){
+//    TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findByRunState(RunState.NOT_STARTED)
+//    def foundJobToRun = TpmGmtAnalysisJob.createCriteria().list {
+//      eq("runState",RunState.NOT_STARTED)
+//      maxResults(MAX_JOB_SIZE)
+//    }
+    def foundJobToRun = TpmGmtAnalysisJob.executeQuery("select t from TpmGmtAnalysisJob t where t.runState = :runState",[runState:RunState.NOT_STARTED])
+    log.debug("job to run: $foundJobToRun")
+    if(foundJobToRun){
+      TpmGmtAnalysisJob jobToRun = foundJobToRun.first()
       log.info "running job, $jobToRun.cohort.name and $jobToRun.gmt.name"
-
 //      Promise p = task {
         analysisService.doBpaAnalysis2(jobToRun)
 //      }
-
     }
     else{
-      log.info "No job found to run "
+      log.debug "No job found to run "
     }
-
 
   }
 
