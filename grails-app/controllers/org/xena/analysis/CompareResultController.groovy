@@ -266,12 +266,23 @@ class CompareResultController {
     returnObject.put("gmt",gmtObject)
 //    returnObject.put("gmtName",gmt.name)
 //    returnObject.put("gmtName",gmt.name)
-    JSONArray returnArray = new JSONObject()
-    returnArray.add(JSON.parse(resultA.result))
-    returnArray.add(JSON.parse(resultB.result))
 
+    Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB)
 
-    returnObject.data = returnArray
+    String gmtData = gmt.data
+    // TODO: implement
+    JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
+
+//    println "input array as JSON"
+//    println inputArray as JSON
+//    JSONArray returnArray = new JSONObject()
+//    returnArray.add(JSON.parse(resultA.result))
+//    returnArray.add(JSON.parse(resultB.result))
+//
+//
+    returnObject.data = inputArray
+
+    // TODO: store it in new cached object
 
     response.outputStream << returnObject.toString()
     response.outputStream.flush()

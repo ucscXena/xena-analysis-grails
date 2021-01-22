@@ -481,8 +481,8 @@ class AnalysisService {
         jsonObject.goid = gene[1]
 
         jsonObject.gene = gene.subList(2,gene.size())
-        jsonObject.firstSamples= meanMap.samples[0]
-        jsonObject.secondSamples= meanMap.samples[1]
+//        jsonObject.firstSamples= meanMap.samples[0]
+//        jsonObject.secondSamples= meanMap.samples[1]
         jsonObject.firstGeneExpressionPathwayActivity= meanMap.zPathwayScores[0][keyIndex]
         jsonObject.secondGeneExpressionPathwayActivity= meanMap.zPathwayScores[1][keyIndex]
         jsonObject.firstGeneExpressionSampleActivity= meanMap.zSampleScores[0][keyIndex]
@@ -508,7 +508,7 @@ class AnalysisService {
 
     String gmtData = gmt.data
     // TODO: implement
-    JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
+    JSONArray inputArray = generateResult(gmtData,meanMap)
 
     CompareResult compareResult = new CompareResult(
       method: method,
@@ -526,11 +526,13 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static def extractValuesByCohort(JSONObject input){
+  static def extractValuesByCohort(JSONObject input,Double mean,Double std){
 
     def values = []
+    println "input "
+    println input.data as JSON
     input.data.eachWithIndex { def entry, int i ->
-      def converted = entry.localTpmFile.collect { Float.parseFloat(it)}
+      def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
       values.add(converted )
     }
     return values
@@ -539,10 +541,53 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static JSONArray extractValues(JSONObject inputA,JSONObject inputB){
-    return [extractValuesByCohort(inputA),extractValuesByCohort(inputB)]
+  static List extractValues(JSONObject inputA,JSONObject inputB,Double mean,Double std){
+    return [extractValuesByCohort(inputA,mean,std),extractValuesByCohort(inputB,mean,std)]
   }
 
+  Map createMeanMapFromTpmGmt(Gmt gmt,TpmGmtResult resultA,TpmGmtResult resultB) {
+    println "creating mean map"
+    JSONObject dataA = new JSONObject(resultA.result)
+    JSONObject dataB = new JSONObject(resultB.result)
+
+    println "input data $dataA, $dataB"
+//    def samples = [  dataA.samples,dataB.samples ]
+
+    def geneSetNames = getGeneSetNames(dataA)
+
+    println "gene set names $geneSetNames"
+
+    double mean = gmt.mean
+    double std = Math.sqrt(gmt.variance)
+    def zSampleScores = extractValues(dataA,dataB,mean,std)
+    println "values as JSON: "
+    println zSampleScores as JSON
+//    def values = extractValuesAsList(dataA,dataB)
+
+
+    def zScoreValues = []
+
+//    def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
+    // calculates cohorts separately
+//    def zSampleScores = [getZSampleScores(values[0]),getZSampleScores(values[1])]
+    // uses mean separately
+    def zPathwayScores = getZPathwayScores(zSampleScores)
+
+    JSONObject jsonObject = new JSONObject()
+//    jsonObject.put("samples",samples)
+    jsonObject.put("zSampleScores",zSampleScores)
+    jsonObject.put("zPathwayScores",zPathwayScores)
+    jsonObject.put("geneSetNames",geneSetNames)
+
+    return jsonObject
+  }
+
+  /**
+   * @deprecated
+   * @param resultA
+   * @param resultB
+   * @return
+   */
   Map createMeanMap(Result resultA,Result resultB) {
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
