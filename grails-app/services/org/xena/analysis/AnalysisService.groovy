@@ -302,11 +302,12 @@ class AnalysisService {
   }
 
   @NotTransactional
-  def getSumAndCountForResult(String resultData){
+  def getSumAndCountForResult(String resultData,JSONObject initObject){
 //    println "input resultData "
 //    println resultData
 
     def object = JSON.parse(resultData)
+
     JSONArray dataArray = object.data as JSONArray
 //    println "data size: ${dataArray.size()}"
 //    println "parsed object"
