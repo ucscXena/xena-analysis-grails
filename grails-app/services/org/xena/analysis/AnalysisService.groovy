@@ -526,7 +526,7 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static def extractValuesByCohort(JSONObject input,Double mean,Double std,JSONArray samplesArray){
+  static def extractValuesByCohort(JSONObject input,JSONObject statsObj,JSONArray samplesArray){
 
     def values = []
     List samples = samplesArray as List
@@ -569,8 +569,8 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static List extractValues(JSONObject inputA,JSONObject inputB,Double mean,Double std,JSONArray samplesArray){
-    return [extractValuesByCohort(inputA,mean,std,samplesArray[0]),extractValuesByCohort(inputB,mean,std,samplesArray[1])]
+  static List extractValues(JSONObject inputA,JSONObject inputB,JSONObject statsObj,JSONArray samplesArray){
+    return [extractValuesByCohort(inputA,statsObj,samplesArray[0]),extractValuesByCohort(inputB,statsObj,samplesArray[1])]
   }
 
   Map createMeanMapFromTpmGmt(Gmt gmt,TpmGmtResult resultA,TpmGmtResult resultB,JSONArray samplesArray) {
@@ -585,9 +585,8 @@ class AnalysisService {
 
     println "gene set names $geneSetNames"
 
-    double mean = gmt.mean
-    double std = Math.sqrt(gmt.variance)
-    def zSampleScores = extractValues(dataA,dataB,mean,std,samplesArray)
+    JSONObject statsObject = JSON.parse(gmt.stats) as JSONObject
+    def zSampleScores = extractValues(dataA,dataB,statsObject,samplesArray)
 //    println "values as JSON: "
 //    println zSampleScores as JSON
 //    def values = extractValuesAsList(dataA,dataB)

@@ -249,22 +249,22 @@ class CompareResultController {
     println "resultA: $resultA"
     println "resultB: $resultB"
 
-    println "mean $gmt.mean"
-    println "variance $gmt.variance"
+//    println "mean $gmt.mean"
+//    println "variance $gmt.variance"
 
     if(resultA==null)throw new RuntimeException("No results available for $method ${cohortNameA} $gmt.name")
     if(resultB==null)throw new RuntimeException("No results available for $method ${cohortNameB} $gmt.name")
 
-    if(gmt.mean == null || gmt.variance == null){
-      throw new RuntimeException("Analysis not yet calculated for $method  $gmt.name")
-    }
+//    if(gmt.mean == null || gmt.variance == null){
+//      throw new RuntimeException("Analysis not yet calculated for $method  $gmt.name")
+//    }
 
     JSONObject returnObject = new JSONObject()
     JSONObject gmtObject= new JSONObject()
     gmtObject.name = gmt.name
     gmtObject.hash = gmt.hash
-    gmtObject.mean = gmt.mean
-    gmtObject.variance = gmt.variance
+    gmtObject.stats = gmt.stats
+//    gmtObject.variance = gmt.variance
 
     returnObject.put("gmt",gmtObject)
 //    returnObject.put("gmtName",gmt.name)
