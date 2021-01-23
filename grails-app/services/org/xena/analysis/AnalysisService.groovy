@@ -529,8 +529,8 @@ class AnalysisService {
   static def extractValuesByCohort(JSONObject input,Double mean,Double std){
 
     def values = []
-    println "input "
-    println input.data as JSON
+//    println "input "
+//    println input.data as JSON
     input.data.eachWithIndex { def entry, int i ->
       def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
       values.add(converted )
@@ -550,7 +550,7 @@ class AnalysisService {
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
 
-    println "input data $dataA, $dataB"
+//    println "input data $dataA, $dataB"
 //    def samples = [  dataA.samples,dataB.samples ]
 
     def geneSetNames = getGeneSetNames(dataA)
@@ -560,8 +560,8 @@ class AnalysisService {
     double mean = gmt.mean
     double std = Math.sqrt(gmt.variance)
     def zSampleScores = extractValues(dataA,dataB,mean,std)
-    println "values as JSON: "
-    println zSampleScores as JSON
+//    println "values as JSON: "
+//    println zSampleScores as JSON
 //    def values = extractValuesAsList(dataA,dataB)
 
 
