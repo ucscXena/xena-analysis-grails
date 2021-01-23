@@ -12,17 +12,78 @@ import static org.springframework.http.HttpStatus.*
 @ReadOnly
 class GmtController {
 
+  private globalMean
+  private globalVariance
+
   GmtService gmtService
+  AnalysisService analysisService
+  TpmAnalysisService tpmAnalysisService
 
   static responseFormats = ['json', 'xml']
-  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyzeGmt: "POST"]
 
   def index(Integer max,String method) {
 
     println "method: ${method}"
     println "max: ${max}"
 
-      respond gmtService.list(params)
+    respond Gmt.list(params)
+  }
+
+  /**
+   * Loads all TPM files for cohorts
+   */
+  def loadAllCohorts(){
+    def json = request.JSON
+    def requestedCohorts = json.cohorts as JSONObject
+    def cohortNames = requestedCohorts.name  as List<String>
+    def foundCohortList = Cohort.findAllByNameInList(cohortNames) as List<Cohort>
+    def foundCohortNames = foundCohortList.name
+
+    // add any cohorts that are not yet found
+    def missingCohortNameList = cohortNames - foundCohortNames
+    missingCohortNameList.eachParallel {
+      Cohort cohort = new Cohort(
+        name: it,
+        remoteUrl: requestedCohorts[it],
+      )
+      if(! new File(cohort.localTpmFile).exists() ){
+         // download to local file
+        analysisService.getOriginalTpmFile(it)
+      }
+      cohort.save(failOnError: true,flush:true)
+    }
+    foundCohortList.eachParallel { Cohort it ->
+      if(! new File(it.localTpmFile).exists()){
+        analysisService.getOriginalTpmFile(it)
+      }
+    }
+
+    // assert that all cohorts are there
+    // assert that the input matches the output cohort names
+    assert cohortNames.sort() == Cohort.all.name.sort()
+
+    def stats = analysisService.calculateMeanAndVariance()
+    globalMean = stats[0]
+    globalVariance = stats[1]
+
+//    analysisService.createZScores(globalMean,globalVariance)
+
+  }
+
+  /**
+   * Analyzes loaded GMT files
+   */
+  def analyzeGmt(){
+    def json = request.JSON
+    String method = json.method
+    String gmtname = json.gmtname
+    println "analyzing with method '${method}' and gmt name '${gmtname}'"
+    Gmt gmt = Gmt.findByName(gmtname)
+    if (gmt == null) {
+      throw new RuntimeException("Gmt file not found for ${gmtname}")
+    }
+
   }
 
   def names(String method) {
@@ -38,10 +99,13 @@ class GmtController {
     gmtList.each {
       def obj = new JSONObject()
       obj.name = it.name
-      obj.geneCount = it.geneCount
+      obj.geneCount = it.geneSetCount
       obj.hash = it.hash
       obj.id = it.id
       obj.method = it.method
+      obj.readyCount = it.getLoadedResultCount()
+      obj.availableCount = it.availableTpmCount
+      obj.ready = it.ready()
       jsonArray.add(obj)
     }
     render jsonArray.unique() as JSON
@@ -66,13 +130,20 @@ class GmtController {
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
       if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method,geneCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method,geneCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount)
       }
-      gmt.save(failOnError: true, flush: true)
+      gmt.save(failOnError: true)
     }
+
+//    File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
+    def cohorts = new JSONObject(new URL(CohortService.COHORT_URL).text)
+    gmt.availableTpmCount = cohorts.keySet().size()
+    gmt.save(failOnError: true, flush: true)
+
+    tpmAnalysisService.loadTpmForGmtFiles(gmt)
 
     respond(gmt)
 

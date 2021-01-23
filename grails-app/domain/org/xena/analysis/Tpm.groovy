@@ -1,11 +1,14 @@
 package org.xena.analysis
 
+/**
+ * deprecated
+ */
 class Tpm {
 
 
   Cohort cohort
   String url
-  String data // pointer to file
+  String localFile // pointer to file
 
   static constraints = {
   }

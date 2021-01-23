@@ -4,7 +4,10 @@ class Cohort {
 
 
   String name
-  Tpm tpm
+  String remoteUrl
+  String localTpmFile
+//  String tpmUrl
+//  Tpm tpm
 
   static hasMany = [
     results: Result,
@@ -13,7 +16,9 @@ class Cohort {
 
   static constraints = {
     name blank: false,nullable: false
-    tpm nullable: true
+//    tpmUrl blank: false,nullable: true
+//    remoteUrl
+//    tpm nullable: true
   }
 
   static mapping = {

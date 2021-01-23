@@ -33,7 +33,7 @@ class CompareResultController {
 
   JSONObject resultMarshaller(CompareResult result) {
     JSONObject jsonObject = new JSONObject()
-    jsonObject.genesets = dataObject.data as List<Float>
+    jsonObject.genesets = dataObject.localTpmFile as List<Float>
     return jsonObject
   }
 
@@ -106,8 +106,8 @@ class CompareResultController {
     }
   }
 
-  Cohort findCohort(String name,String tpmUrl){
-    println "FINDING cohort: ${name}, tpmUrl: ${tpmUrl}"
+  Cohort findCohort(String name){
+    println "FINDING cohort: ${name}"
     Cohort cohort = Cohort.findByName(name)
     // TODO: get cohorts, etc.
     if(!cohort){
@@ -115,11 +115,181 @@ class CompareResultController {
     }
     Tpm tpm = Tpm.findByCohort(cohort)
     if(!tpm){
-      File tpmFile = analysisService.getOriginalTpmFile(cohort,tpmUrl)
-      tpm = new Tpm(cohort: cohort,url: tpmUrl,data: tpmFile.absolutePath).save()
+      File tpmFile = analysisService.getOriginalTpmFile(cohort)
+//      tpm = new Tpm(cohort: cohort,url: tpmUrl, localFile: tpmFile.absolutePath).save()
     }
-    assert tpm.data.length()>0
+    assert tpm.localFile.length()>0
     return cohort
+  }
+
+  @Transactional
+  def oldGenerateScoredResult(){
+
+    def json = request.JSON
+
+    String method = json.method
+    String geneSetName = json.geneSetName
+    String cohortNameA = json.cohortNameA
+    String cohortNameB = json.cohortNameB
+//    String tpmUrlA = json.tpmUrlA
+//    String tpmUrlB = json.tpmUrlB
+    String samples = json.samples
+
+//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    Gmt gmt = Gmt.findByName(geneSetName)
+    println "gmt name ${gmt}"
+    Cohort cohortA = findCohort(cohortNameA)
+    Cohort cohortB = findCohort(cohortNameB)
+    println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
+
+
+
+    if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
+    if(cohortA==null)throw new RuntimeException("Unable to find cohort for ${cohortNameA}")
+    if(cohortB==null)throw new RuntimeException("Unable to find cohort for ${cohortNameB}")
+
+
+
+
+//    println "method: ${method}"
+//    println "gmt: ${gmt.name} / ${gmt.hash}"
+//    println "cohort name ${cohortA.name} / ${cohortB.name}"
+    CompareResult compareResult = CompareResult.findByMethodAndGmtAndCohortAAndCohortBAndSamples(method,gmt,cohortA,cohortB,samples)
+    println "found compare result ${compareResult}"
+
+//    CompareResult.all.each {
+//      println "it.method: ${it.method}"
+//      println "it.gmt: ${it.gmt.name} / ${it.gmt.hash}"
+//      println "it.cohort name ${it.cohortA.name} / ${it.cohortB.name}"
+//      println "method == ${it.method == method}"
+//      println "gmt == ${it.gmt == gmt}"
+//      println "cohort A == ${it.cohortA == cohortA}"
+//      println "cohort B == ${it.cohortB == cohortB}"
+//    }
+
+    if(!compareResult){
+      println "prior result not found running analysis -> check analysis environment"
+      analysisService.checkAnalysisEnvironment()
+      println "analysis found"
+      // pull in TPM files
+
+
+
+      File gmtFile = File.createTempFile(gmt.name, ".gmt")
+      gmtFile.write(gmt.data)
+      gmtFile.deleteOnExit()
+
+      println "gmt file ${gmtFile} . . exists ${gmtFile.exists()}, size: ${gmtFile.size()}"
+
+      // TODO: run these in parallel if needed, or just 1?
+      JSONArray samplesA = null
+      JSONArray samplesB = null
+      try {
+        if(samples){
+          JSONArray samplesJsonArray = new JSONArray(samples)
+//          println "samples json array "
+//          println samplesJsonArray as JSON
+          samplesA = samplesJsonArray.getJSONArray(0)
+//          println samplesA as JSON
+          samplesB = samplesJsonArray.getJSONArray(1)
+//          println samplesB as JSON
+          //      println "result A: ${resultA}"
+        }
+      } catch (e) {
+        log.error(e)
+      }
+
+      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,samplesA)
+      println "result A: ${resultA}"
+      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,samplesB)
+      println "result B: ${resultB}"
+
+      compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
+      println "compare result: ${compareResult}"
+
+    }
+    response.outputStream << compareResult.result
+    response.outputStream.flush()
+
+  }
+
+
+  @Transactional
+  def retrieveScoredResult(){
+
+    def json = request.JSON
+
+    String method = json.method
+    String geneSetName = json.geneSetName
+    String cohortNameA = json.cohortNameA
+    String cohortNameB = json.cohortNameB
+    String samples = json.samples
+    JSONArray samplesArray = new JSONArray(samples)
+
+    log.info "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    log.info "samples array as JSON"
+    println samplesArray as JSON
+//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}"
+    Gmt gmt = Gmt.findByName(geneSetName)
+    log.info "gmt name ${gmt}"
+    Cohort cohortA = Cohort.findByName(cohortNameA)
+    Cohort cohortB = Cohort.findByName(cohortNameB)
+    log.info "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
+
+
+    if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
+    if(cohortA==null)throw new RuntimeException("Unable to find cohort for ${cohortNameA}")
+    if(cohortB==null)throw new RuntimeException("Unable to find cohort for ${cohortNameB}")
+
+
+
+    TpmGmtResult resultA = TpmGmtResult.findByMethodAndCohortAndGmt(method,cohortA,gmt)
+    TpmGmtResult resultB = TpmGmtResult.findByMethodAndCohortAndGmt(method,cohortB,gmt)
+
+    println "resultA: $resultA"
+    println "resultB: $resultB"
+
+//    println "mean $gmt.mean"
+//    println "variance $gmt.variance"
+
+    if(resultA==null)throw new RuntimeException("No results available for $method ${cohortNameA} $gmt.name")
+    if(resultB==null)throw new RuntimeException("No results available for $method ${cohortNameB} $gmt.name")
+
+//    if(gmt.mean == null || gmt.variance == null){
+//      throw new RuntimeException("Analysis not yet calculated for $method  $gmt.name")
+//    }
+
+    JSONObject returnObject = new JSONObject()
+    JSONObject gmtObject= new JSONObject()
+    gmtObject.name = gmt.name
+    gmtObject.hash = gmt.hash
+    gmtObject.stats = gmt.stats
+//    gmtObject.variance = gmt.variance
+
+    returnObject.put("gmt",gmtObject)
+//    returnObject.put("gmtName",gmt.name)
+//    returnObject.put("gmtName",gmt.name)
+
+    Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
+
+    String gmtData = gmt.data
+    // TODO: implement
+    JSONArray inputArray = analysisService.generateResult(gmtData,meanMap)
+
+//    println "input array as JSON"
+//    println inputArray as JSON
+//    JSONArray returnArray = new JSONObject()
+//    returnArray.add(JSON.parse(resultA.result))
+//    returnArray.add(JSON.parse(resultB.result))
+//
+//
+    returnObject.data = inputArray
+
+    // TODO: store it in new cached object
+
+    response.outputStream << returnObject.toString()
+    response.outputStream.flush()
+
   }
 
   @Transactional
@@ -131,17 +301,17 @@ class CompareResultController {
     String geneSetName = json.geneSetName
     String cohortNameA = json.cohortNameA
     String cohortNameB = json.cohortNameB
-    String tpmUrlA = json.tpmUrlA
-    String tpmUrlB = json.tpmUrlB
+//    String tpmUrlA = json.tpmUrlA
+//    String tpmUrlB = json.tpmUrlB
     String samples = json.samples
 
-    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${tpmUrlA},${tpmUrlB}, ${samples}"
+//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}"
     Gmt gmt = Gmt.findByName(geneSetName)
     println "gmt name ${gmt}"
-    Cohort cohortA = findCohort(cohortNameA,tpmUrlA)
-    Cohort cohortB = findCohort(cohortNameB,tpmUrlB)
+    Cohort cohortA = Cohort.findByName(cohortNameA)
+    Cohort cohortB = Cohort.findByName(cohortNameB)
     println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
-
 
 
     if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
@@ -199,9 +369,9 @@ class CompareResultController {
         log.error(e)
       }
 
-      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,tpmUrlA,samplesA)
+      Result resultA = analysisService.doBpaAnalysis(cohortA,gmtFile,gmt,method,samplesA)
       println "result A: ${resultA}"
-      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,tpmUrlB,samplesB)
+      Result resultB = analysisService.doBpaAnalysis(cohortB,gmtFile,gmt,method,samplesB)
       println "result B: ${resultB}"
 
       compareResult = analysisService.calculateCustomGeneSetActivity(gmt,resultA,resultB,method,samples)
