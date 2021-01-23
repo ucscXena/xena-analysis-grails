@@ -224,14 +224,17 @@ class CompareResultController {
     String cohortNameA = json.cohortNameA
     String cohortNameB = json.cohortNameB
     String samples = json.samples
+    JSONArray samplesArray = new JSONArray(samples)
 
-//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
-    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}"
+    log.info "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    log.info "samples array as JSON"
+    println samplesArray as JSON
+//    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}"
     Gmt gmt = Gmt.findByName(geneSetName)
-    println "gmt name ${gmt}"
+    log.info "gmt name ${gmt}"
     Cohort cohortA = Cohort.findByName(cohortNameA)
     Cohort cohortB = Cohort.findByName(cohortNameB)
-    println "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
+    log.info "cohorts ${Cohort.count} -> ${cohortA}, ${cohortB}"
 
 
     if(gmt==null) throw new RuntimeException("Unable to find gmt for ${geneSetName}")
@@ -267,11 +270,11 @@ class CompareResultController {
 //    returnObject.put("gmtName",gmt.name)
 //    returnObject.put("gmtName",gmt.name)
 
-    Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB)
+    Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
 
     String gmtData = gmt.data
     // TODO: implement
-    JSONArray inputArray = AnalysisService.generateResult(gmtData,meanMap)
+    JSONArray inputArray = analysisService.generateResult(gmtData,meanMap)
 
 //    println "input array as JSON"
 //    println inputArray as JSON

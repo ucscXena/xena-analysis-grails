@@ -526,26 +526,54 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static def extractValuesByCohort(JSONObject input,Double mean,Double std){
+  static def extractValuesByCohort(JSONObject input,Double mean,Double std,JSONArray samplesArray){
 
     def values = []
-//    println "input "
-//    println input.data as JSON
-    input.data.eachWithIndex { def entry, int i ->
-      def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
-      values.add(converted )
+    List samples = samplesArray as List
+//    println "input as JSON"
+//    println input as JSON
+//    println "samples as list"
+//    println samples
+    if(samples.size()>0) {
+      List indices = []
+      input.samples.eachWithIndex { def entry, int index ->
+        if (samples.contains(entry)) {
+          indices.add(index)
+        }
+      }
+      println "indices"
+      println indices
+      input.data.eachWithIndex { def entry, int i ->
+//        println "entry: $entry $i $indices ${indices.contains(i)}"
+        int innerIndex = 0
+        def converted = entry.data.collect{ def value ->
+          if (indices.contains(innerIndex)) {
+            (Float.parseFloat(value) - mean) / std
+          }
+          ++innerIndex
+        }
+        values.add(converted )
+      }
     }
-    return values
+    else{
+      input.data.eachWithIndex { def entry, int i ->
+        def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
+        values.add(converted )
+      }
+//      println "output values"
+//      println values
+      return values
+    }
   }
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static List extractValues(JSONObject inputA,JSONObject inputB,Double mean,Double std){
-    return [extractValuesByCohort(inputA,mean,std),extractValuesByCohort(inputB,mean,std)]
+  static List extractValues(JSONObject inputA,JSONObject inputB,Double mean,Double std,JSONArray samplesArray){
+    return [extractValuesByCohort(inputA,mean,std,samplesArray[0]),extractValuesByCohort(inputB,mean,std,samplesArray[1])]
   }
 
-  Map createMeanMapFromTpmGmt(Gmt gmt,TpmGmtResult resultA,TpmGmtResult resultB) {
+  Map createMeanMapFromTpmGmt(Gmt gmt,TpmGmtResult resultA,TpmGmtResult resultB,JSONArray samplesArray) {
     println "creating mean map"
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
@@ -559,7 +587,7 @@ class AnalysisService {
 
     double mean = gmt.mean
     double std = Math.sqrt(gmt.variance)
-    def zSampleScores = extractValues(dataA,dataB,mean,std)
+    def zSampleScores = extractValues(dataA,dataB,mean,std,samplesArray)
 //    println "values as JSON: "
 //    println zSampleScores as JSON
 //    def values = extractValuesAsList(dataA,dataB)
