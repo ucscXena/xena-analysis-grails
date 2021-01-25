@@ -44,35 +44,35 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert c == ["a","a1","b","b1"]
   }
 
-  void "convert mean map to values"(){
-    given:
-    def inputA = new JSONObject(new File("src/test/data/inputA.json").text)
-    def inputB = new JSONObject(new File("src/test/data/inputB.json").text)
-    assert inputA.samples.size() == 89
-    assert inputB.samples.size() == 548
-    assert inputA.data.size() == 9
-    assert inputB.data.size() == 9
-    assert inputA.data[0].data.size() == 89
-    assert inputB.data[0].data.size() == 548
-
-    when:
-    def valuesA = AnalysisService.extractValuesByCohort(inputA)
-
-    then:
-    assert valuesA.size() == 9
-    assert valuesA[0].size() == 89
-
-
-    when:
-    def values = AnalysisService.extractValues(inputA,inputB)
-
-    then:
-    assert values.size() == 2
-    assert values[0].size() == 9
-    assert values[1].size() == 9
-    assert values[0][0].size() == 89
-    assert values[1][0].size() == 548
-  }
+//  void "convert mean map to values"(){
+//    given:
+//    def inputA = new JSONObject(new File("src/test/data/inputA.json").text)
+//    def inputB = new JSONObject(new File("src/test/data/inputB.json").text)
+//    assert inputA.samples.size() == 89
+//    assert inputB.samples.size() == 548
+//    assert inputA.data.size() == 9
+//    assert inputB.data.size() == 9
+//    assert inputA.data[0].data.size() == 89
+//    assert inputB.data[0].data.size() == 548
+//
+//    when:
+//    def valuesA = AnalysisService.extractValuesByCohort(inputA)
+//
+//    then:
+//    assert valuesA.size() == 9
+//    assert valuesA[0].size() == 89
+//
+//
+//    when:
+//    def values = AnalysisService.extractValues(inputA,inputB)
+//
+//    then:
+//    assert values.size() == 2
+//    assert values[0].size() == 9
+//    assert values[1].size() == 9
+//    assert values[0][0].size() == 89
+//    assert values[1][0].size() == 548
+//  }
 
   void "get data statistics"(){
 
@@ -256,6 +256,56 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
     then:
     assert variance == 0.02905379443913503
+
+  }
+
+  void "get mean, variance, and  from 1 file"(){
+
+    given:
+    File tpmFile1 = new File("src/test/data/sampleFile1.tpm")
+
+    when:
+    TpmStatMap tpmStatMap = TpmStatGenerator.getGeneStatMap(tpmFile1)
+    println tpmStatMap
+    Set<String> geneSet = tpmStatMap.keySet() as List<String>
+    println "gene sets: ${geneSet}"
+    TpmStat geneA = tpmStatMap.get("GeneA")
+    TpmStat geneC = tpmStatMap.get("GeneC")
+
+    then:
+    assert geneSet.size()==3
+    assert geneA.numDataValues()==3
+    assert geneA.mean()==5
+    assert geneA.variance()==1.0
+    assert geneC.numDataValues()==3
+    assert geneC.mean()==5
+    assert geneC.variance()==4.0
+
+  }
+
+  void "get mean, variance, from 2 files"(){
+
+    given:
+    File tpmFile1 = new File("src/test/data/sampleFile1.tpm")
+    File tpmFile2 = new File("src/test/data/sampleFile2.tpm")
+
+    when:
+    TpmStatMap tpmStatMap = TpmStatGenerator.getGeneStatMap(tpmFile1)
+    tpmStatMap = TpmStatGenerator.getGeneStatMap(tpmFile2,tpmStatMap)
+    println tpmStatMap
+    Set<String> geneSet = tpmStatMap.keySet() as List<String>
+    println "gene sets: ${geneSet}"
+    TpmStat geneA = tpmStatMap.get("GeneA")
+    TpmStat geneC = tpmStatMap.get("GeneC")
+
+    then:
+    assert geneSet.size()==3
+    assert geneA.numDataValues()==5
+    assert geneC.numDataValues()==5
+    assert geneA.mean()==6.4
+    assert geneC.mean()==3.6
+    assert geneA.standardDeviation()==2.073644135332772
+    assert geneC.standardDeviation()==2.4083189157584592
 
   }
 
