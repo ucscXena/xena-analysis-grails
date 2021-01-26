@@ -363,7 +363,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     JSONObject geneFile = JSON.parse(convertedTPMFile.text)
     int numGenes = geneFile.keySet().size()
     println "numbeer of genes $numGenes"
-    cohorts.keySet().eachWithIndex { String cohort, int i ->
+    println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
+    cohorts.keySet().sort().eachWithIndex { String cohort, int i ->
       println "processing $cohort: ${i+1} of $numCohorts"
       String localFileName = AnalysisService.generateTpmName(cohort)
       File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
