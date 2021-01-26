@@ -4,6 +4,7 @@ import grails.converters.JSON
 import grails.testing.services.ServiceUnitTest
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class AnalysisServiceSpec extends Specification implements ServiceUnitTest<AnalysisService>{
@@ -310,6 +311,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
+  // NOTE: this is just run as a script and not really for testing
+  @Ignore
   void "collect all TPM files to get stats"(){
 
     given:
@@ -348,6 +351,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
   }
 
 //  void "get Z-scores from the TPM files"(){
+  @Ignore
     void "generateZScore"(){
 
     given:
@@ -365,7 +369,9 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     int numGenes = geneFile.keySet().size()
     println "numbeer of genes $numGenes"
     println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
-    if(false){
+    // NOTE: requires 12 GB of memory to run larger files, or need to split files for more memory
+    boolean doRegenerateFiles = false
+    if(doRegenerateFiles){
       cohorts.keySet().sort().eachWithIndex { String cohort, int i ->
         println "processing $cohort: ${i+1} of $numCohorts"
         String localFileName = AnalysisService.generateTpmName(cohort)
@@ -391,8 +397,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
             stringBuilder.append("\n")
             if(geneCounter % 5000 == 0){
               println (geneCounter / numGenes * 100.0) +"%"
-              OutputHandler.printMemory()
-              System.gc()
+//              OutputHandler.printMemory()
+//              System.gc()
             }
             ++geneCounter
           }
