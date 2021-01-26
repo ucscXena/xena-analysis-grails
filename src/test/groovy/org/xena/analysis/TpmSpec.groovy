@@ -1,6 +1,6 @@
 package org.xena.analysis
 
-
+import grails.converters.JSON
 import grails.testing.gorm.DomainUnitTest
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
@@ -135,6 +135,40 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
       assert allTpmFile.exists() && allTpmFile.size()>0 && allTpmFile.text.split("\n").size() < 5000
 
     }
+
+  void "validate TpmStat"(){
+
+    given: "a tpmstat of values"
+    TpmStat tpmStat = new TpmStat()
+
+    when:
+    tpmStat.addStat(-3.0)
+    tpmStat.addStat(5.0)
+    tpmStat.addStat(-7.0)
+    tpmStat.addStat(9.0)
+    JSONObject tpmStatObject = JSON.parse(tpmStat.toString()) as JSONObject
+    TpmStat tpmStatCopy = new TpmStat(tpmStatObject)
+
+    then:
+    tpmStat.numDataValues()==4
+    tpmStat.mean()==1
+    tpmStat.standardDeviation()==7.302967433402215
+    tpmStatCopy.numDataValues()==4
+    tpmStatCopy.mean()==1
+    tpmStatCopy.standardDeviation()==7.302967433402215
+    println "-3 -> ${tpmStat.getZValue(-3)}"
+    println "5 -> ${tpmStat.getZValue(5)}"
+    println "-7 -> ${tpmStat.getZValue(-7)}"
+    println "9 -> ${tpmStat.getZValue(9)}"
+    Math.abs(tpmStat.getZValue(-3) - (-3 - 1 ) / 7.302967433402215) < 0.00001
+    Math.abs(tpmStat.getZValue(5) - (5 - 1 ) / 7.302967433402215) < 0.00001
+    Math.abs(tpmStat.getZValue(-7) - (-7 - 1 ) / 7.302967433402215) < 0.00001
+    Math.abs(tpmStat.getZValue(9) - (9 - 1 ) / 7.302967433402215) < 0.00001
+
+
+
+  }
+
 //
 //  void "get TPM file mean and variance"() {
 ////        expect:"fix me"

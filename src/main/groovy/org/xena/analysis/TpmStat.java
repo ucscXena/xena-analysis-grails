@@ -2,7 +2,6 @@ package org.xena.analysis;
 
 import org.grails.web.json.JSONObject;
 
-import java.util.TreeMap;
 
 public class TpmStat  {
 
@@ -67,19 +66,20 @@ public class TpmStat  {
   }
 
   double getZValue(double input){
-    return ( input - mean() / standardDeviation());
+    return ( input - mean()) / standardDeviation();
   }
 
   @Override
   public String toString() {
     return "{" +
       "count:" + count +
-//      ", oldMean:" + oldMean +
       ", mean:" + newMean +
-//      ", oldStdev:" + oldStdev +
-//      ", stdev:" + newStdev +
       ", variance:" + this.variance()+
       ", stdev:" + this.standardDeviation()+
       '}';
+
+//      ", oldMean:" + oldMean +
+//      ", oldStdev:" + oldStdev +
+//      ", stdev:" + newStdev +
   }
 }
