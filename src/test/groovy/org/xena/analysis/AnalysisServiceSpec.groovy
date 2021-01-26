@@ -365,47 +365,46 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     int numGenes = geneFile.keySet().size()
     println "numbeer of genes $numGenes"
     println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
-    cohorts.keySet().sort().eachWithIndex { String cohort, int i ->
-      println "processing $cohort: ${i+1} of $numCohorts"
-      String localFileName = AnalysisService.generateTpmName(cohort)
-      File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
-      File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
-      zTransformedTpmFile.write("")
-      boolean isHeader = true
-      StringBuilder stringBuilder = new StringBuilder()
-      int geneCounter = 0
-      unzippedTpmFile.splitEachLine("\t"){List<String> entries ->
-        if(isHeader){
-          stringBuilder.append(entries.join("\t")).append("\n")
-          isHeader = false
-        }
-        else{
-          String gene = entries.get(0)
-//          println "stat object ${statObject.toString()}"
-          TpmStat tpmStat = new TpmStat(geneFile.getJSONObject(gene))
-          stringBuilder.append(gene)
-//          zTransformedTpmFile.write(gene)
-          entries.subList(1,entries.size()).each {String value ->
-             double dValue = Double.parseDouble(value)
-            stringBuilder.append("\t").append(tpmStat.getZValue(dValue))
-//            zTransformedTpmFile.write("\t")
-//            zTransformedTpmFile.write(tpmStat.getZValue(dValue).toString())
+    if(false){
+      cohorts.keySet().sort().eachWithIndex { String cohort, int i ->
+        println "processing $cohort: ${i+1} of $numCohorts"
+        String localFileName = AnalysisService.generateTpmName(cohort)
+        File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
+        File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
+        zTransformedTpmFile.write("")
+        boolean isHeader = true
+        StringBuilder stringBuilder = new StringBuilder()
+        int geneCounter = 0
+        unzippedTpmFile.splitEachLine("\t"){List<String> entries ->
+          if(isHeader){
+            stringBuilder.append(entries.join("\t")).append("\n")
+            isHeader = false
           }
-          stringBuilder.append("\n")
-//          zTransformedTpmFile.write("\n")
-//          zTransformedTpmFile.write(stringBuffer.toString())
-          if(geneCounter % 5000 == 0){
-            println (geneCounter / numGenes * 100.0) +"%"
+          else{
+            String gene = entries.get(0)
+            TpmStat tpmStat = new TpmStat(geneFile.getJSONObject(gene))
+            stringBuilder.append(gene)
+            entries.subList(1,entries.size()).each {String value ->
+              double dValue = Double.parseDouble(value)
+              stringBuilder.append("\t").append(tpmStat.getZValue(dValue))
+            }
+            stringBuilder.append("\n")
+            if(geneCounter % 5000 == 0){
+              println (geneCounter / numGenes * 100.0) +"%"
+              OutputHandler.printMemory()
+              System.gc()
+            }
+            ++geneCounter
           }
-          ++geneCounter
         }
+        println "writing file output to $zTransformedTpmFile.absolutePath"
+        zTransformedTpmFile.write(stringBuilder.toString())
+        stringBuilder = null
+        unzippedTpmFile = null
+        zTransformedTpmFile = null
+
       }
-      println "writing file output to $zTransformedTpmFile.absolutePath"
-      zTransformedTpmFile.write(stringBuilder.toString())
-//      assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
-//      tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
     }
-//    convertedTPMFile.write(tpmStatMap.toString())
 
     then:
     assert true
