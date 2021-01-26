@@ -361,6 +361,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
     when:
     JSONObject geneFile = JSON.parse(convertedTPMFile.text)
+    int numGenes = geneFile.keySet().size()
+    println "numbeer of genes $numGenes"
     cohorts.keySet().eachWithIndex { String cohort, int i ->
       println "processing $cohort: ${i+1} of $numCohorts"
       String localFileName = AnalysisService.generateTpmName(cohort)
@@ -368,23 +370,34 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
       File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
       zTransformedTpmFile.write("")
       boolean isHeader = true
+      StringBuffer stringBuffer
+      int geneCounter = 0
       unzippedTpmFile.splitEachLine("\t"){List<String> entries ->
         if(isHeader){
-          zTransformedTpmFile.write(entries.join("\t")+"\n")
+          stringBuffer = null
+          stringBuffer = new StringBuffer()
+          stringBuffer.append(entries.join("\t")).append("\n")
           isHeader = false
         }
         else{
           String gene = entries.get(0)
-          JSONObject statObject = geneFile.get(gene)
 //          println "stat object ${statObject.toString()}"
-          TpmStat tpmStat = new TpmStat(statObject)
-          zTransformedTpmFile.write(gene)
+          TpmStat tpmStat = new TpmStat(geneFile.getJSONObject(gene))
+          stringBuffer.append(gene)
+//          zTransformedTpmFile.write(gene)
           entries.subList(1,entries.size()).each {String value ->
              double dValue = Double.parseDouble(value)
-            zTransformedTpmFile.write("\t")
-            zTransformedTpmFile.write(tpmStat.getZValue(dValue).toString())
+            stringBuffer.append("\t").append(tpmStat.getZValue(dValue))
+//            zTransformedTpmFile.write("\t")
+//            zTransformedTpmFile.write(tpmStat.getZValue(dValue).toString())
           }
-          zTransformedTpmFile.write("\n")
+          stringBuffer.append("\n")
+//          zTransformedTpmFile.write("\n")
+          zTransformedTpmFile.write(stringBuffer.toString())
+          if(geneCounter % 1000 == 0){
+            println (geneCounter / numGenes * 100.0) +"%"
+          }
+          ++geneCounter
         }
       }
 //      assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
