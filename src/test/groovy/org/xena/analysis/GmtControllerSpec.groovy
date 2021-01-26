@@ -102,20 +102,20 @@ class GmtControllerSpec extends Specification implements ControllerUnitTest<GmtC
     response.status == NOT_FOUND.value()
   }
 
-  void "Test the show action with a valid id"() {
-    given:
-    controller.gmtService = Mock(GmtService) {
-      1 * get(2) >> new Gmt()
-    }
-
-    when: "A domain instance is passed to the show action"
-    params.id = 2
-    controller.show()
-
-    then: "A model is populated containing the domain instance"
-    response.status == OK.value()
-    response.json == [geneCount:0]
-  }
+//  void "Test the show action with a valid id"() {
+//    given:
+//    controller.gmtService = Mock(GmtService) {
+//      1 * get(2) >> new Gmt()
+//    }
+//
+//    when: "A domain instance is passed to the show action"
+//    params.id = 2
+//    controller.show()
+//
+//    then: "A model is populated containing the domain instance"
+//    response.status == OK.value()
+//    response.json == [geneCount:0]
+//  }
 
   void "Test the update action with a null instance"() {
     when:

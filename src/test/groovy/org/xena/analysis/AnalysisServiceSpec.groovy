@@ -1,8 +1,10 @@
 package org.xena.analysis
 
+import grails.converters.JSON
 import grails.testing.services.ServiceUnitTest
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class AnalysisServiceSpec extends Specification implements ServiceUnitTest<AnalysisService>{
@@ -44,35 +46,35 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert c == ["a","a1","b","b1"]
   }
 
-  void "convert mean map to values"(){
-    given:
-    def inputA = new JSONObject(new File("src/test/data/inputA.json").text)
-    def inputB = new JSONObject(new File("src/test/data/inputB.json").text)
-    assert inputA.samples.size() == 89
-    assert inputB.samples.size() == 548
-    assert inputA.data.size() == 9
-    assert inputB.data.size() == 9
-    assert inputA.data[0].data.size() == 89
-    assert inputB.data[0].data.size() == 548
-
-    when:
-    def valuesA = AnalysisService.extractValuesByCohort(inputA)
-
-    then:
-    assert valuesA.size() == 9
-    assert valuesA[0].size() == 89
-
-
-    when:
-    def values = AnalysisService.extractValues(inputA,inputB)
-
-    then:
-    assert values.size() == 2
-    assert values[0].size() == 9
-    assert values[1].size() == 9
-    assert values[0][0].size() == 89
-    assert values[1][0].size() == 548
-  }
+//  void "convert mean map to values"(){
+//    given:
+//    def inputA = new JSONObject(new File("src/test/data/inputA.json").text)
+//    def inputB = new JSONObject(new File("src/test/data/inputB.json").text)
+//    assert inputA.samples.size() == 89
+//    assert inputB.samples.size() == 548
+//    assert inputA.data.size() == 9
+//    assert inputB.data.size() == 9
+//    assert inputA.data[0].data.size() == 89
+//    assert inputB.data[0].data.size() == 548
+//
+//    when:
+//    def valuesA = AnalysisService.extractValuesByCohort(inputA)
+//
+//    then:
+//    assert valuesA.size() == 9
+//    assert valuesA[0].size() == 89
+//
+//
+//    when:
+//    def values = AnalysisService.extractValues(inputA,inputB)
+//
+//    then:
+//    assert values.size() == 2
+//    assert values[0].size() == 9
+//    assert values[1].size() == 9
+//    assert values[0][0].size() == 89
+//    assert values[1][0].size() == 548
+//  }
 
   void "get data statistics"(){
 
@@ -256,6 +258,162 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
     then:
     assert variance == 0.02905379443913503
+
+  }
+
+  void "get mean, variance, and  from 1 file"(){
+
+    given:
+    File tpmFile1 = new File("src/test/data/sampleFile1.tpm")
+
+    when:
+    TpmStatMap tpmStatMap = TpmStatGenerator.getGeneStatMap(tpmFile1)
+    println tpmStatMap
+    Set<String> geneSet = tpmStatMap.keySet() as List<String>
+    println "gene sets: ${geneSet}"
+    TpmStat geneA = tpmStatMap.get("GeneA")
+    TpmStat geneC = tpmStatMap.get("GeneC")
+
+    then:
+    assert geneSet.size()==3
+    assert geneA.numDataValues()==3
+    assert geneA.mean()==5
+    assert geneA.variance()==1.0
+    assert geneC.numDataValues()==3
+    assert geneC.mean()==5
+    assert geneC.variance()==4.0
+
+  }
+
+  void "get mean, variance, from 2 files"(){
+
+    given:
+    File tpmFile1 = new File("src/test/data/sampleFile1.tpm")
+    File tpmFile2 = new File("src/test/data/sampleFile2.tpm")
+
+    when:
+    TpmStatMap tpmStatMap = TpmStatGenerator.getGeneStatMap(tpmFile1)
+    tpmStatMap = TpmStatGenerator.getGeneStatMap(tpmFile2,tpmStatMap)
+    println tpmStatMap
+    Set<String> geneSet = tpmStatMap.keySet() as List<String>
+    println "gene sets: ${geneSet}"
+    TpmStat geneA = tpmStatMap.get("GeneA")
+    TpmStat geneC = tpmStatMap.get("GeneC")
+
+    then:
+    assert geneSet.size()==3
+    assert geneA.numDataValues()==5
+    assert geneC.numDataValues()==5
+    assert geneA.mean()==6.4
+    assert geneC.mean()==3.6
+    assert geneA.standardDeviation()==2.073644135332772
+    assert geneC.standardDeviation()==2.4083189157584592
+
+  }
+
+  // NOTE: this is just run as a script and not really for testing
+  @Ignore
+  void "collect all TPM files to get stats"(){
+
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    File convertedTPMFile = new File("${AnalysisService.TPM_DIRECTORY}/../allTpmGeneStats.json")
+    println "abs path: ${convertedTPMFile.absolutePath}"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    println "keys size: ${cohorts.size()}"
+    int numCohorts = cohorts.size()
+    TpmStatMap tpmStatMap  = new TpmStatMap()
+
+    when:
+    if(!convertedTPMFile.exists() || convertedTPMFile.size()==0){
+      convertedTPMFile.write("")
+      cohorts.keySet().eachWithIndex { String entry, int i ->
+        println "processing $entry: ${i+1} of $numCohorts"
+        String localFileName = AnalysisService.generateTpmName(entry)
+        File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
+        assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
+        tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
+      }
+      convertedTPMFile.write(tpmStatMap.toString())
+    }
+
+    then:
+    assert convertedTPMFile.exists()
+    assert convertedTPMFile.size()>0
+
+    when: "we ingest the file again"
+    JSONObject geneFile = JSON.parse(convertedTPMFile.text)
+
+
+    then: "we should have genes and stats"
+    assert geneFile.keySet().size()==33
+
+  }
+
+//  void "get Z-scores from the TPM files"(){
+  @Ignore
+    void "generateZScore"(){
+
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    File convertedTPMFile = new File("${AnalysisService.TPM_DIRECTORY}/../allTpmGeneStats.json")
+    println "abs path: ${convertedTPMFile.absolutePath}"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    println "keys size: ${cohorts.size()}"
+    int numCohorts = cohorts.size()
+    TpmStatMap tpmStatMap  = new TpmStatMap()
+    assert convertedTPMFile.exists() && convertedTPMFile.size()>0
+
+    when:
+    JSONObject geneFile = JSON.parse(convertedTPMFile.text)
+    int numGenes = geneFile.keySet().size()
+    println "numbeer of genes $numGenes"
+    println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
+    // NOTE: requires 12 GB of memory to run larger files, or need to split files for more memory
+    boolean doRegenerateFiles = false
+    if(doRegenerateFiles){
+      cohorts.keySet().sort().eachWithIndex { String cohort, int i ->
+        println "processing $cohort: ${i+1} of $numCohorts"
+        String localFileName = AnalysisService.generateTpmName(cohort)
+        File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
+        File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
+        zTransformedTpmFile.write("")
+        boolean isHeader = true
+        StringBuilder stringBuilder = new StringBuilder()
+        int geneCounter = 0
+        unzippedTpmFile.splitEachLine("\t"){List<String> entries ->
+          if(isHeader){
+            stringBuilder.append(entries.join("\t")).append("\n")
+            isHeader = false
+          }
+          else{
+            String gene = entries.get(0)
+            TpmStat tpmStat = new TpmStat(geneFile.getJSONObject(gene))
+            stringBuilder.append(gene)
+            entries.subList(1,entries.size()).each {String value ->
+              double dValue = Double.parseDouble(value)
+              stringBuilder.append("\t").append(tpmStat.getZValue(dValue))
+            }
+            stringBuilder.append("\n")
+            if(geneCounter % 5000 == 0){
+              println (geneCounter / numGenes * 100.0) +"%"
+//              OutputHandler.printMemory()
+//              System.gc()
+            }
+            ++geneCounter
+          }
+        }
+        println "writing file output to $zTransformedTpmFile.absolutePath"
+        zTransformedTpmFile.write(stringBuilder.toString())
+        stringBuilder = null
+        unzippedTpmFile = null
+        zTransformedTpmFile = null
+
+      }
+    }
+
+    then:
+    assert true
 
   }
 

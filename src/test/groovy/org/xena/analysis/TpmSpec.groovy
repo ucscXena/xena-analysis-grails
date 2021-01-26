@@ -1,6 +1,6 @@
 package org.xena.analysis
 
-
+import grails.converters.JSON
 import grails.testing.gorm.DomainUnitTest
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
@@ -40,101 +40,40 @@ class TpmSpec extends Specification implements DomainUnitTest<Tpm> {
 
   }
 
-  void "generate global TPM file"() {
-      given:
-      String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
-      File allTpmFile  = new File(AnalysisService.ALL_TPM_FILE_STRING)
-      println "abs path: ${allTpmFile.absolutePath}"
-      def cohorts = new JSONObject(new URL(cohortUrl).text)
-      println "keys size: ${cohorts.size()}"
+
+  void "validate TpmStat"(){
+
+    given: "a tpmstat of values"
+    TpmStat tpmStat = new TpmStat()
 
     when:
-      if(!allTpmFile.exists() || allTpmFile.size()==0 ){
+    tpmStat.addStat(-3.0)
+    tpmStat.addStat(5.0)
+    tpmStat.addStat(-7.0)
+    tpmStat.addStat(9.0)
+    JSONObject tpmStatObject = JSON.parse(tpmStat.toString()) as JSONObject
+    TpmStat tpmStatCopy = new TpmStat(tpmStatObject)
 
-        // cohort name, local file
-        Map<String,File> fileMap = new TreeMap<>()
+    then:
+    tpmStat.numDataValues()==4
+    tpmStat.mean()==1
+    tpmStat.standardDeviation()==7.302967433402215
+    tpmStatCopy.numDataValues()==4
+    tpmStatCopy.mean()==1
+    tpmStatCopy.standardDeviation()==7.302967433402215
+    println "-3 -> ${tpmStat.getZValue(-3)}"
+    println "5 -> ${tpmStat.getZValue(5)}"
+    println "-7 -> ${tpmStat.getZValue(-7)}"
+    println "9 -> ${tpmStat.getZValue(9)}"
+    Math.abs(tpmStat.getZValue(-3) - (-3 - 1 ) / 7.302967433402215) < 0.00001
+    Math.abs(tpmStat.getZValue(5) - (5 - 1 ) / 7.302967433402215) < 0.00001
+    Math.abs(tpmStat.getZValue(-7) - (-7 - 1 ) / 7.302967433402215) < 0.00001
+    Math.abs(tpmStat.getZValue(9) - (9 - 1 ) / 7.302967433402215) < 0.00001
 
-        allTpmFile.write("")
-        cohorts.keySet().each{
-          JSONObject cohortObject = cohorts.get(it)
-//          println "cohort object ${cohortObject.toString()}"
-          // TODO: get local name for EACH TPM file
-          String localFileName = AnalysisService.generateTpmName(it)
-          File localCompressedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm.gz")
-          // TODO: if file exists then note, if not then download
-          if(!localCompressedTpmFile.exists() || localCompressedTpmFile.size()==0){
-            allTpmFile.write("")
-            String remoteurl = AnalysisService.generateTpmRemoteUrl(cohortObject)
-            println "retrieving remote file ${remoteurl} for ${it}"
-            AnalysisService.retrieveTpmFile(localCompressedTpmFile,remoteurl)
-          }
-          File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
-          if(!unzippedTpmFile.exists() || unzippedTpmFile.size()==0) {
-            unzippedTpmFile.delete()
-            AnalysisService.decompressFile(localCompressedTpmFile,unzippedTpmFile)
-            println "decompressing file ${unzippedTpmFile.absolutePath}"
-          }
-          fileMap.put(it,unzippedTpmFile)
-        }
 
-        List<String> genes = AnalysisService.getGenesFromTpm(fileMap.iterator().next().getValue())
-        println "# of genes to process ${genes.size()} . . . ${genes.subList(0,10).join("\t")}"
 
-//        // lets process the samples first
-//        List<String> allSamples = []
-//        fileMap.values().each {File tpmFile ->
-//        }
-//        allTpmFile.write(" \t"+allSamples.join("\t"))
-//
-//
-//
-//
-//
-//        // process gene by gene
-//        genes.each {
-//          // process each file
-//        }
-//
-//
+  }
 
-        // map<gene, map<sample,value>>
-//        Map<String,Map<String,Double>> cohortData = [:]
-//        List<File> cohortDataFiles  = []
-//
-//        cohorts.keySet().eachWithIndex{ def it , int index ->
-//          println "memory 1"
-//          System.gc()
-//          OutputHandler.printMemory()
-//
-//          String tpmLocalFile = "${AnalysisService.TPM_DIRECTORY}
-//          File tpmDataFile = new File()
-//            TpmData tpmData = AnalysisService.getTpmDataFromFile(fileMap.get(it),genes)
-//          FileOutputStream fileOutputStream = new FileOutputStream(tpmDataFile)
-//          ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
-//          objectOutputStream.writeObject(tpmData)
-//          objectOutputStream.close()
-//          cohortDataFiles.add(tpmDataFile)
-//
-//          println "memory 2"
-//          System.gc()
-//          OutputHandler.printMemory()
-//          println "assembling TPM file ${it}"
-//          // TODO: construct the TPM file
-////          cohortData.add(tpmData)
-//          println "memory 3"
-//          System.gc()
-//          OutputHandler.printMemory()
-//        }
-//
-//        // write out TPM file
-//        println "writing TPM data to file"
-//        AnalysisService.writeTpmAllFile(cohortDataFiles,allTpmFile,genes)
-      }
-
-      then:
-      assert allTpmFile.exists() && allTpmFile.size()>0 && allTpmFile.text.split("\n").size() < 5000
-
-    }
 //
 //  void "get TPM file mean and variance"() {
 ////        expect:"fix me"
