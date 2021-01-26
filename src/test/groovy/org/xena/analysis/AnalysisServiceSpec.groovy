@@ -347,7 +347,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
-  void "get Z-scores from the TPM files"(){
+//  void "get Z-scores from the TPM files"(){
+    void "generateZScore"(){
 
     given:
     String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
