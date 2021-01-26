@@ -59,14 +59,14 @@ public class TpmStat  {
 
   @Override
   public String toString() {
-    return "TpmStat{" +
-      "count=" + count +
-      ", oldMean=" + oldMean +
-      ", newMean=" + newMean +
-      ", oldStdev=" + oldStdev +
-      ", newStdev=" + newStdev +
-      ", variance=" + this.variance()+
-      ", stdev=" + this.standardDeviation()+
+    return "{" +
+      "count:" + count +
+//      ", oldMean:" + oldMean +
+      ", mean:" + newMean +
+//      ", oldStdev:" + oldStdev +
+      ", stdev:" + newStdev +
+      ", variance:" + this.variance()+
+      ", stdev:" + this.standardDeviation()+
       '}';
   }
 }

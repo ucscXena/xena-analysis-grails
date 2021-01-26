@@ -1,5 +1,6 @@
 package org.xena.analysis
 
+import grails.converters.JSON
 import grails.testing.services.ServiceUnitTest
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
@@ -306,6 +307,53 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert geneC.mean()==3.6
     assert geneA.standardDeviation()==2.073644135332772
     assert geneC.standardDeviation()==2.4083189157584592
+
+  }
+
+  void "collect all TPM files to get stats"(){
+
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    File convertedTPMFile = new File("${AnalysisService.TPM_DIRECTORY}/../allTpmGeneStats.json")
+    println "abs path: ${convertedTPMFile.absolutePath}"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    println "keys size: ${cohorts.size()}"
+    int numCohorts = cohorts.size()
+    TpmStatMap tpmStatMap  = new TpmStatMap()
+
+    when:
+    if(!convertedTPMFile.exists() || convertedTPMFile.size()==0){
+      convertedTPMFile.write("")
+      cohorts.keySet().eachWithIndex { String entry, int i ->
+        println "processing $entry: ${i+1} of $numCohorts"
+//        if(i < 2){
+//          JSONObject cohortObject = cohorts.get(entry)
+        String localFileName = AnalysisService.generateTpmName(entry)
+        File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
+        assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
+        tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
+//          println "tpm $tpmStatMap"
+//        }
+//        println "processed $entry"
+      }
+//      println "final tpm stat map output $tpmStatMap"
+      convertedTPMFile.write(tpmStatMap.toString())
+    }
+
+    then:
+    assert convertedTPMFile.exists()
+    assert convertedTPMFile.size()>0
+
+    when: "we ingest the file again"
+    JSONObject geneFile = JSON.parse(convertedTPMFile.text)
+
+
+    then: "we should have genes and stats"
+    assert geneFile.keySet().size()==33
+
+  }
+
+  void "get Z-scores from the TPM files"(){
 
   }
 

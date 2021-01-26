@@ -6,7 +6,7 @@ class TpmStatGenerator {
   static TpmStatMap getGeneStatMap(File inputFile,TpmStatMap tpmStatMap = new TpmStatMap()) {
 
     boolean header = true
-    println "input tpmStatMap ${tpmStatMap}"
+//    println "input tpmStatMap ${tpmStatMap}"
     inputFile.splitEachLine("\t"){List<String> tokenLines ->
       if(!header) {
         String geneName = tokenLines[0]
