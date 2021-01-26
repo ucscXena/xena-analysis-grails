@@ -370,40 +370,40 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
       File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
       zTransformedTpmFile.write("")
       boolean isHeader = true
-      StringBuffer stringBuffer
+      StringBuilder stringBuilder = new StringBuilder()
       int geneCounter = 0
       unzippedTpmFile.splitEachLine("\t"){List<String> entries ->
         if(isHeader){
-          stringBuffer = null
-          stringBuffer = new StringBuffer()
-          stringBuffer.append(entries.join("\t")).append("\n")
+          stringBuilder.append(entries.join("\t")).append("\n")
           isHeader = false
         }
         else{
           String gene = entries.get(0)
 //          println "stat object ${statObject.toString()}"
           TpmStat tpmStat = new TpmStat(geneFile.getJSONObject(gene))
-          stringBuffer.append(gene)
+          stringBuilder.append(gene)
 //          zTransformedTpmFile.write(gene)
           entries.subList(1,entries.size()).each {String value ->
              double dValue = Double.parseDouble(value)
-            stringBuffer.append("\t").append(tpmStat.getZValue(dValue))
+            stringBuilder.append("\t").append(tpmStat.getZValue(dValue))
 //            zTransformedTpmFile.write("\t")
 //            zTransformedTpmFile.write(tpmStat.getZValue(dValue).toString())
           }
-          stringBuffer.append("\n")
+          stringBuilder.append("\n")
 //          zTransformedTpmFile.write("\n")
-          zTransformedTpmFile.write(stringBuffer.toString())
-          if(geneCounter % 1000 == 0){
+//          zTransformedTpmFile.write(stringBuffer.toString())
+          if(geneCounter % 5000 == 0){
             println (geneCounter / numGenes * 100.0) +"%"
           }
           ++geneCounter
         }
       }
+      println "writing file output to $zTransformedTpmFile.absolutePath"
+      zTransformedTpmFile.write(stringBuilder.toString())
 //      assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
 //      tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
     }
-    convertedTPMFile.write(tpmStatMap.toString())
+//    convertedTPMFile.write(tpmStatMap.toString())
 
     then:
     assert true
