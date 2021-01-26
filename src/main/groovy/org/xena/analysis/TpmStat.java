@@ -1,5 +1,7 @@
 package org.xena.analysis;
 
+import org.grails.web.json.JSONObject;
+
 import java.util.TreeMap;
 
 public class TpmStat  {
@@ -10,6 +12,13 @@ public class TpmStat  {
   TpmStat() {
     count = 0;
   }
+
+  TpmStat(JSONObject jsonObject){
+    count = jsonObject.getInt("count");
+    newStdev = Math.pow(jsonObject.getDouble("stdev"),2.0) * (count -1);
+    newMean = jsonObject.getDouble("mean");
+  }
+
 
   void clearCount()
   {
@@ -57,6 +66,10 @@ public class TpmStat  {
     return Math.sqrt( variance() );
   }
 
+  double getZValue(double input){
+    return ( input - mean() / standardDeviation());
+  }
+
   @Override
   public String toString() {
     return "{" +
@@ -64,7 +77,7 @@ public class TpmStat  {
 //      ", oldMean:" + oldMean +
       ", mean:" + newMean +
 //      ", oldStdev:" + oldStdev +
-      ", stdev:" + newStdev +
+//      ", stdev:" + newStdev +
       ", variance:" + this.variance()+
       ", stdev:" + this.standardDeviation()+
       '}';

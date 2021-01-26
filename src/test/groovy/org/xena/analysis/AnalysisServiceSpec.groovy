@@ -326,17 +326,11 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
       convertedTPMFile.write("")
       cohorts.keySet().eachWithIndex { String entry, int i ->
         println "processing $entry: ${i+1} of $numCohorts"
-//        if(i < 2){
-//          JSONObject cohortObject = cohorts.get(entry)
         String localFileName = AnalysisService.generateTpmName(entry)
         File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
         assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
         tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
-//          println "tpm $tpmStatMap"
-//        }
-//        println "processed $entry"
       }
-//      println "final tpm stat map output $tpmStatMap"
       convertedTPMFile.write(tpmStatMap.toString())
     }
 
@@ -354,6 +348,49 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
   }
 
   void "get Z-scores from the TPM files"(){
+
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    File convertedTPMFile = new File("${AnalysisService.TPM_DIRECTORY}/../allTpmGeneStats.json")
+    println "abs path: ${convertedTPMFile.absolutePath}"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    println "keys size: ${cohorts.size()}"
+    int numCohorts = cohorts.size()
+    TpmStatMap tpmStatMap  = new TpmStatMap()
+    assert convertedTPMFile.exists() && convertedTPMFile.size()>0
+
+    when:
+    JSONObject geneFile = JSON.parse(convertedTPMFile.text)
+    cohorts.keySet().eachWithIndex { String cohort, int i ->
+      println "processing $cohort: ${i+1} of $numCohorts"
+      String localFileName = AnalysisService.generateTpmName(cohort)
+      File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
+      JSONObject statObject = geneFile.get(cohort)
+      println "stat object ${statObject.toString()}"
+      File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
+      zTransformedTpmFile.write("")
+      boolean isHeader = true
+      unzippedTpmFile.splitEachLine("\t"){List<String> entries ->
+        if(isHeader){
+          zTransformedTpmFile.write(entries.join("\t")+"\n")
+          isHeader = false
+        }
+        else{
+          String gene = entries.get(0)
+          TpmStat tpmStat = new TpmStat(statObject.getJSONObject(gene))
+          zTransformedTpmFile.write(gene)
+          entries.subList(1,entries.size()).each {String value ->
+             double dValue = Double.parseDouble(value)
+            zTransformedTpmFile.write("\t")
+            zTransformedTpmFile.write(tpmStat.getZValue(dValue))
+          }
+          zTransformedTpmFile.write("\n")
+        }
+      }
+//      assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
+//      tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
+    }
+    convertedTPMFile.write(tpmStatMap.toString())
 
   }
 
