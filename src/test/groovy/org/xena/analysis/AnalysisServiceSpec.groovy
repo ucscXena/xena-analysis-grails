@@ -365,8 +365,6 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
       println "processing $cohort: ${i+1} of $numCohorts"
       String localFileName = AnalysisService.generateTpmName(cohort)
       File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
-      JSONObject statObject = geneFile.get(cohort)
-      println "stat object ${statObject.toString()}"
       File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
       zTransformedTpmFile.write("")
       boolean isHeader = true
@@ -377,12 +375,14 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
         }
         else{
           String gene = entries.get(0)
-          TpmStat tpmStat = new TpmStat(statObject.getJSONObject(gene))
+          JSONObject statObject = geneFile.get(gene)
+//          println "stat object ${statObject.toString()}"
+          TpmStat tpmStat = new TpmStat(statObject)
           zTransformedTpmFile.write(gene)
           entries.subList(1,entries.size()).each {String value ->
              double dValue = Double.parseDouble(value)
             zTransformedTpmFile.write("\t")
-            zTransformedTpmFile.write(tpmStat.getZValue(dValue))
+            zTransformedTpmFile.write(tpmStat.getZValue(dValue).toString())
           }
           zTransformedTpmFile.write("\n")
         }
@@ -391,6 +391,9 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 //      tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
     }
     convertedTPMFile.write(tpmStatMap.toString())
+
+    then:
+    assert true
 
   }
 
