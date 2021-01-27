@@ -30,7 +30,8 @@ class TpmStatGenerator {
     // for each geneset
     for(int i = 0 ; i < dataArray.size() ; i++){
       JSONObject jsonObject = dataArray.getJSONObject(i)
-      TpmStat tpmStat = new TpmStat()
+      String pathwayName = jsonObject.geneset
+      TpmStat tpmStat = tpmStatMap.get(pathwayName) ?: new TpmStat()
 
       // for all of the data
       jsonObject.getJSONArray("data").collect {

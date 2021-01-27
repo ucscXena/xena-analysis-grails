@@ -268,21 +268,15 @@ class AnalysisService {
       if(resultCount == possibleCohortCount){
         // 1. get sum and count
         println "same"
-        def results = getSumAndTotalForGmt(gmt)
-        def count = results[0] as Long
-        def sum = results[1] as Double
-        println "results: $results, $count, $sum"
-        double mean = sum / count
-        gmt.mean = mean
+        TpmStatMap tpmStatMap = new TpmStatMap()
+        TpmGmtResult.findAllByGmt(gmt).each {
+          def tpmResult = JSON.parse(it.result) as JSONObject
+          tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult,tpmStatMap)
+        }
+        gmt.stats = tpmStatMap.toString()
         println "$gmt"
-        // 2. calculate variance
-
-        def variance = getVarianceForGmt(gmt,mean,count)
-        println "variance: $variance"
-        gmt.variance = variance
-        println "gmt: $gmt"
         gmt.save(flush: true, failOnError: true)
-        println "saved and lfushed gmt"
+        println "saved and flushed gmt"
       }
       // count all
       println "returnning "
