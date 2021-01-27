@@ -11,6 +11,13 @@ import java.util.Map.Entry;
 
 public class TpmStatMap extends TreeMap<String,TpmStat> {
 
+  public TpmStatMap(){ }
+
+  public TpmStatMap(JSONObject inputObject){
+    for(Object inputKey : inputObject.keySet()){
+      this.put(inputKey.toString(), new TpmStat(inputObject.getJSONObject(inputKey.toString())));
+    }
+  }
 
   @Override
   public String toString() {

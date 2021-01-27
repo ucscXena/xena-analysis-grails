@@ -9,8 +9,8 @@ class Gmt {
   int geneSetCount
   int availableTpmCount // count from defaultGeneSet on initial load
 
-  Double mean  // deprecated
-  Double variance // deprecated
+//  Double mean  // deprecated
+//  Double variance // deprecated
   // use gene names as key
   String stats // { 'ABC':{mean: 0.11212, std: 0.272 },  'DEF': { mean:0.17, std:0.3 } }
 
@@ -24,8 +24,8 @@ class Gmt {
 
   static constraints = {
     name blank: false, unique: true
-    variance nullable: true
-    mean nullable: true
+//    variance nullable: true
+//    mean nullable: true
     stats nullable: true
 //    hash blank: false, unique: true
 //    data blank: false, unique: true

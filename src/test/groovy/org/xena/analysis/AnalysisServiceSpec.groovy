@@ -277,6 +277,48 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
+  void "handle 2 tpmstats"(){
+    given: "2 input files "
+    // -3,-5,2 AND 7, 7, -3
+//    String inputStringA = "{ \"data\": [{ \"geneset\": \"Direct reversal of DNA damage (GO:0006281)\", \"data\": [ \"-3\", \"-5\", \"2\" ] }], \"samples\": [ \"TCGA-OR-A5Jc1-01\", \"TCGA-OR-A5Jb2-01\", \"TCGA-OR-A5J3-0a1\" ] }\n"
+    String inputStringA = "{ \"data\": [ { \"geneset\": \"Direct reversal of DNA damage (GO:0006281)\", \"data\": [ \"-3\", \"-5\", \"2\" ] }, { \"geneset\": \"GeneSet B (GO:0006283)\", \"data\": [ \"7\", \"7\", \"-3\" ] } ], \"samples\": [ \"TCGA-OR-A5Jc1-01\", \"TCGA-OR-A5Jb2-01\", \"TCGA-OR-A5J3-0a1\" ] }"
+    JSONObject inputObjectA = JSON.parse(inputStringA)
+//    println "input object A"
+//    println inputObjectA.toString(2)
+    // 3, 4, 5, 6   AND   3,3,8,6
+    String inputStringB = "{ \"data\": [ { \"geneset\": \"Direct reversal of DNA damage (GO:0006281)\", \"data\": [ \"3\", \"4\", \"5\", \"6\" ] }, { \"geneset\": \"GeneSet B (GO:0006283)\", \"data\": [ \"3\", \"3\", \"8\", \"6\" ] } ], \"samples\": [ \"TCGA-OR-A5J1-01\", \"TCGA-OR-A5J2-01\", \"TCGA-OR-A5J3-01\", \"TCGA-OR-A5J5-01\" ]} "
+    JSONObject inputObjectB = JSON.parse(inputStringB)
+
+    when: "we try to calculate 1 stats"
+    TpmStatMap tpmStatMap = TpmStatGenerator.getPathwayStatMap(inputObjectA)
+    TpmStat tpmStat = tpmStatMap.get("Direct reversal of DNA damage (GO:0006281)")
+    TpmStat tpmStat2 = tpmStatMap.get("GeneSet B (GO:0006283)")
+
+    then:
+    tpmStatMap.size()==2
+    tpmStat.numDataValues()==3
+    tpmStat.mean()==-2
+    tpmStat.standardDeviation()==3.605551275463989
+    tpmStat2.numDataValues()==3
+    tpmStat2.mean()==3.6666666666666665
+    tpmStat2.standardDeviation()==5.773502691896257
+
+
+    when: "we add the other one "
+    tpmStatMap = TpmStatGenerator.getPathwayStatMap(inputObjectB,tpmStatMap)
+    tpmStat = tpmStatMap.get("Direct reversal of DNA damage (GO:0006281)")
+    tpmStat2 = tpmStatMap.get("GeneSet B (GO:0006283)")
+
+    then:
+    tpmStatMap.size()==2
+    tpmStat.numDataValues()==7
+    tpmStat.mean()==1.7142857142857142
+    tpmStat.standardDeviation()==4.15187851918806
+    tpmStat2.numDataValues()==7
+    tpmStat2.mean()==4.428571428571428
+    tpmStat2.standardDeviation()==3.8234863173611093
+  }
+
   void "process for multiple output"(){
     given:
     String inputPath = "src/test/data/resultA.json"
@@ -295,6 +337,22 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert tpmStat.mean()==3.899832197820581
     assert tpmStat.standardDeviation()==0.21746447738787406
     assert tpmStat.variance()==0.04729079892558119
+
+    when: "we see if we can re-hydrate it"
+    def tpmStatMapObject = JSON.parse(tpmStatMap.toString()) as JSONObject
+    TpmStatMap tpmStatMapCopy = new TpmStatMap(tpmStatMapObject)
+
+    then:
+    assert tpmStatMap.size()==9
+    Map.Entry<String,TpmStat> tpmStatEntry2 = tpmStatMap.iterator().next()
+    TpmStat tpmStat2 = tpmStatEntry2.value
+    assert tpmStatEntry.key =='DNA base excision repair (GO:0006281)'
+    assert tpmStat2.numDataValues()==379
+    assert tpmStat2.mean()==3.899832197820581
+    assert tpmStat2.standardDeviation()==0.21746447738787406
+    assert tpmStat2.variance()==0.04729079892558119
+
+
 
   }
 

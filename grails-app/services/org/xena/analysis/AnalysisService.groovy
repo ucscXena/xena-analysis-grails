@@ -268,21 +268,15 @@ class AnalysisService {
       if(resultCount == possibleCohortCount){
         // 1. get sum and count
         println "same"
-        def results = getSumAndTotalForGmt(gmt)
-        def count = results[0] as Long
-        def sum = results[1] as Double
-        println "results: $results, $count, $sum"
-        double mean = sum / count
-        gmt.mean = mean
+        TpmStatMap tpmStatMap = new TpmStatMap()
+        TpmGmtResult.findAllByGmt(gmt).each {
+          def tpmResult = JSON.parse(it.result) as JSONObject
+          tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult,tpmStatMap)
+        }
+        gmt.stats = tpmStatMap.toString()
         println "$gmt"
-        // 2. calculate variance
-
-        def variance = getVarianceForGmt(gmt,mean,count)
-        println "variance: $variance"
-        gmt.variance = variance
-        println "gmt: $gmt"
         gmt.save(flush: true, failOnError: true)
-        println "saved and lfushed gmt"
+        println "saved and flushed gmt"
       }
       // count all
       println "returnning "
@@ -533,6 +527,8 @@ class AnalysisService {
     List samples = samplesArray as List
 //    println "input as JSON"
 //    println input as JSON
+//    println "stats as JSON"
+//    println statsObj as JSON
 //    println "samples as list"
 //    println samples
     if(samples.size()>0) {
@@ -547,6 +543,11 @@ class AnalysisService {
       input.data.eachWithIndex { def entry, int i ->
 //        println "entry: $entry $i $indices ${indices.contains(i)}"
         int innerIndex = 0
+        def genesetName = entry.geneset
+        Double mean = statsObj[genesetName].mean
+        Double std = statsObj[genesetName].stdev
+        // TODO: filter for sample indices
+        // do per gene-set z-value
         def converted = entry.data.collect{ def value ->
           if (indices.contains(innerIndex)) {
             (Float.parseFloat(value) - mean) / std
@@ -558,6 +559,10 @@ class AnalysisService {
     }
     else{
       input.data.eachWithIndex { def entry, int i ->
+        def genesetName = entry.geneset
+        Double mean = statsObj[genesetName].mean
+        Double std = statsObj[genesetName].stdev
+        // do per gene-set z-value
         def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
         values.add(converted )
       }
