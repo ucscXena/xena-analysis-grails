@@ -1,5 +1,8 @@
 package org.xena.analysis
 
+import org.grails.web.json.JSONArray
+import org.grails.web.json.JSONObject
+
 class TpmStatGenerator {
 
 //  https://www.johndcook.com/blog/standard_deviation/
@@ -17,6 +20,24 @@ class TpmStatGenerator {
         tpmStatMap.put(geneName, tpmStat)
       }
       header = false
+    }
+    return tpmStatMap
+  }
+
+  static TpmStatMap getPathwayStatMap(JSONObject inputObject,TpmStatMap tpmStatMap = new TpmStatMap()) {
+
+    JSONArray dataArray = inputObject.getJSONArray("data")
+    // for each geneset
+    for(int i = 0 ; i < dataArray.size() ; i++){
+      JSONObject jsonObject = dataArray.getJSONObject(i)
+      TpmStat tpmStat = new TpmStat()
+
+      // for all of the data
+      jsonObject.getJSONArray("data").collect {
+        tpmStat.addStat( Double.parseDouble(it))
+      }
+
+      tpmStatMap.put(jsonObject.geneset,tpmStat)
     }
     return tpmStatMap
   }

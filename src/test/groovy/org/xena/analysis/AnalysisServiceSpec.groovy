@@ -244,12 +244,12 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     String inputString = "{\"data\":[{\"geneset\":\"Direct reversal of DNA damage (GO:0006281)\",\"data\":[\"2.09239545970997\",\"1.97132727825758\",\"1.60032397375245\",\"1.89290704983659\",\"2.05232326772132\",\"2.09796860838949\",\"1.79190256521988\",\"2.14448933629716\",\"1.74457578177277\",\"1.99359188540912\",\"2.01853895035876\",\"1.92537832642487\",\"2.10943578829161\",\"1.99813233782849\",\"2.04960459374312\",\"2.0730528883914\",\"1.97383878176961\",\"2.19762710994431\",\"1.83273959655064\",\"2.15407722970703\",\"2.12125498735962\",\"1.94958071914254\",\"1.8791965675884\",\"1.8377030533969\",\"1.72201033582089\",\"1.84135428974202\",\"1.82405237420156\",\"1.8579727638253\",\"2.32120082134546\",\"1.57792074231198\",\"1.86989296636481\",\"1.58548846374016\",\"2.10565992595919\",\"2.1972910121179\",\"2.03653369215717\",\"1.85088082024206\",\"2.10406881046339\",\"1.91525776548913\",\"2.14120965833188\",\"1.84221728419151\",\"1.83489431597673\",\"2.09477656066847\",\"1.73671448393877\",\"1.96327174528387\",\"1.8638132168861\",\"2.06735435553049\",\"1.99950398763171\",\"2.06484819423504\",\"1.75531340340595\",\"1.95142979370068\",\"2.07275105539119\",\"2.06405948797351\",\"1.94236154846873\",\"2.34306666743437\",\"2.31874027543505\",\"2.114824495813\",\"2.00340892217389\",\"2.5718342713317\",\"1.72543865837037\",\"2.09954437244427\",\"1.89520558361076\",\"2.09495736473171\",\"2.04562053735889\",\"1.8702735779412\",\"2.0646924876297\",\"1.98716754566897\",\"1.83043297810821\",\"1.85314075615717\",\"1.88457599664042\",\"1.97214888486011\",\"1.76869311197387\",\"1.84656911588848\",\"1.90923466103609\",\"2.09628941476721\",\"1.89918885587281\",\"1.96995277092846\",\"1.89002923425366\",\"1.98567588576069\",\"1.81856205189438\"]}],\"samples\":[\"TCGA-OR-A5J1-01\",\"TCGA-OR-A5J2-01\",\"TCGA-OR-A5J3-01\",\"TCGA-OR-A5J5-01\",\"TCGA-OR-A5J6-01\",\"TCGA-OR-A5J7-01\",\"TCGA-OR-A5J8-01\",\"TCGA-OR-A5J9-01\",\"TCGA-OR-A5JA-01\",\"TCGA-OR-A5JB-01\",\"TCGA-OR-A5JC-01\",\"TCGA-OR-A5JD-01\",\"TCGA-OR-A5JE-01\",\"TCGA-OR-A5JF-01\",\"TCGA-OR-A5JG-01\",\"TCGA-OR-A5JI-01\",\"TCGA-OR-A5JJ-01\",\"TCGA-OR-A5JK-01\",\"TCGA-OR-A5JL-01\",\"TCGA-OR-A5JM-01\",\"TCGA-OR-A5JO-01\",\"TCGA-OR-A5JP-01\",\"TCGA-OR-A5JQ-01\",\"TCGA-OR-A5JR-01\",\"TCGA-OR-A5JS-01\",\"TCGA-OR-A5JT-01\",\"TCGA-OR-A5JV-01\",\"TCGA-OR-A5JW-01\",\"TCGA-OR-A5JX-01\",\"TCGA-OR-A5JY-01\",\"TCGA-OR-A5JZ-01\",\"TCGA-OR-A5K0-01\",\"TCGA-OR-A5K1-01\",\"TCGA-OR-A5K2-01\",\"TCGA-OR-A5K3-01\",\"TCGA-OR-A5K4-01\",\"TCGA-OR-A5K5-01\",\"TCGA-OR-A5K6-01\",\"TCGA-OR-A5K8-01\",\"TCGA-OR-A5K9-01\",\"TCGA-OR-A5KO-01\",\"TCGA-OR-A5KT-01\",\"TCGA-OR-A5KU-01\",\"TCGA-OR-A5KV-01\",\"TCGA-OR-A5KW-01\",\"TCGA-OR-A5KX-01\",\"TCGA-OR-A5KY-01\",\"TCGA-OR-A5KZ-01\",\"TCGA-OR-A5L3-01\",\"TCGA-OR-A5L4-01\",\"TCGA-OR-A5L5-01\",\"TCGA-OR-A5L6-01\",\"TCGA-OR-A5L8-01\",\"TCGA-OR-A5L9-01\",\"TCGA-OR-A5LA-01\",\"TCGA-OR-A5LB-01\",\"TCGA-OR-A5LC-01\",\"TCGA-OR-A5LD-01\",\"TCGA-OR-A5LE-01\",\"TCGA-OR-A5LG-01\",\"TCGA-OR-A5LH-01\",\"TCGA-OR-A5LJ-01\",\"TCGA-OR-A5LK-01\",\"TCGA-OR-A5LL-01\",\"TCGA-OR-A5LM-01\",\"TCGA-OR-A5LN-01\",\"TCGA-OR-A5LO-01\",\"TCGA-OR-A5LP-01\",\"TCGA-OR-A5LR-01\",\"TCGA-OR-A5LS-01\",\"TCGA-OR-A5LT-01\",\"TCGA-OU-A5PI-01\",\"TCGA-P6-A5OF-01\",\"TCGA-P6-A5OG-01\",\"TCGA-PA-A5YG-01\",\"TCGA-PK-A5H8-01\",\"TCGA-PK-A5H9-01\",\"TCGA-PK-A5HA-01\",\"TCGA-PK-A5HB-01\"]}"
 
     when:
-    JSONObject initObject = new JSONObject()
     JSONObject inputObject = JSON.parse(inputString)
+//    println inputObject.toString(2)
     List<Double> dataValues = inputObject.getJSONArray("data").getJSONObject(0).getJSONArray("data").collect{
       Double.parseDouble(it)
     }
-    println "data values: ${dataValues}"
+//    println "data values: ${dataValues}"
     double sum = dataValues.sum()
     long count = dataValues.size()
     double mean = sum / count
@@ -258,14 +258,14 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     println "mean: $mean"
 
     then:
-    assert sum == 155
+    assert sum == 155.5653384903447
     assert count == 79
     assert mean == sum / count
 
 
 
     when:
-    TpmStatMap tpmStatMap = new AnalysisService().getSumAndCountForResult(inputString,initObject)
+    TpmStatMap tpmStatMap = TpmStatGenerator.getPathwayStatMap(inputObject)
     assert tpmStatMap.size()==1
     Map.Entry<String,TpmStat> tpmStatEntry = tpmStatMap.iterator().next()
     TpmStat tpmStat = tpmStatEntry.value
@@ -276,8 +276,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     then:
     assert tpmStatEntry.key =='Direct reversal of DNA damage (GO:0006281)'
     assert tpmStat.numDataValues()==79
-    assert tpmStat.mean()==mean
-    assert tpmStat.standardDeviation()==79
+    assert Math.abs(tpmStat.mean()-mean)< 0.0000001
+    assert tpmStat.standardDeviation()==0.17154089594970198
 
     when:
     def variance = new AnalysisService().getVarianceForResult(inputString,mean,count)
