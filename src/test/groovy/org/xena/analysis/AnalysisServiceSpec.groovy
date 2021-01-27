@@ -349,6 +349,49 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
+
+
+  void "rewrite gene expression cohort data to add z-scores"(){
+
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+
+    when:
+    cohorts.keySet().each { String cohortName ->
+      JSONObject cohortObject = cohorts.getJSONObject(cohortName)
+      JSONObject geneExpressionObject = cohortObject.getJSONObject("gene expression")
+//      String dataset = geneExpressionObject.dataset
+
+//      println "for cohort $cohortName"
+//      println "for cohort object: ${cohortObject['gene expression'].dataset}"
+      String mangledCohortName = cohortName == "TCGA Pheochromocytoma & Paraganglioma (PCPG)" ? "TCGA_PCPG" : cohortName.replaceAll("[ |\\(|\\)]", "_")
+      String newDataSet = "tpm_z/${mangledCohortName}.z.tpm"
+      geneExpressionObject.dataset = newDataSet
+      String remoteUrl = AnalysisService.generateTpmRemoteUrl(cohortObject)
+      println "remote url: $remoteUrl"
+      def metadata = new URL(remoteUrl).openConnection().contentLength
+      assert metadata!=9
+//      println metadata
+
+
+//      https://xenago.xenahubs.net/download/expr_tpm/TCGA-LUAD_tpm_tab.tsv.gz
+//      https://xenago.xenahubs.net/download/tpm_z/TCGA-LUAD_z.tpm.gz
+
+      // convert "expr_tpm/TCGA-LIHC_tpm_tab.tsv" to "tpm_z/TCGA-LIHC_z.tsv
+//      https://xenago.xenahubs.net/download/tpm_z/TCGA_Breast_Cancer__BRCA_.z.tpm.gz
+      // convert "expr_tpm/TCGA-BRCA_tpm_tab.tsv" to "tpm_z/TCGA-BRCA_z.tsv
+
+    }
+
+    then:
+    println "output cohort object"
+    File outputFile = new File("output_defaultDatasetForGeneset.json")
+    outputFile.write(cohorts.toString(2))
+
+
+  }
+
   // NOTE: this is just run as a script and not really for testing
   @Ignore
   void "collect all TPM files to get stats"(){
