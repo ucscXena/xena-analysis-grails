@@ -38,11 +38,6 @@ class TpmAnalysisService {
     }
     int numJobsToRun = TpmGmtAnalysisJob.executeQuery("select count(*) from TpmGmtAnalysisJob t where t.runState = :runState",[runState:RunState.NOT_STARTED])[0] as int
     log.info("number of jobs to run $numJobsToRun")
-//    TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findByRunState(RunState.NOT_STARTED)
-//    def foundJobToRun = TpmGmtAnalysisJob.createCriteria().list {
-//      eq("runState",RunState.NOT_STARTED)
-//      maxResults(MAX_JOB_SIZE)
-//    }
     def foundJobToRun = TpmGmtAnalysisJob.executeQuery("select t from TpmGmtAnalysisJob t where t.runState = :runState",[runState:RunState.NOT_STARTED])
     log.debug("job to run: $foundJobToRun")
     if(foundJobToRun){
