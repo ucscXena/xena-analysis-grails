@@ -527,6 +527,8 @@ class AnalysisService {
     List samples = samplesArray as List
 //    println "input as JSON"
 //    println input as JSON
+//    println "stats as JSON"
+//    println statsObj as JSON
 //    println "samples as list"
 //    println samples
     if(samples.size()>0) {
@@ -541,6 +543,11 @@ class AnalysisService {
       input.data.eachWithIndex { def entry, int i ->
 //        println "entry: $entry $i $indices ${indices.contains(i)}"
         int innerIndex = 0
+        def genesetName = entry.geneset
+        Double mean = statsObj[genesetName].mean
+        Double std = statsObj[genesetName].stdev
+        // TODO: filter for sample indices
+        // do per gene-set z-value
         def converted = entry.data.collect{ def value ->
           if (indices.contains(innerIndex)) {
             (Float.parseFloat(value) - mean) / std
@@ -552,6 +559,10 @@ class AnalysisService {
     }
     else{
       input.data.eachWithIndex { def entry, int i ->
+        def genesetName = entry.geneset
+        Double mean = statsObj[genesetName].mean
+        Double std = statsObj[genesetName].stdev
+        // do per gene-set z-value
         def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
         values.add(converted )
       }
