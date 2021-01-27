@@ -538,21 +538,19 @@ class AnalysisService {
           indices.add(index)
         }
       }
-      println "indices"
-      println indices
+//      println "indices"
+//      println indices
       input.data.eachWithIndex { def entry, int i ->
 //        println "entry: $entry $i $indices ${indices.contains(i)}"
-        int innerIndex = 0
         def genesetName = entry.geneset
         Double mean = statsObj[genesetName].mean
         Double std = statsObj[genesetName].stdev
         // TODO: filter for sample indices
         // do per gene-set z-value
-        def converted = entry.data.collect{ def value ->
-          if (indices.contains(innerIndex)) {
-            (Float.parseFloat(value) - mean) / std
-          }
-          ++innerIndex
+        int innerIndex = 0
+        def filtered = entry.data.findAll{indices.contains(innerIndex++)}
+        def converted = filtered.collect{
+          return (Double.parseDouble(it) - mean) / std
         }
         values.add(converted )
       }
@@ -568,8 +566,8 @@ class AnalysisService {
       }
 //      println "output values"
 //      println values
-      return values
     }
+    return values
   }
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
@@ -580,31 +578,40 @@ class AnalysisService {
   }
 
   Map createMeanMapFromTpmGmt(Gmt gmt,TpmGmtResult resultA,TpmGmtResult resultB,JSONArray samplesArray) {
-    println "creating mean map"
+//    println "creating mean map"
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
 
-//    println "input data $dataA, $dataB"
-//    def samples = [  dataA.samples,dataB.samples ]
-
     def geneSetNames = getGeneSetNames(dataA)
 
-    println "gene set names $geneSetNames"
+//    println "gene set names $geneSetNames"
 
     JSONObject statsObject = JSON.parse(gmt.stats) as JSONObject
     def zSampleScores = extractValues(dataA,dataB,statsObject,samplesArray)
-//    println "values as JSON: "
-//    println zSampleScores as JSON
-//    def values = extractValuesAsList(dataA,dataB)
 
 
-    def zScoreValues = []
 
-//    def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
-    // calculates cohorts separately
-//    def zSampleScores = [getZSampleScores(values[0]),getZSampleScores(values[1])]
-    // uses mean separately
+//    println "z sample scores"
+//    println zSampleScores
+//    println "calss"
+//    println zSampleScores.getClass()
+//    println zSampleScores.size()
+//    println zSampleScores[0].size()
+//    println zSampleScores[0][0].size()
+//    println zSampleScores[1].size()
+//    println zSampleScores[1][0].size()
+//    JSONObject samplesZObj = new JSONObject(zSampleScores)
+//    println samplesZObj.toString(2)
+//    println zSampleScores[0]
+//    println zSampleScores[1]
+
+    // take the mean of each
     def zPathwayScores = getZPathwayScores(zSampleScores)
+//    println "z pathway scores"
+//    println zPathwayScores.size()
+//    println zPathwayScores[0].size()
+//    println zPathwayScores[1].size()
+//    println zPathwayScores
 
     JSONObject jsonObject = new JSONObject()
 //    jsonObject.put("samples",samples)
@@ -651,8 +658,8 @@ class AnalysisService {
   @NotTransactional
   static def getZPathwayScoresForCohort(List sampleScores){
     def returnArray = []
-    sampleScores.each {
-      returnArray.add(it.sum() / it.size())
+    sampleScores.eachWithIndex{  def entry , int index ->
+      returnArray.add(entry.sum() / entry.size())
     }
     return returnArray
   }
