@@ -260,7 +260,7 @@ class AnalysisService {
           result: jsonFile.text,
         ).save(failOnError: true)
 
-      setJobState(analysisJob,RunState.FINISHED)
+//      setJobState(analysisJob,RunState.FINISHED)
 //      }
 
       // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
@@ -402,7 +402,9 @@ class AnalysisService {
 
   @NotTransactional
   def runBpaAnalysis(File gmtFile, File tpmFile, File outputFile) {
-    Process process = "Rscript ${BPA_ANALYSIS_SCRIPT} ${gmtFile.absolutePath} ${tpmFile.absolutePath} ${outputFile.absolutePath} BPA".execute()
+    String runScript = "Rscript ${BPA_ANALYSIS_SCRIPT} ${gmtFile.absolutePath} ${tpmFile.absolutePath} ${outputFile.absolutePath} BPA"
+    println "running: $runScript"
+    Process process = runScript.execute()
     int exitValue = process.waitFor()
     println "exit value ${exitValue}"
 
