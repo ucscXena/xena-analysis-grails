@@ -47,6 +47,7 @@ class TpmAnalysisService {
     for(TpmGmtAnalysisJob jobToRun in foundJobsToRun){
 //      TpmGmtAnalysisJob jobToRun = foundJobsToRun.first()
       log.info "running job, $jobToRun.cohort.name and $jobToRun.gmt.name"
+      new StartJobThread(jobToRun.id,analysisService).start()
       new AnalysisJobThread(jobToRun.id,analysisService).start()
 //      new Thread(){
 //        @Override

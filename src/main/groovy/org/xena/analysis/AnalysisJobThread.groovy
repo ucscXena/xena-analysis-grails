@@ -14,8 +14,6 @@ class AnalysisJobThread extends Thread{
   void run() {
     TpmGmtAnalysisJob.withNewTransaction {
       TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findById(jobId)
-      println "running task , $jobToRun.cohort.name and $jobToRun.gmt.name"
-      analysisService.setJobState(jobToRun.id,RunState.RUNNING)
       println "set job to running, $jobToRun.cohort.name and $jobToRun.gmt.name"
       analysisService.doBpaAnalysis2(jobToRun)
       println "did analysis, setting to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
