@@ -47,19 +47,20 @@ class TpmAnalysisService {
     for(TpmGmtAnalysisJob jobToRun in foundJobsToRun){
 //      TpmGmtAnalysisJob jobToRun = foundJobsToRun.first()
       log.info "running job, $jobToRun.cohort.name and $jobToRun.gmt.name"
-      new Thread(){
-        @Override
-        void run() {
-          super.run()
-          log.info "running task , $jobToRun.cohort.name and $jobToRun.gmt.name"
-          analysisService.setJobState(jobToRun,RunState.RUNNING)
-          log.info "set job to running, $jobToRun.cohort.name and $jobToRun.gmt.name"
-          analysisService.doBpaAnalysis2(jobToRun)
-          log.info "did analysis, setting to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
-          analysisService.setJobState(jobToRun,RunState.FINISHED)
-          log.info "set to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
-        }
-      }.start()
+      new AnalysisJobThread(jobToRun.id,analysisService).start()
+//      new Thread(){
+//        @Override
+//        void run() {
+////          super.run()
+//          log.info "running task , $jobToRun.cohort.name and $jobToRun.gmt.name"
+//          analysisService.setJobState(jobToRun.id,RunState.RUNNING)
+//          log.info "set job to running, $jobToRun.cohort.name and $jobToRun.gmt.name"
+//          analysisService.doBpaAnalysis2(jobToRun)
+//          log.info "did analysis, setting to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+//          analysisService.setJobState(jobToRun.id,RunState.FINISHED)
+//          log.info "set to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+//        }
+//      }.start()
       log.info "running thread, $jobToRun.cohort.name and $jobToRun.gmt.name"
 //      Promise p = task {
 //      }

@@ -205,10 +205,9 @@ class AnalysisService {
     return unzippedTpmFile
   }
 
-  def setJobState(TpmGmtAnalysisJob analysisJob,RunState runState){
-    analysisJob.runState = runState
-    analysisJob.lastUpdated = new Date()
-    analysisJob.save(flush: true, failOnError: true)
+  def setJobState(Long id,RunState runState){
+    TpmGmtAnalysisJob.executeUpdate("update TpmGmtAnalysisJob j set j.runState = :state , j.lastUpdated = :date where j.id = :id",[id:id,state:runState,date:new Date()])
+//    analysisJob.save(flush: true, failOnError: true)
   }
 
 

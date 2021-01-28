@@ -1,0 +1,27 @@
+package org.xena.analysis
+
+class AnalysisJobThread extends Thread{
+
+  private Long jobId
+  private AnalysisService analysisService
+
+  AnalysisJobThread(Long jobId,AnalysisService analysisService){
+    this.jobId = jobId
+    this.analysisService = analysisService
+  }
+
+  @Override
+  void run() {
+    TpmGmtAnalysisJob.withNewTransaction {
+      TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findById(jobId)
+      println "running task , $jobToRun.cohort.name and $jobToRun.gmt.name"
+      analysisService.setJobState(jobToRun.id,RunState.RUNNING)
+      println "set job to running, $jobToRun.cohort.name and $jobToRun.gmt.name"
+      analysisService.doBpaAnalysis2(jobToRun)
+      println "did analysis, setting to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+      analysisService.setJobState(jobToRun.id,RunState.FINISHED)
+      println "set to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+    }
+
+  }
+}
