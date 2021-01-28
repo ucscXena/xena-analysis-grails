@@ -45,12 +45,16 @@ class AnalysisService {
   }
 
 
-  static String generateTpmName(String cohortName){
+  static String generateLocalTpmName(String cohortName){
     return cohortName.replaceAll("[ |\\(|\\)]", "_")
   }
 
   static String generateTpmRemoteUrl(JSONObject cohortObject){
     return "${cohortObject['gene expression'].host}/download/${cohortObject['gene expression'].dataset}.gz"
+  }
+
+  static String generateTpmRawRemoteUrl(JSONObject cohortObject){
+    return "${cohortObject['gene expression raw'].host}/download/${cohortObject['gene expression raw'].dataset}.gz"
   }
 
   static List<String> getGenesFromTpm(File inputTpmFile) {

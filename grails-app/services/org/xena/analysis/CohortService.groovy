@@ -35,7 +35,7 @@ class CohortService {
               name: it
             )
           }
-          String localFileName = AnalysisService.generateTpmName(it)
+          String localFileName = AnalysisService.generateLocalTpmName(it)
           // TODO: get local name for EACH TPM file
           File localCompressedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm.gz")
           String remoteUrl = AnalysisService.generateTpmRemoteUrl(cohortObject)

@@ -419,6 +419,10 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     cohorts.keySet().each { String cohortName ->
       JSONObject cohortObject = cohorts.getJSONObject(cohortName)
       JSONObject geneExpressionObject = cohortObject.getJSONObject("gene expression")
+      JSONObject rawGeneExpression = new JSONObject()
+      rawGeneExpression.host = geneExpressionObject.host
+      rawGeneExpression.dataset = geneExpressionObject.dataset
+      cohortObject.put("gene expression raw",rawGeneExpression)
 //      String dataset = geneExpressionObject.dataset
 
 //      println "for cohort $cohortName"
@@ -429,6 +433,11 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
       String remoteUrl = AnalysisService.generateTpmRemoteUrl(cohortObject)
       println "remote url: $remoteUrl"
       def metadata = new URL(remoteUrl).openConnection().contentLength
+      assert metadata!=9
+
+      remoteUrl = AnalysisService.generateTpmRawRemoteUrl(cohortObject)
+      println "remote url raw: $remoteUrl"
+      metadata = new URL(remoteUrl).openConnection().contentLength
       assert metadata!=9
 //      println metadata
 
@@ -468,7 +477,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
       convertedTPMFile.write("")
       cohorts.keySet().eachWithIndex { String entry, int i ->
         println "processing $entry: ${i+1} of $numCohorts"
-        String localFileName = AnalysisService.generateTpmName(entry)
+        String localFileName = AnalysisService.generateLocalTpmName(entry)
         File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
         assert unzippedTpmFile.exists() && unzippedTpmFile.size()>0
         tpmStatMap = TpmStatGenerator.getGeneStatMap(unzippedTpmFile,tpmStatMap)
@@ -513,7 +522,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     if(doRegenerateFiles){
       cohorts.keySet().sort().eachWithIndex { String cohort, int i ->
         println "processing $cohort: ${i+1} of $numCohorts"
-        String localFileName = AnalysisService.generateTpmName(cohort)
+        String localFileName = AnalysisService.generateLocalTpmName(cohort)
         File unzippedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
         File zTransformedTpmFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.z.tpm")
         zTransformedTpmFile.write("")
