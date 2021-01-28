@@ -88,27 +88,22 @@ class GmtController {
 
   def names(String method) {
     println "method: ${method}"
-//    List<Gmt> gmtList = Gmt.findAllByMethod(method)
-    List<Gmt> gmtList = gmtService.list().sort{ a,b ->
-      if(a.name.startsWith("Default")) return -1
-      if(b.name.startsWith("Default")) return 1
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
-    }
-    println "gmtlist ${gmtList.name}"
+    def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g join g.results r group by g")
+    println "gmtlist ${gmtList}"
     JSONArray jsonArray = new JSONArray()
-    gmtList.each {
+    gmtList.each { def gmtEntry ->
       def obj = new JSONObject()
-      obj.name = it.name
-      obj.geneCount = it.geneSetCount
-      obj.hash = it.hash
-      obj.id = it.id
-      obj.method = it.method
-      obj.readyCount = it.getLoadedResultCount()
-      obj.availableCount = it.availableTpmCount
-      obj.ready = it.ready()
+      obj.name = gmtEntry[0]
+      obj.geneCount = gmtEntry[1]
+//      obj.hash = it.hash
+//      obj.id = it.id
+      obj.method = method
+      obj.availableCount = gmtEntry[2]
+      obj.readyCount = gmtEntry[3]
+      obj.ready = obj.availableCount == obj.readyCount
       jsonArray.add(obj)
     }
-    render jsonArray.unique() as JSON
+    render jsonArray as JSON
   }
 
   def show(Long id) {

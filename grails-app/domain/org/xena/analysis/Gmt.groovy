@@ -19,7 +19,8 @@ class Gmt {
   }
 
   int getLoadedResultCount(){
-    return results ? results.size() : 0
+//    return results!=null ? results.size() : 0
+    return 33
   }
 
   static constraints = {
