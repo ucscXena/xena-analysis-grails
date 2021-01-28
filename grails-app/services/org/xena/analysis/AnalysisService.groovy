@@ -205,6 +205,12 @@ class AnalysisService {
     return unzippedTpmFile
   }
 
+  def setJobState(TpmGmtAnalysisJob analysisJob,RunState runState){
+    analysisJob.runState = runState
+    analysisJob.lastUpdated = new Date()
+    analysisJob.save(flush: true, failOnError: true)
+  }
+
 
 //  TpmGmtAnalysisJob doBpaAnalysis2(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
     def doBpaAnalysis2(TpmGmtAnalysisJob analysisJob){
@@ -214,13 +220,10 @@ class AnalysisService {
 //      Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl
       Cohort cohort = analysisJob.cohort
       Gmt gmt = analysisJob.gmt
-//      TpmGmtAnalysisJob.withNewTransaction{
-        analysisJob.runState = RunState.RUNNING
-        analysisJob.lastUpdated = new Date()
-        analysisJob.save(flush: true, failOnError: true)
-//      }
-//      String method = analysisJob.method
-//      String tpmUrl = cohort.tpmUrl
+//      setJobState(analysisJob,RunState.RUNNING)
+//        analysisJob.runState = RunState.RUNNING
+//        analysisJob.lastUpdated = new Date()
+//        analysisJob.save(flush: true, failOnError: true)
 
     TpmGmtResult result = TpmGmtResult.findByCohortAndGmtHashAndMethod(cohort,gmt.hash,gmt.method)
     println "result found ${result} for ${cohort.name} and $gmt.name "
@@ -249,7 +252,6 @@ class AnalysisService {
 
     File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
       println "output returned $jsonFile"
-//      TpmGmtResult.withNewTransaction {
         result = new TpmGmtResult(
           method: gmt.method,
           gmt: gmt,
@@ -258,10 +260,7 @@ class AnalysisService {
           result: jsonFile.text,
         ).save(failOnError: true)
 
-//        println "result saved $jsonFile.text"
-
-        analysisJob.runState = RunState.FINISHED
-        analysisJob.save(flush: true)
+      setJobState(analysisJob,RunState.FINISHED)
 //      }
 
       // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
@@ -270,22 +269,27 @@ class AnalysisService {
       int resultCount = TpmGmtResult.countByGmt(gmt)
       println "result count: ${resultCount}"
       if(resultCount == possibleCohortCount){
-        // 1. get sum and count
-        println "same"
-        TpmStatMap tpmStatMap = new TpmStatMap()
-        TpmGmtResult.findAllByGmt(gmt).each {
-          def tpmResult = JSON.parse(it.result) as JSONObject
-          tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult,tpmStatMap)
-        }
-        gmt.stats = tpmStatMap.toString()
-        println "$gmt"
-        gmt.save(flush: true, failOnError: true)
-        println "saved and flushed gmt"
+        createGmtStats(gmt)
       }
       // count all
       println "returnning "
 
     return result
+  }
+
+  def createGmtStats(Gmt gmt){
+    // 1. get sum and count
+    println "same"
+    TpmStatMap tpmStatMap = new TpmStatMap()
+    TpmGmtResult.findAllByGmt(gmt).each {
+      def tpmResult = JSON.parse(it.result) as JSONObject
+      tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult,tpmStatMap)
+    }
+    gmt.stats = tpmStatMap.toString()
+    println "$gmt"
+    gmt.save(flush: true, failOnError: true)
+    println "saved and flushed gmt"
+
   }
 
   def getVarianceForGmt(Gmt gmt, double mean, long count){
