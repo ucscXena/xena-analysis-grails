@@ -3,21 +3,21 @@ package org.xena.analysis
 enum RunState {
   NOT_STARTED,
   RUNNING,
+  ERROR,
   FINISHED
 }
 
 class TpmGmtAnalysisJob {
 
-    static constraints = {
-      result nullable: true
-    }
-
-//  String method
   Gmt gmt
   Cohort cohort
-  TpmGmtResult result
   RunState runState = RunState.NOT_STARTED
   Date lastUpdated
   Date createdDate
+  String errorMessage
+
+  static constraints = {
+    errorMessage nullable: true
+  }
 
 }

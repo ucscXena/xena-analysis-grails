@@ -170,13 +170,18 @@ class CompareResultController {
 
     returnObject.put("gmt",gmtObject)
 
+    println "creating mean map "
     Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
+    println "created mean map"
 
     String gmtData = gmt.data
+    println "generating result"
     JSONArray inputArray = analysisService.generateResult(gmtData,meanMap)
+    println "generated result"
 
     returnObject.data = inputArray
 
+    println "dumping out"
     response.outputStream << returnObject.toString()
     response.outputStream.flush()
 
