@@ -479,56 +479,33 @@ class AnalysisService {
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
     println "output gene list ${geneList.size()}"
     println "mean map, geneset names ${meanMap.geneSetNames.size()}"
-    println "gene set names ${meanMap.geneSetNames}"
+//    println "gene set names ${meanMap.geneSetNameMap}"
+
 
     for (List gene in geneList) {
-      def keyIndex = meanMap.geneSetNames.findIndexOf { it == gene[0] }
-      keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it == "${gene[0]} (${gene[1]})" }
-      JSONObject jsonObject = new JSONObject()
-      jsonObject.golabel = gene[0]
-      jsonObject.goid = gene[1]
+//      def keyIndex = meanMap.geneSetNames.findIndexOf { it == gene[0] }
+//      keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it == "${gene[0]} (${gene[1]})" }
+      def keyIndex = meanMap.geneSetNameMap[gene[0]]
+      keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNameMap["${gene[0]} (${gene[1]})"]
+//      println "key index: $keyIndex for ${gene[0]} and ${gene[1]}"
+      if(keyIndex){
+        JSONObject jsonObject = new JSONObject()
+        jsonObject.golabel = gene[0]
+        jsonObject.goid = gene[1]
 
-      jsonObject.gene = gene.subList(2, gene.size())
-      jsonObject.firstGeneExpressionPathwayActivity = meanMap.zPathwayScores[0][keyIndex]
-      jsonObject.secondGeneExpressionPathwayActivity = meanMap.zPathwayScores[1][keyIndex]
-      jsonObject.firstGeneExpressionSampleActivity = meanMap.zSampleScores[0][keyIndex]
-      jsonObject.secondGeneExpressionSampleActivity = meanMap.zSampleScores[1][keyIndex]
+        jsonObject.gene = gene.subList(2, gene.size())
+        jsonObject.firstGeneExpressionPathwayActivity = meanMap.zPathwayScores[0][keyIndex]
+        jsonObject.secondGeneExpressionPathwayActivity = meanMap.zPathwayScores[1][keyIndex]
+        jsonObject.firstGeneExpressionSampleActivity = meanMap.zSampleScores[0][keyIndex]
+        jsonObject.secondGeneExpressionSampleActivity = meanMap.zSampleScores[1][keyIndex]
 
-      outputArray.push(jsonObject)
+        outputArray.push(jsonObject)
+      }
     }
     println "finished calcus and returning "
     return outputArray
   }
 
-  /**
-   * Emulates XenaGoWidget:AnalysisService.js:calculateCustomGeneSetActivity so we aren't transferring large files back and forth
-   * @param result1
-   * @param result2
-   * @return
-   */
-  CompareResult calculateCustomGeneSetActivity(Gmt gmt, Result resultA, Result resultB, String method, String samples) {
-
-    Map meanMap = createMeanMap(resultA, resultB)
-//    println "output mean map"
-//    println new JSONObject(meanMap) as JSON
-
-
-    String gmtData = gmt.data
-    // TODO: implement
-    JSONArray inputArray = generateResult(gmtData, meanMap)
-
-    CompareResult compareResult = new CompareResult(
-      method: method,
-      gmt: gmt,
-      samples: samples,
-      cohortA: resultA.cohort,
-      cohortB: resultB.cohort,
-      result: inputArray.toString()
-    ).save(flush: true, failOnError: true)
-
-    return compareResult
-
-  }
 
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
@@ -594,6 +571,10 @@ class AnalysisService {
     JSONObject dataB = new JSONObject(resultB.result)
 
     def geneSetNames = getGeneSetNames(dataA)
+    JSONObject geneSetNameMap = new JSONObject()
+    geneSetNames.eachWithIndex { Object entry, int i ->
+      geneSetNameMap.put(entry,i)
+    }
 
 //    println "gene set names $geneSetNames"
 
@@ -628,6 +609,7 @@ class AnalysisService {
     jsonObject.put("zSampleScores", zSampleScores)
     jsonObject.put("zPathwayScores", zPathwayScores)
     jsonObject.put("geneSetNames", geneSetNames)
+    jsonObject.put("geneSetNameMap", geneSetNameMap)
 
     return jsonObject
   }
