@@ -14,12 +14,13 @@ class TpmAnalysisService {
   // this needs to be here for quarts
   static lazyInit = false
 //  static List<TpmGmtAnalysisJob> analysisServiceJobs = []
-  final int MAX_JOB_SIZE = 5
+  final int MAX_JOB_SIZE = System.getenv("XENA_ANALYSIS_PROCESSORS") ? Integer.parseInt(System.getenv("XENA_ANALYSIS_PROCESSORS")): 4
   int counter = 0
   int possibleCohortCount
 
   TpmAnalysisService() {
     possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()
+    println "max job size: $MAX_JOB_SIZE"
     println "possible cohorts: $possibleCohortCount"
   }
 
