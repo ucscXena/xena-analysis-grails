@@ -47,7 +47,6 @@ class TpmAnalysisService {
 
   @Scheduled(fixedDelay = 10000L)
   void checkJobQueue() {
-    println "test B"
     log.info("checking job queue: " + counter)
     ++counter
 
