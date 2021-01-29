@@ -46,35 +46,6 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert c == ["a","a1","b","b1"]
   }
 
-//  void "convert mean map to values"(){
-//    given:
-//    def inputA = new JSONObject(new File("src/test/data/inputA.json").text)
-//    def inputB = new JSONObject(new File("src/test/data/inputB.json").text)
-//    assert inputA.samples.size() == 89
-//    assert inputB.samples.size() == 548
-//    assert inputA.data.size() == 9
-//    assert inputB.data.size() == 9
-//    assert inputA.data[0].data.size() == 89
-//    assert inputB.data[0].data.size() == 548
-//
-//    when:
-//    def valuesA = AnalysisService.extractValuesByCohort(inputA)
-//
-//    then:
-//    assert valuesA.size() == 9
-//    assert valuesA[0].size() == 89
-//
-//
-//    when:
-//    def values = AnalysisService.extractValues(inputA,inputB)
-//
-//    then:
-//    assert values.size() == 2
-//    assert values[0].size() == 9
-//    assert values[1].size() == 9
-//    assert values[0][0].size() == 89
-//    assert values[1][0].size() == 548
-//  }
 
   void "get data statistics"(){
 
@@ -184,15 +155,15 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
-  void "handle gmt data"(){
-
-    expect:
-    def gmtData = new File("src/test/data/gmtData.gmt").text
-    def meanMap = new JSONObject(new File("src/test/data/meanMap.json").text) as Map
-    JSONArray outputArray = AnalysisService.generateResult(gmtData,meanMap)
-    assert outputArray.length()==9
-
-  }
+//  void "handle gmt data"(){
+//
+//    expect:
+//    def gmtData = new File("src/test/data/gmtData.gmt").text
+//    def meanMap = new JSONObject(new File("src/test/data/meanMap.json").text) as Map
+//    JSONArray outputArray = AnalysisService.generateResult(gmtData,meanMap)
+//    assert outputArray.length()==9
+//
+//  }
 
   void "generate new filename"(){
 
