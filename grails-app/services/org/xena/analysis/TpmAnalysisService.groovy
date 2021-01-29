@@ -25,14 +25,13 @@ class TpmAnalysisService {
 
   AnalysisService analysisService
 
-  @Scheduled(fixedDelay = 5000L)
-  void executeEveryTen() {
-    log.info "Simple Job every 5 seconds :{}", new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date())
-  }
+//  @Scheduled(fixedDelay = 5000L)
+//  void executeEveryTen() {
+//    log.info "Simple Job every 5 seconds :{}", new SimpleDateFormat("dd/M/yyyy hh:mm:ss").format(new Date())
+//  }
 
   @Scheduled(fixedDelay = 10000L)
   void calculateGmtStats() {
-    println "test A"
     log.info("checking gmt ready to calculate ")
     println "possible cohort count: ${possibleCohortCount}"
     def gmt = Gmt.findByStatsIsNull()

@@ -271,12 +271,25 @@ class AnalysisService {
     // 1. get sum and count
     println "same"
     TpmStatMap tpmStatMap = new TpmStatMap()
-    TpmGmtResult.findAllByGmt(gmt).each {
-      def tpmResult = JSON.parse(it.result) as JSONObject
+    // get id for each one, even if more queries, will reduce memory
+    println "pre-query"
+    List<Long> gmtIds = TpmGmtResult.executeQuery("select t.id from TpmGmtResult t join t.gmt g where g = :gmt",[gmt:gmt])
+    println "gmt ids: ${gmtIds.size()}"
+    println "list of gmt ids: ${gmtIds.join(",")}"
+//    TpmGmtResult.findAllByGmt(gmt).each {
+    for(Long gmtId in gmtIds){
+      println "doing query: $gmtId"
+      TpmGmtResult tpmGmtResult = TpmGmtResult.get(gmtId)
+      println "result: $tpmGmtResult"
+      println "input ${tpmGmtResult.cohort.name}"
+      def tpmResult = JSON.parse(tpmGmtResult.result) as JSONObject
+      println "output ${tpmGmtResult.cohort.name}"
       tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult, tpmStatMap)
+      println "post map ${tpmGmtResult.cohort.name}"
     }
+    println "finished loop ${gmt.name}"
     gmt.stats = tpmStatMap.toString()
-    println "$gmt"
+    println "status done $gmt.name"
     gmt.save(flush: true, failOnError: true)
     println "saved and flushed gmt"
 
@@ -462,12 +475,12 @@ class AnalysisService {
   @NotTransactional
   static JSONArray generateResult(String gmtData, Map meanMap) {
     JSONArray outputArray = new JSONArray()
+    println "input calculating gene list"
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
+    println "output gene list ${geneList.size()}"
+    println "mean map, geneset names ${meanMap.geneSetNames.size()}"
+    println "gene set names ${meanMap.geneSetNames}"
 
-//    println "mean map"
-//    println new JSONObject(meanMap) as JSON
-//    println "gene set names"
-//    println meanMap.geneSetNames
     for (List gene in geneList) {
       def keyIndex = meanMap.geneSetNames.findIndexOf { it == gene[0] }
       keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it == "${gene[0]} (${gene[1]})" }
@@ -476,8 +489,6 @@ class AnalysisService {
       jsonObject.goid = gene[1]
 
       jsonObject.gene = gene.subList(2, gene.size())
-//        jsonObject.firstSamples= meanMap.samples[0]
-//        jsonObject.secondSamples= meanMap.samples[1]
       jsonObject.firstGeneExpressionPathwayActivity = meanMap.zPathwayScores[0][keyIndex]
       jsonObject.secondGeneExpressionPathwayActivity = meanMap.zPathwayScores[1][keyIndex]
       jsonObject.firstGeneExpressionSampleActivity = meanMap.zSampleScores[0][keyIndex]
@@ -485,6 +496,7 @@ class AnalysisService {
 
       outputArray.push(jsonObject)
     }
+    println "finished calcus and returning "
     return outputArray
   }
 
