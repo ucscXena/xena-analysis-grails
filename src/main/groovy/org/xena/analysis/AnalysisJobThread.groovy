@@ -13,12 +13,16 @@ class AnalysisJobThread extends Thread{
   @Override
   void run() {
     TpmGmtAnalysisJob.withNewTransaction {
-      TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findById(jobId)
-      println "set job to running, $jobToRun.cohort.name and $jobToRun.gmt.name"
-      analysisService.doBpaAnalysis2(jobToRun)
-      println "did analysis, setting to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
-      analysisService.setJobState(jobToRun.id,RunState.FINISHED)
-      println "set to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+      try {
+        TpmGmtAnalysisJob jobToRun = TpmGmtAnalysisJob.findById(jobId)
+        println "set job to running, $jobToRun.cohort.name and $jobToRun.gmt.name"
+        analysisService.doBpaAnalysis2(jobToRun)
+        println "did analysis, setting to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+        analysisService.setJobState(jobToRun.id,RunState.FINISHED)
+        println "set to finished, $jobToRun.cohort.name and $jobToRun.gmt.name"
+      } catch (e) {
+        analysisService.setJobState(jobId,RunState.ERROR,e.message)
+      }
     }
 
   }

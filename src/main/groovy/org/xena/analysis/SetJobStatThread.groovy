@@ -1,11 +1,11 @@
 package org.xena.analysis
 
-class StartJobThread extends Thread{
+class SetJobStatThread extends Thread{
 
   private Long jobId
   private AnalysisService analysisService
 
-    StartJobThread(Long jobId, AnalysisService analysisService){
+  SetJobStatThread(Long jobId, AnalysisService analysisService){
     this.jobId = jobId
     this.analysisService = analysisService
   }

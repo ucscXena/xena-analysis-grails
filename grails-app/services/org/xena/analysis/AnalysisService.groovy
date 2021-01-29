@@ -20,7 +20,7 @@ class AnalysisService {
   // Total: 7.80789496160133E8
   final static Double TCGA_ALL_TPM_MEAN = 1.2149232255989761
   final static Double TCGA_ALL_TPM_VARIANCE = 2.3314200093496904
-  final static Double TCGA_ALL_TPM_STD= Math.sqrt(TCGA_ALL_TPM_VARIANCE)
+  final static Double TCGA_ALL_TPM_STD = Math.sqrt(TCGA_ALL_TPM_VARIANCE)
 
   @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {
@@ -36,70 +36,69 @@ class AnalysisService {
 
 //  /Users/nathandunn/repositories/XENA/xena-analysis-grails/data/tpm/TCGA_Ovarian_Cancer__OV_.tpm.gz
   @NotTransactional
-  static String getNewFileName(File originalFile,String sampleHash){
+  static String getNewFileName(File originalFile, String sampleHash) {
     String TPM_SUFFIX = ".tpm.gz"
     String root = originalFile.getParent()
-    String name  = originalFile.getName()
+    String name = originalFile.getName()
     int suffixIndex = name.indexOf(TPM_SUFFIX)
-    return root + "/" + name.substring(0,suffixIndex) + sampleHash + TPM_SUFFIX
+    return root + "/" + name.substring(0, suffixIndex) + sampleHash + TPM_SUFFIX
   }
 
 
-  static String generateLocalTpmName(String cohortName){
+  static String generateLocalTpmName(String cohortName) {
     return cohortName.replaceAll("[ |\\(|\\)]", "_")
   }
 
-  static String generateTpmRemoteUrl(JSONObject cohortObject){
+  static String generateTpmRemoteUrl(JSONObject cohortObject) {
     return "${cohortObject['gene expression'].host}/download/${cohortObject['gene expression'].dataset}.gz"
   }
 
-  static String generateTpmRawRemoteUrl(JSONObject cohortObject){
+  static String generateTpmRawRemoteUrl(JSONObject cohortObject) {
     return "${cohortObject['gene expression raw'].host}/download/${cohortObject['gene expression raw'].dataset}.gz"
   }
 
   static List<String> getGenesFromTpm(File inputTpmFile) {
     String inputText = inputTpmFile.text
-    def fullList = inputText.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")[0]}
-    return fullList.subList(1,fullList.size())
+    def fullList = inputText.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t")[0] }
+    return fullList.subList(1, fullList.size())
   }
 
-  static TpmData getTpmDataFromFile(File file,List<String> genes){
+  static TpmData getTpmDataFromFile(File file, List<String> genes) {
     TpmData tpmData = new TpmData()
     List<String> samplesIndex = []
     int index = 0
-    file.text.splitEachLine("\t"){
-      if(index==0){
-        samplesIndex = it.subList(1,it.size())
+    file.text.splitEachLine("\t") {
+      if (index == 0) {
+        samplesIndex = it.subList(1, it.size())
         tpmData.setSamples(samplesIndex)
-      }
-      else{
+      } else {
         String gene = it[0]
-        tpmData.geneData.put(gene,it.subList(1,it.size()))
+        tpmData.geneData.put(gene, it.subList(1, it.size()))
       }
       ++index
     }
-    assert genes.size()==tpmData.geneData.size()
+    assert genes.size() == tpmData.geneData.size()
     return tpmData
   }
 
-  static List<String> getAllSamples(List<File> tpmSerializedDataFileList){
+  static List<String> getAllSamples(List<File> tpmSerializedDataFileList) {
     List<String> samples = []
-    tpmSerializedDataFileList.each {File tpmDataFile->
+    tpmSerializedDataFileList.each { File tpmDataFile ->
       TpmData tpmData = getSerializedTpmDataFromFile(tpmDataFile)
       samples.addAll(tpmData.samples)
     }
     return samples
   }
 
-  static TpmData getSerializedTpmDataFromFile(File file){
-    FileInputStream fis = new FileInputStream(file);
-    ObjectInputStream ois = new ObjectInputStream(fis);
-    TpmData tpmData = (TpmData) ois.readObject();
+  static TpmData getSerializedTpmDataFromFile(File file) {
+    FileInputStream fis = new FileInputStream(file)
+    ObjectInputStream ois = new ObjectInputStream(fis)
+    TpmData tpmData = (TpmData) ois.readObject()
     ois.close()
     return tpmData
   }
 
-  static void writeTpmAllFile(List<File> tpmSerializedDataFileList, File outputAllTpmFile,List<String> genes) {
+  static void writeTpmAllFile(List<File> tpmSerializedDataFileList, File outputAllTpmFile, List<String> genes) {
     println "memory pre-samples"
     System.gc()
     OutputHandler.printMemory()
@@ -107,7 +106,7 @@ class AnalysisService {
     println "got samples"
     System.gc()
     OutputHandler.printMemory()
-    println "samples list ${samples.size()} . . . .${samples.subList(0,20).join("\t")}"
+    println "samples list ${samples.size()} . . . .${samples.subList(0, 20).join("\t")}"
     outputAllTpmFile.write(samples.join("\t"))
     outputAllTpmFile.write("\n")
     println "wrote samples "
@@ -126,23 +125,22 @@ class AnalysisService {
 
 
   File getTpmFileForSamples(File originalFile, JSONArray samples) {
-    if(samples==null || samples.size()==0) return originalFile
+    if (samples == null || samples.size() == 0) return originalFile
 
     String samplesHash = samples.toString().md5()
 
     println "original file '${originalFile.name}' and '${originalFile.absolutePath}'"
     println "sample hash ${samplesHash}"
 
-    String newName = getNewFileName(originalFile,samplesHash)
+    String newName = getNewFileName(originalFile, samplesHash)
     println "new name ${newName}"
 
     File newFileCompressed = new File(newName)
     // does file exist with sample hash name?
-    if(newFileCompressed.exists() && newFileCompressed.size()>0)  return newFileCompressed
+    if (newFileCompressed.exists() && newFileCompressed.size() > 0) return newFileCompressed
 
 
-
-    String newNameDecompressed = newName.substring(0,newName.length()-(".gz".length()))
+    String newNameDecompressed = newName.substring(0, newName.length() - (".gz".length()))
     File newFileDecompressed = new File(newNameDecompressed)
     println "newNameDecomprssed: '${newNameDecompressed}'"
 
@@ -155,24 +153,24 @@ class AnalysisService {
 //    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gzipInputStream))
 
     FileOutputStream fileOutputStream = new FileOutputStream(newFileDecompressed)
-    IOUtils.copy(gzipInputStream,fileOutputStream)
+    IOUtils.copy(gzipInputStream, fileOutputStream)
     gzipInputStream.close()
     fileOutputStream.close()
 
     // check that it exists
     assert newFileDecompressed.exists()
-    assert newFileDecompressed.size()>0
+    assert newFileDecompressed.size() > 0
 
 //    File tempFile = File.createTempFile("tpm-working",".tpm")
 //    tempFile.deleteOnExit()
 
     // filter for samples
-    String filteredTpmSampleString = filterTpmForSamples( newFileDecompressed,samples)
+    String filteredTpmSampleString = filterTpmForSamples(newFileDecompressed, samples)
 //    assert newFileDecompressed.delete()
     newFileDecompressed.write ""
 
     assert newFileDecompressed.exists()
-    assert newFileDecompressed.size()==0
+    assert newFileDecompressed.size() == 0
 
     newFileDecompressed.write(filteredTpmSampleString)
 
@@ -183,7 +181,7 @@ class AnalysisService {
     CompressorOutputStream compressorOutputStream = new CompressorStreamFactory()
       .createCompressorOutputStream(CompressorStreamFactory.GZIP, compressedFileOutputStream)
     BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(newFileDecompressed))
-    IOUtils.copy(inputStream,compressorOutputStream)
+    IOUtils.copy(inputStream, compressorOutputStream)
     compressorOutputStream.close()
     inputStream.close()
 
@@ -196,37 +194,31 @@ class AnalysisService {
   static File decompressFile(File localCompressedTpmFile, File unzippedTpmFile) {
     GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(localCompressedTpmFile))
     FileOutputStream fileOutputStream = new FileOutputStream(unzippedTpmFile)
-    IOUtils.copy(gzipInputStream,fileOutputStream)
+    IOUtils.copy(gzipInputStream, fileOutputStream)
     gzipInputStream.close()
     fileOutputStream.close()
 
     assert unzippedTpmFile.exists()
-    assert unzippedTpmFile.size()>0
+    assert unzippedTpmFile.size() > 0
     return unzippedTpmFile
   }
 
-  def setJobState(Long id,RunState runState){
-    TpmGmtAnalysisJob.executeUpdate("update TpmGmtAnalysisJob j set j.runState = :state , j.lastUpdated = :date where j.id = :id",[id:id,state:runState,date:new Date()])
+  def setJobState(Long id, RunState runState, String errorMessage = null) {
+    TpmGmtAnalysisJob.executeUpdate("update TpmGmtAnalysisJob j set j.runState = :state , j.lastUpdated = :date, j.errorMessage = :error where j.id = :id", [id: id, state: runState, date: new Date(), error: errorMessage])
 //    analysisJob.save(flush: true, failOnError: true)
   }
 
 
-//  TpmGmtAnalysisJob doBpaAnalysis2(Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl){
-    def doBpaAnalysis2(TpmGmtAnalysisJob analysisJob){
+  def doBpaAnalysis2(TpmGmtAnalysisJob analysisJob) {
 
-      println "doing BPA analysis with ${analysisJob}"
+    println "doing BPA analysis with ${analysisJob}"
 
-//      Cohort cohort,File gmtFile,Gmt gmt,String method,String tpmUrl
-      Cohort cohort = analysisJob.cohort
-      Gmt gmt = analysisJob.gmt
-//      setJobState(analysisJob,RunState.RUNNING)
-//        analysisJob.runState = RunState.RUNNING
-//        analysisJob.lastUpdated = new Date()
-//        analysisJob.save(flush: true, failOnError: true)
+    Cohort cohort = analysisJob.cohort
+    Gmt gmt = analysisJob.gmt
 
-    TpmGmtResult result = TpmGmtResult.findByCohortAndGmtHashAndMethod(cohort,gmt.hash,gmt.method)
+    TpmGmtResult result = TpmGmtResult.findByCohortAndGmtHashAndMethod(cohort, gmt.hash, gmt.method)
     println "result found ${result} for ${cohort.name} and $gmt.name "
-    if(result) return result
+    if (result) return result
 
     File tpmFile = new File(cohort.localTpmFile)
 
@@ -237,7 +229,7 @@ class AnalysisService {
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
-    runBpaAnalysis(gmtFile,tpmFile,outputFile)
+    runBpaAnalysis(gmtFile, tpmFile, outputFile)
 
     long lastOutputFileSize = 0
     int waitCount = 0
@@ -248,41 +240,40 @@ class AnalysisService {
     }
 
 
-
     File jsonFile = OutputHandler.convertTsvFromFile(outputFile)
-      println "output returned $jsonFile"
-        result = new TpmGmtResult(
-          method: gmt.method,
-          gmt: gmt,
-          gmtHash: gmt.hash,
-          cohort: cohort,
-          result: jsonFile.text,
-        ).save(failOnError: true)
+    println "output returned $jsonFile"
+    result = new TpmGmtResult(
+      method: gmt.method,
+      gmt: gmt,
+      gmtHash: gmt.hash,
+      cohort: cohort,
+      result: jsonFile.text,
+    ).save(failOnError: true)
 
 //      setJobState(analysisJob,RunState.FINISHED)
 //      }
 
-      // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
-      int possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()
-      println "possible cohort count: ${possibleCohortCount}"
-      int resultCount = TpmGmtResult.countByGmt(gmt)
-      println "result count: ${resultCount}"
-      if(resultCount == possibleCohortCount){
-        createGmtStats(gmt)
-      }
-      // count all
-      println "returnning "
+    // if we have calculated all of them, then we take the mean and variance for EVERY TPM file in the cohort
+//    int possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()
+//    println "possible cohort count: ${possibleCohortCount}"
+//    int resultCount = TpmGmtResult.countByGmt(gmt)
+//    println "result count: ${resultCount}"
+//    if (resultCount == possibleCohortCount) {
+//      createGmtStats(gmt)
+//    }
+//    // count all
+//    println "returnning "
 
     return result
   }
 
-  def createGmtStats(Gmt gmt){
+  def createGmtStats(Gmt gmt) {
     // 1. get sum and count
     println "same"
     TpmStatMap tpmStatMap = new TpmStatMap()
     TpmGmtResult.findAllByGmt(gmt).each {
       def tpmResult = JSON.parse(it.result) as JSONObject
-      tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult,tpmStatMap)
+      tpmStatMap = TpmStatGenerator.getPathwayStatMap(tpmResult, tpmStatMap)
     }
     gmt.stats = tpmStatMap.toString()
     println "$gmt"
@@ -291,11 +282,11 @@ class AnalysisService {
 
   }
 
-  def getVarianceForGmt(Gmt gmt, double mean, long count){
+  def getVarianceForGmt(Gmt gmt, double mean, long count) {
     double variance = 0
     TpmGmtResult.findAllByGmt(gmt).each {
 //      println "data: ${it.result}"
-      def tpmResult = getVarianceForResult(it.result,mean,count)
+      def tpmResult = getVarianceForResult(it.result, mean, count)
       variance += tpmResult
 //      println "data: ${it.result}"
     }
@@ -303,7 +294,7 @@ class AnalysisService {
   }
 
   @NotTransactional
-  def getSumAndCountForResult(String resultData,JSONObject initObject){
+  def getSumAndCountForResult(String resultData, JSONObject initObject) {
 //    println "input resultData "
 //    println resultData
 
@@ -315,34 +306,34 @@ class AnalysisService {
 //    println object.toString()
     long count = 0
     double sum = 0d
-    for(int i = 0 ; i < dataArray.size() ; i++){
+    for (int i = 0; i < dataArray.size(); i++) {
       def sampleData = dataArray.get(i).data
 //      println "sample data: $sampleData"
       def doubleData = sampleData as List<Double>
 //      println "double data: $doubleData"
       count += doubleData.size()
-      doubleData.sum{ sum += Double.parseDouble(it) }
+      doubleData.sum { sum += Double.parseDouble(it) }
     }
 
-    return [count,sum]
+    return [count, sum]
   }
 
   @NotTransactional
-  def getVarianceForResult(String resultData,double mean, long count){
+  def getVarianceForResult(String resultData, double mean, long count) {
     def object = JSON.parse(resultData)
     JSONArray dataArray = object.data as JSONArray
     double variance = 0d
-    for(int i = 0 ; i < dataArray.size() ; i++){
+    for (int i = 0; i < dataArray.size(); i++) {
       def sampleData = dataArray.get(i).data
       def doubleData = sampleData as List<Double>
-      doubleData.sum{
-        variance += Math.pow(Double.parseDouble(it) - mean,2.0)
+      doubleData.sum {
+        variance += Math.pow(Double.parseDouble(it) - mean, 2.0)
       }
     }
     return variance / count
   }
 
-  def getSumAndTotalForGmt(Gmt gmt){
+  def getSumAndTotalForGmt(Gmt gmt) {
     double sum = 0
     long count = 0
     TpmGmtResult.findAllByGmt(gmt).each {
@@ -350,7 +341,7 @@ class AnalysisService {
       sum += tpmResult[0]
       count += tpmResult[1]
     }
-    return [sum,count]
+    return [sum, count]
   }
 
   /**
@@ -364,19 +355,19 @@ class AnalysisService {
    * @param samples
    * @return
    */
-  Result doBpaAnalysis(Cohort cohort,File gmtFile,Gmt gmt,String method,JSONArray samples){
+  Result doBpaAnalysis(Cohort cohort, File gmtFile, Gmt gmt, String method, JSONArray samples) {
 
-    Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method,cohort,gmt.hash,samples.toString())
+    Result result = Result.findByMethodAndCohortAndGmtHashAndSamples(method, cohort, gmt.hash, samples.toString())
     println "result found ${result} for ${cohort.name} and $gmt.name "
-    if(result) return result
+    if (result) return result
 
     File originalTpmFile = getOriginalTpmFile(cohort)
-    File tpmFile = getTpmFileForSamples(originalTpmFile,samples)
+    File tpmFile = getTpmFileForSamples(originalTpmFile, samples)
 
     String mangledCohortName = cohort.name.replaceAll("[ |\\(|\\)]", "_")
     File outputFile = File.createTempFile("output-${mangledCohortName}${gmt.hash}", ".tsv")
     outputFile.write("")
-    runBpaAnalysis(gmtFile,tpmFile,outputFile)
+    runBpaAnalysis(gmtFile, tpmFile, outputFile)
 
     long lastOutputFileSize = 0
     int waitCount = 0
@@ -427,16 +418,16 @@ class AnalysisService {
 
   }
 
-  static def retrieveTpmFile(File tpmFile,String tpmUrl){
+  static def retrieveTpmFile(File tpmFile, String tpmUrl) {
     def out = new BufferedOutputStream(new FileOutputStream(tpmFile))
     out << tpmUrl.toURL().openStream()
     out.close()
   }
 
-  Cohort getOriginalTpmFile(Cohort cohort){
+  Cohort getOriginalTpmFile(Cohort cohort) {
 
 //    Tpm tpm = Tpm.findByCohort(cohort)
-    if(cohort.localTpmFile !=null && new File(cohort.localTpmFile).exists()){
+    if (cohort.localTpmFile != null && new File(cohort.localTpmFile).exists()) {
       println "is good ${cohort.name}"
       return cohort
     }
@@ -458,10 +449,10 @@ class AnalysisService {
 //        localFile: tpmFile.absolutePath
 //      ).save(failOnError: true, flush: true)
 //      cohort.tpm = tpm
-      cohort.save(failOnError: true, flush:true)
+    cohort.save(failOnError: true, flush: true)
 //  else {
-      assert new File(cohort.localTpmFile).exists()
-      // nothign to do?
+    assert new File(cohort.localTpmFile).exists()
+    // nothign to do?
 //    }
 //    return tpmFile
 
@@ -469,30 +460,30 @@ class AnalysisService {
 
 
   @NotTransactional
-  static JSONArray generateResult(String gmtData,Map meanMap) {
+  static JSONArray generateResult(String gmtData, Map meanMap) {
     JSONArray outputArray = new JSONArray()
-    def geneList = gmtData.split("\n").findAll{it.split("\t").size()>2 }.collect{ it.split("\t")}
+    def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
 
 //    println "mean map"
 //    println new JSONObject(meanMap) as JSON
 //    println "gene set names"
 //    println meanMap.geneSetNames
-    for(List gene in geneList){
-        def keyIndex = meanMap.geneSetNames.findIndexOf { it==gene[0]}
-        keyIndex = keyIndex >=0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it=="${gene[0]} (${gene[1]})" }
-        JSONObject jsonObject = new JSONObject()
-        jsonObject.golabel = gene[0]
-        jsonObject.goid = gene[1]
+    for (List gene in geneList) {
+      def keyIndex = meanMap.geneSetNames.findIndexOf { it == gene[0] }
+      keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it == "${gene[0]} (${gene[1]})" }
+      JSONObject jsonObject = new JSONObject()
+      jsonObject.golabel = gene[0]
+      jsonObject.goid = gene[1]
 
-        jsonObject.gene = gene.subList(2,gene.size())
+      jsonObject.gene = gene.subList(2, gene.size())
 //        jsonObject.firstSamples= meanMap.samples[0]
 //        jsonObject.secondSamples= meanMap.samples[1]
-        jsonObject.firstGeneExpressionPathwayActivity= meanMap.zPathwayScores[0][keyIndex]
-        jsonObject.secondGeneExpressionPathwayActivity= meanMap.zPathwayScores[1][keyIndex]
-        jsonObject.firstGeneExpressionSampleActivity= meanMap.zSampleScores[0][keyIndex]
-        jsonObject.secondGeneExpressionSampleActivity= meanMap.zSampleScores[1][keyIndex]
+      jsonObject.firstGeneExpressionPathwayActivity = meanMap.zPathwayScores[0][keyIndex]
+      jsonObject.secondGeneExpressionPathwayActivity = meanMap.zPathwayScores[1][keyIndex]
+      jsonObject.firstGeneExpressionSampleActivity = meanMap.zSampleScores[0][keyIndex]
+      jsonObject.secondGeneExpressionSampleActivity = meanMap.zSampleScores[1][keyIndex]
 
-        outputArray.push(jsonObject)
+      outputArray.push(jsonObject)
     }
     return outputArray
   }
@@ -503,16 +494,16 @@ class AnalysisService {
    * @param result2
    * @return
    */
-  CompareResult calculateCustomGeneSetActivity(Gmt gmt,Result resultA, Result resultB,String method,String samples) {
+  CompareResult calculateCustomGeneSetActivity(Gmt gmt, Result resultA, Result resultB, String method, String samples) {
 
-    Map meanMap = createMeanMap(resultA,resultB)
+    Map meanMap = createMeanMap(resultA, resultB)
 //    println "output mean map"
 //    println new JSONObject(meanMap) as JSON
 
 
     String gmtData = gmt.data
     // TODO: implement
-    JSONArray inputArray = generateResult(gmtData,meanMap)
+    JSONArray inputArray = generateResult(gmtData, meanMap)
 
     CompareResult compareResult = new CompareResult(
       method: method,
@@ -520,7 +511,7 @@ class AnalysisService {
       samples: samples,
       cohortA: resultA.cohort,
       cohortB: resultB.cohort,
-      result:inputArray.toString()
+      result: inputArray.toString()
     ).save(flush: true, failOnError: true)
 
     return compareResult
@@ -530,7 +521,7 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static def extractValuesByCohort(JSONObject input,JSONObject statsObj,JSONArray samplesArray){
+  static def extractValuesByCohort(JSONObject input, JSONObject statsObj, JSONArray samplesArray) {
 
     def values = []
     List samples = samplesArray as List
@@ -540,7 +531,7 @@ class AnalysisService {
 //    println statsObj as JSON
 //    println "samples as list"
 //    println samples
-    if(samples.size()>0) {
+    if (samples.size() > 0) {
       List indices = []
       input.samples.eachWithIndex { def entry, int index ->
         if (samples.contains(entry)) {
@@ -557,21 +548,20 @@ class AnalysisService {
         // TODO: filter for sample indices
         // do per gene-set z-value
         int innerIndex = 0
-        def filtered = entry.data.findAll{indices.contains(innerIndex++)}
-        def converted = filtered.collect{
+        def filtered = entry.data.findAll { indices.contains(innerIndex++) }
+        def converted = filtered.collect {
           return (Double.parseDouble(it) - mean) / std
         }
-        values.add(converted )
+        values.add(converted)
       }
-    }
-    else{
+    } else {
       input.data.eachWithIndex { def entry, int i ->
         def genesetName = entry.geneset
         Double mean = statsObj[genesetName].mean
         Double std = statsObj[genesetName].stdev
         // do per gene-set z-value
         def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
-        values.add(converted )
+        values.add(converted)
       }
 //      println "output values"
 //      println values
@@ -582,11 +572,11 @@ class AnalysisService {
   // input a regular data object and output of the shape: 2 cohorts, and each cohort has N genesets and each has S sample values
   // each value has to be parsed to double from string as well
   @NotTransactional
-  static List extractValues(JSONObject inputA,JSONObject inputB,JSONObject statsObj,JSONArray samplesArray){
-    return [extractValuesByCohort(inputA,statsObj,samplesArray[0]),extractValuesByCohort(inputB,statsObj,samplesArray[1])]
+  static List extractValues(JSONObject inputA, JSONObject inputB, JSONObject statsObj, JSONArray samplesArray) {
+    return [extractValuesByCohort(inputA, statsObj, samplesArray[0]), extractValuesByCohort(inputB, statsObj, samplesArray[1])]
   }
 
-  Map createMeanMapFromTpmGmt(Gmt gmt,TpmGmtResult resultA,TpmGmtResult resultB,JSONArray samplesArray) {
+  Map createMeanMapFromTpmGmt(Gmt gmt, TpmGmtResult resultA, TpmGmtResult resultB, JSONArray samplesArray) {
 //    println "creating mean map"
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
@@ -596,8 +586,7 @@ class AnalysisService {
 //    println "gene set names $geneSetNames"
 
     JSONObject statsObject = JSON.parse(gmt.stats) as JSONObject
-    def zSampleScores = extractValues(dataA,dataB,statsObject,samplesArray)
-
+    def zSampleScores = extractValues(dataA, dataB, statsObject, samplesArray)
 
 
 //    println "z sample scores"
@@ -624,9 +613,9 @@ class AnalysisService {
 
     JSONObject jsonObject = new JSONObject()
 //    jsonObject.put("samples",samples)
-    jsonObject.put("zSampleScores",zSampleScores)
-    jsonObject.put("zPathwayScores",zPathwayScores)
-    jsonObject.put("geneSetNames",geneSetNames)
+    jsonObject.put("zSampleScores", zSampleScores)
+    jsonObject.put("zPathwayScores", zPathwayScores)
+    jsonObject.put("geneSetNames", geneSetNames)
 
     return jsonObject
   }
@@ -637,25 +626,25 @@ class AnalysisService {
    * @param resultB
    * @return
    */
-  Map createMeanMap(Result resultA,Result resultB) {
+  Map createMeanMap(Result resultA, Result resultB) {
     JSONObject dataA = new JSONObject(resultA.result)
     JSONObject dataB = new JSONObject(resultB.result)
 
-    def samples = [  dataA.samples,dataB.samples ]
+    def samples = [dataA.samples, dataB.samples]
 
     def geneSetNames = getGeneSetNames(dataA)
-    def values = extractValues(dataA,dataB)
+    def values = extractValues(dataA, dataB)
     def dataStatisticsPerGeneSet = getDataStatisticsPerGeneSet(values)
     // calculates cohorts separately
-    def zSampleScores = [getZSampleScores(values[0],dataStatisticsPerGeneSet),getZSampleScores(values[1],dataStatisticsPerGeneSet)]
+    def zSampleScores = [getZSampleScores(values[0], dataStatisticsPerGeneSet), getZSampleScores(values[1], dataStatisticsPerGeneSet)]
     // uses mean separately
     def zPathwayScores = getZPathwayScores(zSampleScores)
 
     JSONObject jsonObject = new JSONObject()
-    jsonObject.put("samples",samples)
-    jsonObject.put("zSampleScores",zSampleScores)
-    jsonObject.put("zPathwayScores",zPathwayScores)
-    jsonObject.put("geneSetNames",geneSetNames)
+    jsonObject.put("samples", samples)
+    jsonObject.put("zSampleScores", zSampleScores)
+    jsonObject.put("zPathwayScores", zPathwayScores)
+    jsonObject.put("geneSetNames", geneSetNames)
 
     return jsonObject
   }
@@ -665,9 +654,9 @@ class AnalysisService {
  * @return
  */
   @NotTransactional
-  static def getZPathwayScoresForCohort(List sampleScores){
+  static def getZPathwayScoresForCohort(List sampleScores) {
     def returnArray = []
-    sampleScores.eachWithIndex{  def entry , int index ->
+    sampleScores.eachWithIndex { def entry, int index ->
       returnArray.add(entry.sum() / entry.size())
     }
     return returnArray
@@ -675,23 +664,23 @@ class AnalysisService {
 
 // eslint-disable-next-line no-unused-vars
   @NotTransactional
-  static def getZPathwayScores(sampleZScores){
-    return [getZPathwayScoresForCohort(sampleZScores[0]),getZPathwayScoresForCohort(sampleZScores[1])]
+  static def getZPathwayScores(sampleZScores) {
+    return [getZPathwayScoresForCohort(sampleZScores[0]), getZPathwayScoresForCohort(sampleZScores[1])]
   }
 
   @NotTransactional
-  static def getZSampleScores(values,dataStatisticsPerGeneSet){
+  static def getZSampleScores(values, dataStatisticsPerGeneSet) {
     def scoreValues = []
-    values.eachWithIndex { def value , int index ->
-      def statistics  = dataStatisticsPerGeneSet[index] // [0] = mean, [1] = variance
+    values.eachWithIndex { def value, int index ->
+      def statistics = dataStatisticsPerGeneSet[index] // [0] = mean, [1] = variance
       // TODO: collect for each
 //      const array = values[index].data.map( v => (v - mean)/ variance )
       // TODO: do other collection
       def entryValue = []
-      value.each{
+      value.each {
         def convertedValue = (it - statistics.mean) / statistics.variance
 //        println "input value ($it - $statistics.mean) / $statistics.variance = $convertedValue "
-        entryValue.add( convertedValue )
+        entryValue.add(convertedValue)
       }
       scoreValues.add(entryValue)
     }
@@ -699,43 +688,43 @@ class AnalysisService {
   }
 
   List getGeneSetNames(JSONObject inputData) {
-    return inputData.data.collect{ it.geneset}
+    return inputData.data.collect { it.geneset }
   }
 
   @NotTransactional
   static List getDataStatisticsPerGeneSet(def inputData) {
     def outputData = []
-    for(int i = 0 ; i < inputData[0].size() ; i++ ){
-      def valuesForIndex = getValuesForIndex(inputData,i)
+    for (int i = 0; i < inputData[0].size(); i++) {
+      def valuesForIndex = getValuesForIndex(inputData, i)
 //      println "values for index $i"
 //      println valuesForIndex
       def output = getDataStatisticsForGeneSet(valuesForIndex)
-      def jsonObject = new JSONObject(mean: output[0],variance: output[1])
+      def jsonObject = new JSONObject(mean: output[0], variance: output[1])
       outputData.add(jsonObject)
     }
     return outputData
   }
 
   @NotTransactional
-  static def getDataStatisticsForGeneSet(List inputArray){
+  static def getDataStatisticsForGeneSet(List inputArray) {
     int count = inputArray.size()
     def total = 0
-    for(double a in inputArray){
+    for (double a in inputArray) {
       total += a
     }
     def mean = total / count
     double temp = 0
-    for(double a in inputArray){
-      temp += (a - mean) * (a -mean)
+    for (double a in inputArray) {
+      temp += (a - mean) * (a - mean)
     }
     def variance = temp / (inputArray.size() - 1)
-    return [mean,variance]
+    return [mean, variance]
 
   }
 
   @NotTransactional
   static String filterTpmForSamples(File originalTpmFile, JSONArray samplesArray) {
-    if(samplesArray.size()==0) return originalTpmFile
+    if (samplesArray.size() == 0) return originalTpmFile
 
     List<String> sampleList = samplesArray as List<String>
 
@@ -744,7 +733,7 @@ class AnalysisService {
     List<String> tpmEntries = tpmText.split("\n") as List<String>
 
     String[] availableSamples = tpmEntries.get(0).split("\t")
-    List<String> availableSamplesList = (availableSamples as List).subList(0,availableSamples.length)
+    List<String> availableSamplesList = (availableSamples as List).subList(0, availableSamples.length)
 
     // find columns with matching samples
     List<String> intersectingLists = sampleList.intersect(availableSamplesList)
@@ -755,7 +744,7 @@ class AnalysisService {
 
     // for each line in tpmEntries, write out columns
     StringBuffer stringBuffer = new StringBuffer()
-    for(String tpmEntry in tpmEntries){
+    for (String tpmEntry in tpmEntries) {
       String[] inputValues = tpmEntry.split("\t")
       List<String> outputArray = [inputValues[0]]
       matchingIndices.each {
@@ -790,18 +779,18 @@ class AnalysisService {
 
     // TODO: / populate inputData
     Cohort.all.eachParallel {
-      inputData.addAll( getTpmData( it))
+      inputData.addAll(getTpmData(it))
     }
 
     double total = inputData.sumParallel()
-    double mean = total /  inputData.size()
+    double mean = total / inputData.size()
 
     double variance = 0
     inputData.eachParallel {
-      variance += Math.pow(it - mean,2.0)
+      variance += Math.pow(it - mean, 2.0)
     }
     variance = variance / inputData.size()
-    return [mean,variance]
+    return [mean, variance]
   }
 
 }
