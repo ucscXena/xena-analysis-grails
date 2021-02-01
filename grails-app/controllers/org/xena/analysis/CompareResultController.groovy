@@ -163,12 +163,13 @@ class CompareResultController {
     if(resultB==null)throw new RuntimeException("No results available for $method ${cohortNameB} $gmt.name")
 
     JSONObject returnObject = new JSONObject()
-    JSONObject gmtObject= new JSONObject()
-    gmtObject.name = gmt.name
-    gmtObject.hash = gmt.hash
-    gmtObject.stats = gmt.stats
+    // I don't think this is used
+//    JSONObject gmtObject= new JSONObject()
+//    gmtObject.name = gmt.name
+//    gmtObject.hash = gmt.hash
+//    gmtObject.stats = gmt.stats
 
-    returnObject.put("gmt",gmtObject)
+//    returnObject.put("gmt",gmtObject)
 
     println "creating mean map "
     Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
