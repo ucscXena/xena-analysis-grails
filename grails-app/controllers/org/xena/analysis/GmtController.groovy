@@ -88,7 +88,7 @@ class GmtController {
 
   def names(String method) {
     println "method: ${method}"
-    def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g join g.results r group by g")
+    def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r group by g")
     println "gmtlist ${gmtList}"
     JSONArray jsonArray = new JSONArray()
     gmtList.each { def gmtEntry ->
@@ -138,10 +138,10 @@ class GmtController {
     gmt.availableTpmCount = cohorts.keySet().size()
     gmt.save(failOnError: true, flush: true)
 
-    tpmAnalysisService.loadTpmForGmtFiles(gmt)
 
     respond(gmt)
 
+    tpmAnalysisService.loadTpmForGmtFiles(gmt)
   }
 
 
