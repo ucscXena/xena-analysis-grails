@@ -477,8 +477,8 @@ class AnalysisService {
     JSONArray outputArray = new JSONArray()
     println "input calculating gene list"
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
-    println "output gene list ${geneList.size()}"
-    println "mean map, geneset names ${meanMap.geneSetNames.size()}"
+    log.debug "output gene list ${geneList.size()}"
+    log.debug "mean map, geneset names ${meanMap.geneSetNames.join(",")}"
 //    println "gene set names ${meanMap.geneSetNameMap}"
 
 
@@ -487,8 +487,7 @@ class AnalysisService {
 //      keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it == "${gene[0]} (${gene[1]})" }
       def keyIndex = meanMap.geneSetNameMap[gene[0]]
       keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNameMap["${gene[0]} (${gene[1]})"]
-//      println "key index: $keyIndex for ${gene[0]} and ${gene[1]}"
-      if(keyIndex){
+      if(keyIndex>=0){
         JSONObject jsonObject = new JSONObject()
         jsonObject.golabel = gene[0]
         jsonObject.goid = gene[1]
@@ -501,8 +500,10 @@ class AnalysisService {
 
         outputArray.push(jsonObject)
       }
+      else{
+        log.error "key not found: [${gene[0]}] and [${gene[1]}]"
+      }
     }
-    println "finished calcus and returning "
     return outputArray
   }
 
@@ -576,33 +577,11 @@ class AnalysisService {
       geneSetNameMap.put(entry,i)
     }
 
-//    println "gene set names $geneSetNames"
-
     JSONObject statsObject = JSON.parse(gmt.stats) as JSONObject
     def zSampleScores = extractValues(dataA, dataB, statsObject, samplesArray)
 
-
-//    println "z sample scores"
-//    println zSampleScores
-//    println "calss"
-//    println zSampleScores.getClass()
-//    println zSampleScores.size()
-//    println zSampleScores[0].size()
-//    println zSampleScores[0][0].size()
-//    println zSampleScores[1].size()
-//    println zSampleScores[1][0].size()
-//    JSONObject samplesZObj = new JSONObject(zSampleScores)
-//    println samplesZObj.toString(2)
-//    println zSampleScores[0]
-//    println zSampleScores[1]
-
     // take the mean of each
     def zPathwayScores = getZPathwayScores(zSampleScores)
-//    println "z pathway scores"
-//    println zPathwayScores.size()
-//    println zPathwayScores[0].size()
-//    println zPathwayScores[1].size()
-//    println zPathwayScores
 
     JSONObject jsonObject = new JSONObject()
 //    jsonObject.put("samples",samples)
