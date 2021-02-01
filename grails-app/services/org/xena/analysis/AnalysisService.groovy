@@ -477,8 +477,8 @@ class AnalysisService {
     JSONArray outputArray = new JSONArray()
     println "input calculating gene list"
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
-    log.debug "output gene list ${geneList.size()}"
-    log.debug "mean map, geneset names ${meanMap.geneSetNames.join(",")}"
+    println "output gene list ${geneList.size()}"
+    println "mean map, geneset names ${meanMap.geneSetNames.join(",")}"
 //    println "gene set names ${meanMap.geneSetNameMap}"
 
 
@@ -501,7 +501,7 @@ class AnalysisService {
         outputArray.push(jsonObject)
       }
       else{
-        log.error "key not found: [${gene[0]}] and [${gene[1]}]"
+        println "key not found: [${gene[0]}] and [${gene[1]}]"
       }
     }
     return outputArray
