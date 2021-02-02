@@ -479,6 +479,7 @@ class AnalysisService {
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
     println "output gene list ${geneList.size()}"
     println "mean map, geneset names ${meanMap.geneSetNames.join(",")}"
+    println "mean map: ${meanMap}"
 //    println "gene set names ${meanMap.geneSetNameMap}"
 
 
@@ -498,12 +499,14 @@ class AnalysisService {
         jsonObject.firstGeneExpressionSampleActivity = meanMap.zSampleScores[0][keyIndex]
         jsonObject.secondGeneExpressionSampleActivity = meanMap.zSampleScores[1][keyIndex]
 
+
         outputArray.push(jsonObject)
       }
       else{
         println "key not found: [${gene[0]}] and [${gene[1]}]"
       }
     }
+      outputArray.getJSONObject(0).samples = meanMap.samples
     return outputArray
   }
 
@@ -583,8 +586,12 @@ class AnalysisService {
     // take the mean of each
     def zPathwayScores = getZPathwayScores(zSampleScores)
 
+    JSONArray samples = new JSONArray()
+    samples.add(dataA.getJSONArray("samples"))
+    samples.add(dataB.getJSONArray("samples"))
+
     JSONObject jsonObject = new JSONObject()
-//    jsonObject.put("samples",samples)
+    jsonObject.put("samples",samples)
     jsonObject.put("zSampleScores", zSampleScores)
     jsonObject.put("zPathwayScores", zPathwayScores)
     jsonObject.put("geneSetNames", geneSetNames)
