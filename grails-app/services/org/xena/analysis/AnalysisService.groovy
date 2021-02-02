@@ -506,7 +506,7 @@ class AnalysisService {
         println "key not found: [${gene[0]}] and [${gene[1]}]"
       }
     }
-      outputArray.getJSONObject(0).samples = meanMap.samples
+      outputArray.getJSONObject(outputArray.size()-1).samples = meanMap.samples
     return outputArray
   }
 
