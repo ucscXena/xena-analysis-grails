@@ -591,7 +591,7 @@ class AnalysisService {
     samples.add(dataB.getJSONArray("samples"))
 
     JSONObject jsonObject = new JSONObject()
-    jsonObject.put("samples",samples)
+    jsonObject.put("samples",samplesArray)
     jsonObject.put("zSampleScores", zSampleScores)
     jsonObject.put("zPathwayScores", zPathwayScores)
     jsonObject.put("geneSetNames", geneSetNames)
