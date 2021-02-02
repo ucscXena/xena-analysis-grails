@@ -164,12 +164,12 @@ class CompareResultController {
 
     JSONObject returnObject = new JSONObject()
     // I don't think this is used
-//    JSONObject gmtObject= new JSONObject()
-//    gmtObject.name = gmt.name
-//    gmtObject.hash = gmt.hash
-//    gmtObject.stats = gmt.stats
+    JSONObject gmtObject= new JSONObject()
+    gmtObject.name = gmt.name
+    gmtObject.hash = gmt.hash
+    gmtObject.stats = gmt.stats
 
-//    returnObject.put("gmt",gmtObject)
+    returnObject.put("gmt",gmtObject)
 
     println "creating mean map "
     Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
