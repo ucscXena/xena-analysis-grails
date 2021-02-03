@@ -518,14 +518,15 @@ class AnalysisService {
 
     def values = new ArrayList()
     Map indicesMap = [:]
+    Map relativeIndexMap = [:]
     List samples = samplesArray as List
     int indexCount = 0
     println "input.samples as JSON"
     println input.samples.size()
 //    println "stats as JSON"
 //    println statsObj as JSON
-//    println "samples as list"
-//    println samples
+    println "samples as list"
+    println samples.size()
     if (samples.size() > 0) {
 //      values = new ArrayList<Double>[samples.size()]
       input.samples.eachWithIndex { def entry, int index ->
@@ -536,12 +537,15 @@ class AnalysisService {
         int actualIndex = samples.indexOf(entry)
         if(actualIndex>=0) {
           println "sample index: ${actualIndex}, vs ${index}"
-          indicesMap.put(actualIndex,indexCount++)
+          // this is the relative index
+          relativeIndexMap.put(actualIndex,indexCount++)
+          indicesMap.put(index,actualIndex)
         }
       }
       assert indicesMap.size()==samples.size()
-//      println "indices"
-//      println indices
+      println "indices"
+      println indicesMap
+      println relativeIndexMap
       println "input data ${input.data.size()}"
       input.data.eachWithIndex { def entry, int i ->
 //        println "entry: $entry $i $indices ${indices.contains(i)}"
@@ -550,24 +554,47 @@ class AnalysisService {
         Double std = statsObj[genesetName].stdev
         int innerIndex = 0
         // filter for sample indices
-        def filtered = entry.data.findAll {
-          indicesMap.containsKey(innerIndex++)
-//          indices.contains(innerIndex++)
+        println  "# of entries: ${entry.data.size()} "
+
+        def filtered = []
+        indicesMap.each { filtered.add(0)}
+
+//        def filtered = entry.data.findAll { def dataEntry ->
+//          indicesMap.containsKey(dataEntry)
+////          indices.contains(innerIndex++)
+//        }
+        indicesMap.each {
+          filtered[it.value] = entry.data[it.key]
         }
+
+        println "filtered: ${filtered}"
         // do per gene-set z-value
+        def reordered = new ArrayList(filtered.size())
+        filtered.each { reordered.add(0)}
         def converted = filtered.collect {
           return (Double.parseDouble(it) - mean) / std
         }
+        println "converted: $converted"
         println "extracdtin $i"
-        int actualIndex = indicesMap.get(i)
-        println "actual $actualIndex"
-        println "actual index: $actualIndex"
-        values[actualIndex] = converted
+//        int actualIndex = indicesMap.get(i)
+//        println "actual index: $actualIndex"
+        println "indicesMap: $indicesMap"
+        println "relativeIndexMap: $relativeIndexMap"
+
+        // sort
+        println "converted: $converted"
+        converted.eachWithIndex { double nextEntry, int nextIndex ->
+          println "input index: $nextIndex,  $i"
+          int testIndex = relativeIndexMap.get(nextIndex)
+          println "output index: $testIndex <- $nextIndex, $i"
+          reordered.set( testIndex ,nextEntry)
+        }
+        println "reordered: $reordered"
+        values[i] =converted
       }
       assert values[0].size()==samples.size()
       assert indicesMap.size()==samples.size()
 
-      println "index max ${indicesMap}"
 
     } else {
 //      values = ArrayList<Double>[input.samples.size()]
