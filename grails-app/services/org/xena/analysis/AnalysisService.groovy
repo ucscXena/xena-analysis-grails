@@ -478,7 +478,7 @@ class AnalysisService {
     println "input calculating gene list"
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
     println "output gene list ${geneList.size()}"
-    println "mean map, geneset names ${meanMap.geneSetNames.join(",")}"
+    println "mean map, geneset names ${meanMap.geneSetNames.size()}"
 //    println "mean map: ${meanMap}"
 //    println "gene set names ${meanMap.geneSetNameMap}"
 
