@@ -516,28 +516,33 @@ class AnalysisService {
   @NotTransactional
   static def extractValuesByCohort(JSONObject input, JSONObject statsObj, JSONArray samplesArray) {
 
-    double[] values
+    def values = new ArrayList()
     Map indicesMap = [:]
     List samples = samplesArray as List
     int indexCount = 0
     println "input.samples as JSON"
-    println input.samples
+    println input.samples.size()
 //    println "stats as JSON"
 //    println statsObj as JSON
 //    println "samples as list"
 //    println samples
     if (samples.size() > 0) {
-      values = [samples.size()]
+//      values = new ArrayList<Double>[samples.size()]
       input.samples.eachWithIndex { def entry, int index ->
 //        if (samples.contains(entry)) {
 //          int actualIndex = samples.indexOf(entry)
 //          indicesMap.put(actualIndex,indexCount++)
 //        }
         int actualIndex = samples.indexOf(entry)
-        if(actualIndex>=0) indicesMap.put(actualIndex,indexCount++)
+        if(actualIndex>=0) {
+          println "sample index: ${actualIndex}, vs ${index}"
+          indicesMap.put(actualIndex,indexCount++)
+        }
       }
+      assert indicesMap.size()==samples.size()
 //      println "indices"
 //      println indices
+      println "input data ${input.data.size()}"
       input.data.eachWithIndex { def entry, int i ->
 //        println "entry: $entry $i $indices ${indices.contains(i)}"
         def genesetName = entry.geneset
@@ -553,14 +558,19 @@ class AnalysisService {
         def converted = filtered.collect {
           return (Double.parseDouble(it) - mean) / std
         }
+        println "extracdtin $i"
         int actualIndex = indicesMap.get(i)
+        println "actual $actualIndex"
+        println "actual index: $actualIndex"
         values[actualIndex] = converted
       }
+      assert values[0].size()==samples.size()
+      assert indicesMap.size()==samples.size()
 
       println "index max ${indicesMap}"
 
     } else {
-      values = [input.samples.size()]
+//      values = ArrayList<Double>[input.samples.size()]
       // TODO: process map for all samples
       input.samples.eachWithIndex { def entry, int index ->
         int actualIndex = samples.indexOf(entry)
@@ -576,6 +586,8 @@ class AnalysisService {
         int actualIndex = indicesMap.get(i)
         values[actualIndex] = converted
       }
+      assert values.size()==input.samples.size()
+      assert indicesMap.size()==input.samples.size()
 //      println "output values"
 //      println values
     }
