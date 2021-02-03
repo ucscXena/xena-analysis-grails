@@ -516,20 +516,25 @@ class AnalysisService {
   @NotTransactional
   static def extractValuesByCohort(JSONObject input, JSONObject statsObj, JSONArray samplesArray) {
 
-    def values = []
+    double[] values
+    Map indicesMap = [:]
     List samples = samplesArray as List
-//    println "input as JSON"
-//    println input as JSON
+    int indexCount = 0
+    println "input.samples as JSON"
+    println input.samples
 //    println "stats as JSON"
 //    println statsObj as JSON
 //    println "samples as list"
 //    println samples
     if (samples.size() > 0) {
-      List indices = []
+      values = [samples.size()]
       input.samples.eachWithIndex { def entry, int index ->
-        if (samples.contains(entry)) {
-          indices.add(index)
-        }
+//        if (samples.contains(entry)) {
+//          int actualIndex = samples.indexOf(entry)
+//          indicesMap.put(actualIndex,indexCount++)
+//        }
+        int actualIndex = samples.indexOf(entry)
+        if(actualIndex>=0) indicesMap.put(actualIndex,indexCount++)
       }
 //      println "indices"
 //      println indices
@@ -538,23 +543,38 @@ class AnalysisService {
         def genesetName = entry.geneset
         Double mean = statsObj[genesetName].mean
         Double std = statsObj[genesetName].stdev
-        // TODO: filter for sample indices
-        // do per gene-set z-value
         int innerIndex = 0
-        def filtered = entry.data.findAll { indices.contains(innerIndex++) }
+        // filter for sample indices
+        def filtered = entry.data.findAll {
+          indicesMap.containsKey(innerIndex++)
+//          indices.contains(innerIndex++)
+        }
+        // do per gene-set z-value
         def converted = filtered.collect {
           return (Double.parseDouble(it) - mean) / std
         }
-        values.add(converted)
+        int actualIndex = indicesMap.get(i)
+        values[actualIndex] = converted
       }
+
+      println "index max ${indicesMap}"
+
     } else {
+      values = [input.samples.size()]
+      // TODO: process map for all samples
+      input.samples.eachWithIndex { def entry, int index ->
+        int actualIndex = samples.indexOf(entry)
+        if(actualIndex>=0) indicesMap.put(actualIndex,indexCount++)
+      }
+
       input.data.eachWithIndex { def entry, int i ->
         def genesetName = entry.geneset
         Double mean = statsObj[genesetName].mean
         Double std = statsObj[genesetName].stdev
         // do per gene-set z-value
         def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
-        values.add(converted)
+        int actualIndex = indicesMap.get(i)
+        values[actualIndex] = converted
       }
 //      println "output values"
 //      println values
