@@ -273,11 +273,11 @@ class AnalysisService {
     TpmStatMap tpmStatMap = new TpmStatMap()
     // get id for each one, even if more queries, will reduce memory
     println "pre-query"
-    List<Long> gmtIds = TpmGmtResult.executeQuery("select t.id from TpmGmtResult t join t.gmt g where g = :gmt",[gmt:gmt])
+    List<Long> gmtIds = TpmGmtResult.executeQuery("select t.id from TpmGmtResult t join t.gmt g where g = :gmt", [gmt: gmt])
     println "gmt ids: ${gmtIds.size()}"
     println "list of gmt ids: ${gmtIds.join(",")}"
 //    TpmGmtResult.findAllByGmt(gmt).each {
-    for(Long gmtId in gmtIds){
+    for (Long gmtId in gmtIds) {
       println "doing query: $gmtId"
       TpmGmtResult tpmGmtResult = TpmGmtResult.get(gmtId)
       println "result: $tpmGmtResult"
@@ -479,7 +479,7 @@ class AnalysisService {
     def geneList = gmtData.split("\n").findAll { it.split("\t").size() > 2 }.collect { it.split("\t") }
     println "output gene list ${geneList.size()}"
     println "mean map, geneset names ${meanMap.geneSetNames.join(",")}"
-    println "mean map: ${meanMap}"
+//    println "mean map: ${meanMap}"
 //    println "gene set names ${meanMap.geneSetNameMap}"
 
 
@@ -488,7 +488,7 @@ class AnalysisService {
 //      keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNames.findIndexOf { it == "${gene[0]} (${gene[1]})" }
       def keyIndex = meanMap.geneSetNameMap[gene[0]]
       keyIndex = keyIndex >= 0 ? keyIndex : meanMap.geneSetNameMap["${gene[0]} (${gene[1]})"]
-      if(keyIndex>=0){
+      if (keyIndex >= 0) {
         JSONObject jsonObject = new JSONObject()
         jsonObject.golabel = gene[0]
         jsonObject.goid = gene[1]
@@ -501,12 +501,11 @@ class AnalysisService {
 
 
         outputArray.push(jsonObject)
-      }
-      else{
+      } else {
         println "key not found: [${gene[0]}] and [${gene[1]}]"
       }
     }
-      outputArray.getJSONObject(outputArray.size()-1).samples = meanMap.samples
+    outputArray.getJSONObject(outputArray.size() - 1).samples = meanMap.samples
     return outputArray
   }
 
@@ -521,103 +520,44 @@ class AnalysisService {
     Map relativeIndexMap = [:]
     List samples = samplesArray as List
     int indexCount = 0
-    println "input.samples as JSON"
-    println input.samples.size()
-//    println "stats as JSON"
-//    println statsObj as JSON
-    println "samples as list"
-    println samples.size()
-    if (samples.size() > 0) {
-//      values = new ArrayList<Double>[samples.size()]
-      input.samples.eachWithIndex { def entry, int index ->
-//        if (samples.contains(entry)) {
-//          int actualIndex = samples.indexOf(entry)
-//          indicesMap.put(actualIndex,indexCount++)
-//        }
-        int actualIndex = samples.indexOf(entry)
-        if(actualIndex>=0) {
-          println "sample index: ${actualIndex}, vs ${index}"
-          // this is the relative index
-          relativeIndexMap.put(actualIndex,indexCount++)
-          indicesMap.put(index,actualIndex)
-        }
+    input.samples.eachWithIndex { def entry, int index ->
+      int actualIndex = samples.indexOf(entry)
+      if (actualIndex >= 0) {
+        // this is the relative index
+        relativeIndexMap.put(actualIndex, indexCount++)
+        indicesMap.put(index, actualIndex)
       }
-      assert indicesMap.size()==samples.size()
-      println "indices"
-      println indicesMap
-      println relativeIndexMap
-      println "input data ${input.data.size()}"
-      input.data.eachWithIndex { def entry, int i ->
-//        println "entry: $entry $i $indices ${indices.contains(i)}"
-        def genesetName = entry.geneset
-        Double mean = statsObj[genesetName].mean
-        Double std = statsObj[genesetName].stdev
-        int innerIndex = 0
-        // filter for sample indices
-        println  "# of entries: ${entry.data.size()} "
-
-        def filtered = []
-        indicesMap.each { filtered.add(0)}
-
-//        def filtered = entry.data.findAll { def dataEntry ->
-//          indicesMap.containsKey(dataEntry)
-////          indices.contains(innerIndex++)
-//        }
-        indicesMap.each {
-          filtered[it.value] = entry.data[it.key]
-        }
-
-        println "filtered: ${filtered}"
-        // do per gene-set z-value
-        def reordered = new ArrayList(filtered.size())
-        filtered.each { reordered.add(0)}
-        def converted = filtered.collect {
-          return (Double.parseDouble(it) - mean) / std
-        }
-        println "converted: $converted"
-        println "extracdtin $i"
-//        int actualIndex = indicesMap.get(i)
-//        println "actual index: $actualIndex"
-        println "indicesMap: $indicesMap"
-        println "relativeIndexMap: $relativeIndexMap"
-
-        // sort
-        println "converted: $converted"
-        converted.eachWithIndex { double nextEntry, int nextIndex ->
-          println "input index: $nextIndex,  $i"
-          int testIndex = relativeIndexMap.get(nextIndex)
-          println "output index: $testIndex <- $nextIndex, $i"
-          reordered.set( testIndex ,nextEntry)
-        }
-        println "reordered: $reordered"
-        values[i] =converted
-      }
-      assert values[0].size()==samples.size()
-      assert indicesMap.size()==samples.size()
-
-
-    } else {
-//      values = ArrayList<Double>[input.samples.size()]
-      // TODO: process map for all samples
-      input.samples.eachWithIndex { def entry, int index ->
-        int actualIndex = samples.indexOf(entry)
-        if(actualIndex>=0) indicesMap.put(actualIndex,indexCount++)
-      }
-
-      input.data.eachWithIndex { def entry, int i ->
-        def genesetName = entry.geneset
-        Double mean = statsObj[genesetName].mean
-        Double std = statsObj[genesetName].stdev
-        // do per gene-set z-value
-        def converted = entry.data.collect { (Float.parseFloat(it) - mean) / std }
-        int actualIndex = indicesMap.get(i)
-        values[actualIndex] = converted
-      }
-      assert values.size()==input.samples.size()
-      assert indicesMap.size()==input.samples.size()
-//      println "output values"
-//      println values
     }
+    assert indicesMap.size() == samples.size()
+    input.data.eachWithIndex { def entry, int i ->
+      def genesetName = entry.geneset
+      Double mean = statsObj[genesetName].mean
+      Double std = statsObj[genesetName].stdev
+      // filter for sample indices
+
+      def filtered = []
+      indicesMap.each { filtered.add(0) }
+      indicesMap.each {
+        filtered[it.value] = entry.data[it.key]
+      }
+
+      // do per gene-set z-value
+      def reordered = new ArrayList(filtered.size())
+      filtered.each { reordered.add(0) }
+      def converted = filtered.collect {
+        return (Double.parseDouble(it) - mean) / std
+      }
+
+      // sort
+      converted.eachWithIndex { double nextEntry, int nextIndex ->
+        int testIndex = relativeIndexMap.get(nextIndex)
+        reordered.set(testIndex, nextEntry)
+      }
+      values[i] = converted
+    }
+    assert values[0].size() == samples.size()
+    assert indicesMap.size() == samples.size()
+
     return values
   }
 
@@ -636,11 +576,16 @@ class AnalysisService {
     def geneSetNames = getGeneSetNames(dataA)
     JSONObject geneSetNameMap = new JSONObject()
     geneSetNames.eachWithIndex { Object entry, int i ->
-      geneSetNameMap.put(entry,i)
+      geneSetNameMap.put(entry, i)
     }
 
     JSONObject statsObject = JSON.parse(gmt.stats) as JSONObject
-    def zSampleScores = extractValues(dataA, dataB, statsObject, samplesArray)
+
+    JSONArray inputSamplesArray = new JSONArray()
+    inputSamplesArray.add(samplesArray[0].size() == 0 ? dataA.getJSONArray("samples") : samplesArray[0])
+    inputSamplesArray.add(samplesArray[1].size() == 0 ? dataB.getJSONArray("samples") : samplesArray[1])
+
+    def zSampleScores = extractValues(dataA, dataB, statsObject, inputSamplesArray)
 
     // take the mean of each
     def zPathwayScores = getZPathwayScores(zSampleScores)
@@ -650,7 +595,7 @@ class AnalysisService {
     samples.add(dataB.getJSONArray("samples"))
 
     JSONObject jsonObject = new JSONObject()
-    jsonObject.put("samples",samplesArray)
+    jsonObject.put("samples", samplesArray)
     jsonObject.put("zSampleScores", zSampleScores)
     jsonObject.put("zPathwayScores", zPathwayScores)
     jsonObject.put("geneSetNames", geneSetNames)
