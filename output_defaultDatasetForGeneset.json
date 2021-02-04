@@ -1,0 +1,1689 @@
+{
+  "TCGA Lung Adenocarcinoma (LUAD)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_LUAD_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.LUAD.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Lung_Adenocarcinoma__LUAD_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/LUAD_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.LUAD.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Lung_Adenocarcinoma__LUAD_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/LUAD_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "Regulon activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "regulon_activity_matrix_tcga_luad.tsv"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/LUAD_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Pancreatic Cancer (PAAD)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_PAAD_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.PAAD.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Pancreatic_Cancer__PAAD_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/PAAD_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.PAAD.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Pancreatic_Cancer__PAAD_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/PAAD_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/PAAD_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Liver Cancer (LIHC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_LIHC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.LIHC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Liver_Cancer__LIHC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/LIHC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.LIHC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Liver_Cancer__LIHC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/LIHC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/LIHC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Stomach Cancer (STAD)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_STAD_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.STAD.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Stomach_Cancer__STAD_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/STAD_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.STAD.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Stomach_Cancer__STAD_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/STAD_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/STAD_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Colon Cancer (COAD)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_COAD_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.COAD.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Colon_Cancer__COAD_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/COAD_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.COAD.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Colon_Cancer__COAD_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/COAD_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/COAD_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Thymoma (THYM)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_THYM_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.THYM.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Thymoma__THYM_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/THYM_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.THYM.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Thymoma__THYM_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/THYM_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/THYM_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Kidney Clear Cell Carcinoma (KIRC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_KIRC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.KIRC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Kidney_Clear_Cell_Carcinoma__KIRC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/KIRC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.KIRC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Kidney_Clear_Cell_Carcinoma__KIRC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/KIRC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/KIRC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Kidney Papillary Cell Carcinoma (KIRP)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_KIRP_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.KIRP.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Kidney_Papillary_Cell_Carcinoma__KIRP_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/KIRP_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.KIRP.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Kidney_Papillary_Cell_Carcinoma__KIRP_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/KIRP_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/KIRP_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Adrenocortical Cancer (ACC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_ACC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.ACC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Adrenocortical_Cancer__ACC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/ACC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.ACC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Adrenocortical_Cancer__ACC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/ACC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/ACC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Ocular melanomas (UVM)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_UVM_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.UVM.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Ocular_melanomas__UVM_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/UVM_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.UVM.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Ocular_melanomas__UVM_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/UVM_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/UVM_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Lung Squamous Cell Carcinoma (LUSC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_LUSC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.LUSC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Lung_Squamous_Cell_Carcinoma__LUSC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/LUSC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.LUSC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Lung_Squamous_Cell_Carcinoma__LUSC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/LUSC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/LUSC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Ovarian Cancer (OV)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_OV_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.OV.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Ovarian_Cancer__OV_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/OV_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.OV.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Ovarian_Cancer__OV_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/OV_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/OV_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Thyroid Cancer (THCA)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_THCA_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.THCA.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Thyroid_Cancer__THCA_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/THCA_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.THCA.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Thyroid_Cancer__THCA_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/THCA_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/THCA_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Endometrioid Cancer (UCEC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_UCEC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.UCEC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Endometrioid_Cancer__UCEC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/UCEC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.UCEC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Endometrioid_Cancer__UCEC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/UCEC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/UCEC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Cervical Cancer (CESC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_CESC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.CESC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Cervical_Cancer__CESC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/CESC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.CESC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Cervical_Cancer__CESC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/CESC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/CESC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Kidney Chromophobe (KICH)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_KICH_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.KICH.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Kidney_Chromophobe__KICH_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/KICH_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.KICH.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Kidney_Chromophobe__KICH_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/KICH_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/KICH_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Bile Duct Cancer (CHOL)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_CHOL_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.CHOL.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Bile_Duct_Cancer__CHOL_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/CHOL_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.CHOL.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Bile_Duct_Cancer__CHOL_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/CHOL_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/CHOL_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Uterine Carcinosarcoma (UCS)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_UCS_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.UCS.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Uterine_Carcinosarcoma__UCS_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/UCS_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.UCS.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Uterine_Carcinosarcoma__UCS_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/UCS_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/UCS_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Mesothelioma (MESO)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_MESO_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.MESO.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Mesothelioma__MESO_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/MESO_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.MESO.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Mesothelioma__MESO_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/MESO_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/MESO_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Rectal Cancer (READ)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_READ_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.READ.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Rectal_Cancer__READ_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/READ_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.READ.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Rectal_Cancer__READ_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/READ_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/READ_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Head and Neck Cancer (HNSC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_HNSC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.HNSC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Head_and_Neck_Cancer__HNSC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/HNSC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.HNSC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Head_and_Neck_Cancer__HNSC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/HSNC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/HNSC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Acute Myeloid Leukemia (LAML)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_LAML_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.LAML.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Acute_Myeloid_Leukemia__LAML_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.LAML.sampleMap/mutation_wustl"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.LAML.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Acute_Myeloid_Leukemia__LAML_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/LAML_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/LAML_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Bladder Cancer (BLCA)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_BLCA_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.BLCA.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Bladder_Cancer__BLCA_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/BLCA_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.BLCA.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Bladder_Cancer__BLCA_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/BLCA_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/BLCA_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Prostate Cancer (PRAD)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_PRAD_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.PRAD.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Prostate_Cancer__PRAD_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/PRAD_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.PRAD.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Prostate_Cancer__PRAD_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/PRAD_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/PRAD_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Large B-cell Lymphoma (DLBC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_DLBC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.DLBC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Large_B-cell_Lymphoma__DLBC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/DLBC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.DLBC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Large_B-cell_Lymphoma__DLBC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/DLBC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/DLBC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Esophageal Cancer (ESCA)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_ESCA_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.ESCA.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Esophageal_Cancer__ESCA_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/ESCA_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.ESCA.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Esophageal_Cancer__ESCA_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/ESCA_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/ESCA_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Glioblastoma (GBM)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_GBM_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.GBM.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Glioblastoma__GBM_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/GBM_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.GBM.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Glioblastoma__GBM_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/GBM_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/GBM_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Lower Grade Glioma (LGG)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_LGG_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.LGG.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Lower_Grade_Glioma__LGG_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/LGG_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.LGG.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Lower_Grade_Glioma__LGG_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/LGG_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/LGG_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Melanoma (SKCM)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_SKCM_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.SKCM.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Melanoma__SKCM_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/SKCM_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.SKCM.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Melanoma__SKCM_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/SKCM_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/SKCM_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Testicular Cancer (TGCT)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_TGCT_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.TGCT.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Testicular_Cancer__TGCT_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/TGCT_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.TGCT.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Testicular_Cancer__TGCT_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/TGCT_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/TGCT_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Breast Cancer (BRCA)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_BRCA_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.BRCA.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Breast_Cancer__BRCA_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/BRCA_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.BRCA.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Breast_Cancer__BRCA_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/BRCA_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/BRCA_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Sarcoma (SARC)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_SARC_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.SARC.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Sarcoma__SARC_.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/SARC_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.SARC.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_Sarcoma__SARC_.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/SARC_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/SARC_merge_merged_reals.txt"
+    }
+  },
+  "TCGA Pheochromocytoma & Paraganglioma (PCPG)": {
+    "viewInPathway": true,
+    "genome background": {
+      "mutation": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "mutation_sampleEvent"
+      },
+      "copy number": {
+        "feature_event_K": "event_K",
+        "feature_total_pop_N": "total_pop_N",
+        "host": "https://xenago.xenahubs.net",
+        "dataset": "cnv_sampleEvent"
+      }
+    },
+    "gene expression pathway activity": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "pathway_act/TCGA_PCPG_BPA_Z.tsv"
+    },
+    "copy number for pathway view": {
+      "host": "https://tcga.xenahubs.net",
+      "amplificationThreshold": 2,
+      "dataset": "TCGA.PCPG.sampleMap/Gistic2_CopyNumber_Gistic2_all_thresholded.by_genes",
+      "deletionThreshold": -2
+    },
+    "gene expression raw": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_PCPG.z.tpm"
+    },
+    "simple somatic mutation": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "mc3/PCPG_mc3.txt"
+    },
+    "copy number": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "TCGA.PCPG.sampleMap/SNP6_nocnv_genomicSegment"
+    },
+    "gene expression": {
+      "host": "https://xenago.xenahubs.net",
+      "dataset": "tpm_z/TCGA_PCPG.z.tpm"
+    },
+    "PARADIGM pathway activity": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z/PCPG_PanCan33_ssGSEA_1387GeneSets_NonZero_sample_level_Z.txt"
+    },
+    "PARADIGM": {
+      "host": "https://tcga.xenahubs.net",
+      "dataset": "merge_merged_reals/PCPG_merge_merged_reals.txt"
+    }
+  }
+}
