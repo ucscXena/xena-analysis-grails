@@ -4,8 +4,10 @@ import grails.converters.JSON
 import grails.gorm.transactions.ReadOnly
 import grails.gorm.transactions.Transactional
 import grails.validation.ValidationException
+import grails.web.RequestParameter
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+import org.springframework.http.HttpStatus
 
 import static org.springframework.http.HttpStatus.*
 
@@ -20,7 +22,7 @@ class GmtController {
   TpmAnalysisService tpmAnalysisService
 
   static responseFormats = ['json', 'xml']
-  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",analyzeGmt: "POST"]
+  static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",deleteByMethodAndName: "DELETE", analyzeGmt: "POST"]
 
   def index(Integer max,String method) {
 
@@ -187,6 +189,21 @@ class GmtController {
     }
 
     respond gmt, [status: OK, view: "show"]
+  }
+
+  @Transactional
+  def deleteByMethodAndName(@RequestParameter('method')  String method, @RequestParameter('geneSetName') String geneSetName) {
+    Gmt gmt = Gmt.findByNameAndMethod(geneSetName,method)
+    if(gmt==null){
+      render status: NOT_FOUND
+      return
+    }
+
+    TpmGmtAnalysisJob.deleteAll(TpmGmtAnalysisJob.findAllByGmt(gmt))
+    TpmGmtResult.deleteAll(TpmGmtResult.findAllByGmt(gmt))
+    gmt.delete()
+
+    render status: OK
   }
 
   @Transactional
