@@ -555,9 +555,11 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert file.exists()
     boolean isHeader = true
     int geneCounter = 0
+    int sampleCounter = 0
     file.splitEachLine("\t"){ List<String> entries ->
       if(isHeader){
         isHeader = false
+        sampleCounter = entries.size() - 1
       }
       else{
         entries.subList(1,entries.size()).each {String value ->
@@ -578,7 +580,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
     then:
     assert numCohorts==33
-    assert tpmStat1.count == geneCounter
+    assert tpmStat1.count == geneCounter * sampleCounter
 
 
 
