@@ -537,5 +537,52 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
   }
 
 
+  void "get stats for one cohort to confirm that mean of z-score is near 0"(){
+
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    println "keys size: ${cohorts.size()}"
+    int numCohorts = cohorts.size()
+    TpmStat tpmStat1 = new TpmStat()
+
+    when:
+    println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
+    // get first 1
+    String firstKey = cohorts.keySet().first()
+    String localFileName = AnalysisService.generateLocalTpmName(firstKey)
+    File file = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
+    assert file.exists()
+    boolean isHeader = true
+    int geneCounter = 0
+    file.splitEachLine("\t"){ List<String> entries ->
+      if(isHeader){
+        isHeader = false
+      }
+      else{
+        entries.subList(1,entries.size()).each {String value ->
+          double dValue = Double.parseDouble(value)
+          tpmStat1.addStat(dValue)
+        }
+        if(geneCounter % 5000 == 0){
+          println " $geneCounter "
+          OutputHandler.printMemory()
+          System.gc()
+        }
+        ++geneCounter
+      }
+    }
+    println tpmStat1.toString()
+
+    // NOTE: requires 12 GB of memory to run larger files, or need to split files for more memory
+
+    then:
+    assert numCohorts==33
+    assert tpmStat1.count == geneCounter
+
+
+
+  }
+
 }
 
