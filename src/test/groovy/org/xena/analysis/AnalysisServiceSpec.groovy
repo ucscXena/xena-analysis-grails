@@ -2,6 +2,8 @@ package org.xena.analysis
 
 import grails.converters.JSON
 import grails.testing.services.ServiceUnitTest
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.utils.IOUtils
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
@@ -551,12 +553,27 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     // get first 1
     String firstKey = cohorts.keySet().first()
     String localFileName = AnalysisService.generateLocalTpmName(firstKey)
-    File file = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}.tpm")
-    assert file.exists()
+    File deCompressedFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}_z_activity.tpm")
+    if(!deCompressedFile.exists() || deCompressedFile.size()==0){
+      File compressedFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}_z_activity.tpm.gz")
+      if(!compressedFile.exists() || compressedFile.size()==0){
+        String remoteFileUrl = AnalysisService.generateTpmRemoteUrl(cohorts.getJSONObject(firstKey))
+        AnalysisService.retrieveTpmFile(compressedFile,remoteFileUrl)
+//        compressedFile.write(new URL(remoteFileUrl).bytes)
+      }
+      GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(compressedFile))
+      FileOutputStream fileOutputStream = new FileOutputStream(deCompressedFile)
+      IOUtils.copy(gzipInputStream, fileOutputStream)
+      gzipInputStream.close()
+      fileOutputStream.close()
+//        deCompressedFile.write(new URL(remoteFileUrl).text)
+    }
+    assert deCompressedFile.exists()
+    assert deCompressedFile.size()>10
     boolean isHeader = true
     int geneCounter = 0
     int sampleCounter = 0
-    file.splitEachLine("\t"){ List<String> entries ->
+    deCompressedFile.splitEachLine("\t"){ List<String> entries ->
       if(isHeader){
         isHeader = false
         sampleCounter = entries.size() - 1
@@ -568,8 +585,8 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
         }
         if(geneCounter % 5000 == 0){
           println " $geneCounter "
-          OutputHandler.printMemory()
-          System.gc()
+//          OutputHandler.printMemory()
+//          System.gc()
         }
         ++geneCounter
       }
