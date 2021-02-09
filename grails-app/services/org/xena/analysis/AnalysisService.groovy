@@ -21,9 +21,6 @@ class AnalysisService {
   final static Double TCGA_ALL_TPM_MEAN = 1.2149232255989761
   final static Double TCGA_ALL_TPM_VARIANCE = 2.3314200093496904
   final static Double TCGA_ALL_TPM_STD = Math.sqrt(TCGA_ALL_TPM_VARIANCE)
-  final static Double TCGA_ALL_TPM_ZSCORE_MEAN = 1.2149232255989761
-  final static Double TCGA_ALL_TPM_ZSCORE_VARIANCE = 2.3314200093496904
-  final static Double TCGA_ALL_TPM_ZSCORE_STD = Math.sqrt(TCGA_ALL_TPM_VARIANCE)
 
   @NotTransactional
   static List getValuesForIndex(JSONArray jsonArray, int i) {

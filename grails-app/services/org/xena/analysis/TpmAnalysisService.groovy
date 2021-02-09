@@ -14,7 +14,7 @@ class TpmAnalysisService {
   // this needs to be here for quarts
   static lazyInit = false
 //  static List<TpmGmtAnalysisJob> analysisServiceJobs = []
-  final int MAX_JOB_SIZE = System.getenv("XENA_ANALYSIS_PROCESSORS") ? Integer.parseInt(System.getenv("XENA_ANALYSIS_PROCESSORS")): 4
+  final int MAX_JOB_SIZE = Math.max(0,(System.getenv("XENA_ANALYSIS_PROCESSORS") ? Integer.parseInt(System.getenv("XENA_ANALYSIS_PROCESSORS")): Runtime.getRuntime().availableProcessors() - 1 ))
   int counter = 0
   int possibleCohortCount
 
@@ -47,19 +47,19 @@ class TpmAnalysisService {
 
   @Scheduled(fixedDelay = 10000L)
   void checkJobQueue() {
-    log.info("checking job queue: " + counter)
+    log.debug("checking job queue: " + counter)
     ++counter
 
     int jobsRunning = TpmGmtAnalysisJob.executeQuery("select count(*) from TpmGmtAnalysisJob t where t.runState = :runState", [runState: RunState.RUNNING])[0] as int
-    log.info("jobs running: ${jobsRunning} vs $MAX_JOB_SIZE")
+    log.debug("jobs running: ${jobsRunning} vs $MAX_JOB_SIZE")
     if (jobsRunning >= MAX_JOB_SIZE) {
-      log.info("already have " + jobsRunning + " max allowed is $MAX_JOB_SIZE")
+      log.debug("already have " + jobsRunning + " max allowed is $MAX_JOB_SIZE")
       return
     }
     int numJobsToRun = TpmGmtAnalysisJob.executeQuery("select count(*) from TpmGmtAnalysisJob t where t.runState = :runState", [runState: RunState.NOT_STARTED])[0] as int
-    log.info("number of jobs to run $numJobsToRun")
+    log.debug("number of jobs to run $numJobsToRun")
     def foundJobsToRun = TpmGmtAnalysisJob.executeQuery("select t from TpmGmtAnalysisJob t where t.runState = :runState order by t.createdDate", [runState: RunState.NOT_STARTED, max: MAX_JOB_SIZE - jobsRunning])
-    log.info("job to try and run run: ${foundJobsToRun.size()}")
+    log.debug("job to try and run run: ${foundJobsToRun.size()}")
     for (TpmGmtAnalysisJob jobToRun in foundJobsToRun) {
       log.info "running job, $jobToRun.cohort.name and $jobToRun.gmt.name"
       new SetJobStatThread(jobToRun.id, analysisService).start()
