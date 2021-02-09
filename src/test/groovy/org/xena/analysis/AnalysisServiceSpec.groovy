@@ -569,6 +569,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
 
   }
 
+  @Ignore
   void "run all stats on all Z-Scores"(){
 
     given:
