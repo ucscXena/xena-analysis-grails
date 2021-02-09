@@ -810,4 +810,28 @@ class AnalysisService {
 
   }
 
+  static File getActivityTpmFile(JSONObject cohorts, String cohortKey){
+
+    String localFileName = AnalysisService.generateLocalTpmName(cohortKey)
+    File deCompressedFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}_z_activity.tpm")
+    if(!deCompressedFile.exists() || deCompressedFile.size()==0){
+      File compressedFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}_z_activity.tpm.gz")
+      if(!compressedFile.exists() || compressedFile.size()==0){
+        String remoteFileUrl = AnalysisService.generateTpmRemoteUrl(cohorts.getJSONObject(cohortKey))
+        AnalysisService.retrieveTpmFile(compressedFile,remoteFileUrl)
+//        compressedFile.write(new URL(remoteFileUrl).bytes)
+      }
+      GzipCompressorInputStream gzipInputStream = new GzipCompressorInputStream(new FileInputStream(compressedFile))
+      FileOutputStream fileOutputStream = new FileOutputStream(deCompressedFile)
+      IOUtils.copy(gzipInputStream, fileOutputStream)
+      gzipInputStream.close()
+      fileOutputStream.close()
+//        deCompressedFile.write(new URL(remoteFileUrl).text)
+    }
+    assert deCompressedFile.exists()
+    assert deCompressedFile.size()>10
+
+    return deCompressedFile
+  }
+
 }
