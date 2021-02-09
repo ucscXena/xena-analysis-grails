@@ -539,6 +539,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
   }
 
 
+//  @Ignore
   void "get stats for one cohort to confirm that mean of z-score is near 0"(){
 
     given:
@@ -552,6 +553,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
     // get first 1
     String firstKey = cohorts.keySet().first()
+
     String localFileName = AnalysisService.generateLocalTpmName(firstKey)
     File deCompressedFile = new File("${AnalysisService.TPM_DIRECTORY}/${localFileName}_z_activity.tpm")
     if(!deCompressedFile.exists() || deCompressedFile.size()==0){
@@ -570,34 +572,18 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     }
     assert deCompressedFile.exists()
     assert deCompressedFile.size()>10
-    boolean isHeader = true
-    int geneCounter = 0
-    int sampleCounter = 0
-    deCompressedFile.splitEachLine("\t"){ List<String> entries ->
-      if(isHeader){
-        isHeader = false
-        sampleCounter = entries.size() - 1
-      }
-      else{
-        entries.subList(1,entries.size()).each {String value ->
-          double dValue = Double.parseDouble(value)
-          tpmStat1.addStat(dValue)
-        }
-        if(geneCounter % 5000 == 0){
-          println " $geneCounter "
-//          OutputHandler.printMemory()
-//          System.gc()
-        }
-        ++geneCounter
-      }
-    }
+    tpmStat1 = AnalysisService.analysizeTpmFile(deCompressedFile,tpmStat1)
     println tpmStat1.toString()
 
     // NOTE: requires 12 GB of memory to run larger files, or need to split files for more memory
 
     then:
     assert numCohorts==33
-    assert tpmStat1.count == geneCounter * sampleCounter
+    assert tpmStat1.count == 32576796
+    assert tpmStat1.mean() != Double.NaN
+    assert tpmStat1.standardDeviation() != Double.NaN
+    assert tpmStat1.variance()  != Double.NaN
+//    assert tpmStat1.count == geneCounter * sampleCounter
 
 
 

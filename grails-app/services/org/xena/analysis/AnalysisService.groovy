@@ -780,4 +780,34 @@ class AnalysisService {
     return [mean, variance]
   }
 
+  static TpmStat analysizeTpmFile(File inputFile,TpmStat tpmStat){
+    int geneCounter = 0
+    int sampleCounter = 0
+    boolean isHeader = true
+    inputFile.splitEachLine("\t"){ List<String> entries ->
+      if(isHeader){
+        isHeader = false
+        sampleCounter = entries.size() - 1
+      }
+      else{
+        if(!entries.contains("NaN")){
+          entries.subList(1,entries.size()).each {String value ->
+            double dValue = Double.parseDouble(value)
+            if(dValue!=Double.NaN){
+              tpmStat.addStat(dValue)
+            }
+          }
+          if(geneCounter % 5000 == 0){
+            println " $geneCounter ${tpmStat.toString()}"
+//          OutputHandler.printMemory()
+//          System.gc()
+          }
+          ++geneCounter
+        }
+      }
+    }
+    return tpmStat
+
+  }
+
 }
