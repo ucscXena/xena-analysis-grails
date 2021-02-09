@@ -539,7 +539,7 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
   }
 
 
-//  @Ignore
+  @Ignore
   void "get stats for one cohort to confirm that mean of z-score is near 0"(){
 
     given:
@@ -567,8 +567,36 @@ class AnalysisServiceSpec extends Specification implements ServiceUnitTest<Analy
     assert tpmStat1.variance()  != Double.NaN
 //    assert tpmStat1.count == geneCounter * sampleCounter
 
+  }
 
+  void "run all stats on all Z-Scores"(){
 
+    given:
+    String cohortUrl = "https://raw.githubusercontent.com/ucscXena/XenaGoWidget/develop/src/data/defaultDatasetForGeneset.json"
+    def cohorts = new JSONObject(new URL(cohortUrl).text)
+    println "keys size: ${cohorts.size()}"
+    int numCohorts = cohorts.size()
+    TpmStat tpmStat1 = new TpmStat()
+
+    when:
+    println "cohorts sorted: ${cohorts.keySet().sort().join(" ")}"
+    // get first 1
+    cohorts.keySet().each { String cohortKey ->
+      println("processing: "+cohortKey)
+      File deCompressedFile = AnalysisService.getActivityTpmFile(cohorts,cohortKey)
+      tpmStat1 = AnalysisService.analysizeTpmFile(deCompressedFile,tpmStat1)
+      println tpmStat1.toString()
+    }
+
+    // NOTE: requires 12 GB of memory to run larger files, or need to split files for more memory
+
+    then:
+    assert numCohorts==33
+    assert tpmStat1.count == 32576796
+    assert tpmStat1.mean() != Double.NaN
+    assert tpmStat1.standardDeviation() != Double.NaN
+    assert tpmStat1.variance()  != Double.NaN
+//    assert tpmStat1.count == geneCounter * sampleCounter
   }
 
 }

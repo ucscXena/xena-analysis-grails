@@ -797,7 +797,7 @@ class AnalysisService {
               tpmStat.addStat(dValue)
             }
           }
-          if(geneCounter % 5000 == 0){
+          if(geneCounter % 20000 == 0){
             println " $geneCounter ${tpmStat.toString()}"
 //          OutputHandler.printMemory()
 //          System.gc()
