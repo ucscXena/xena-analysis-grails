@@ -39,7 +39,6 @@ mappingFile.splitEachLine("\t"){
 println "uniprot map size: ${uniprotMap.size()}"
 
 def handleRawGene(String input,StringBuilder stringBuilder){
-  println "rawGene ${input}"
   if(input.contains("%MF%")){
     String[] values = input.split("%MF%")
     stringBuilder.append(values[0]).append("\t").append(values[1])
