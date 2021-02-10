@@ -93,7 +93,7 @@ class GmtController {
     def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r group by g")
     println "gmtlist ${gmtList}"
     JSONArray jsonArray = new JSONArray()
-    gmtList.each { def gmtEntry ->
+    gmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
       def obj = new JSONObject()
       obj.name = gmtEntry[0]
       obj.geneCount = gmtEntry[1]
