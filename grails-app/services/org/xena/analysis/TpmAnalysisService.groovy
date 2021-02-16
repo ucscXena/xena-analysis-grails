@@ -20,8 +20,8 @@ class TpmAnalysisService {
 
   TpmAnalysisService() {
     possibleCohortCount = new JSONObject(new URL(CohortService.COHORT_URL).text).keySet().size()
-    println "max job size: $MAX_JOB_SIZE"
-    println "possible cohorts: $possibleCohortCount"
+    log.info "Max job size: $MAX_JOB_SIZE"
+    log.info "Number of cohorts: $possibleCohortCount"
   }
 
   AnalysisService analysisService
@@ -33,15 +33,15 @@ class TpmAnalysisService {
 
   @Scheduled(fixedDelay = 10000L)
   void calculateGmtStats() {
-    log.info("checking gmt ready to calculate ")
+    log.debug("checking gmt ready to calculate ")
     println "possible cohort count: ${possibleCohortCount}"
     def gmt = Gmt.findByStatsIsNull()
     int resultCount = TpmGmtResult.countByGmt(gmt)
-    println "result count: ${resultCount}"
+    log.debug "result count: ${resultCount}"
     if (resultCount == possibleCohortCount) {
-      println "creating gmt stats for ${gmt.name}"
+      log.info "creating gmt stats for ${gmt.name}"
       analysisService.createGmtStats(gmt)
-      println "CREATED gmt stats for ${gmt.name}"
+      log.info "CREATED gmt stats for ${gmt.name}"
     }
   }
 

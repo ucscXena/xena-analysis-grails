@@ -123,11 +123,23 @@ class CompareResultController {
   }
 
 
+    long startTimer = System.currentTimeMillis()
+    long endTimer = System.currentTimeMillis()
+    void measureTime(String msg){
+        endTimer = System.currentTimeMillis()
+        println "---------------------"
+        println "$msg : ${ (endTimer - startTimer ) / 1000.0}s "
+        println "---------------------"
+        startTimer = System.currentTimeMillis()
+    }
 
-  @Transactional
+
+    @Transactional
   def retrieveScoredResult(){
 
-    def json = request.JSON
+        measureTime("init retrieve")
+
+      def json = request.JSON
 
     String method = json.method
     String geneSetName = json.geneSetName
@@ -136,9 +148,9 @@ class CompareResultController {
     String samples = json.samples
     JSONArray samplesArray = new JSONArray(samples)
 
-    log.info "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
-    log.info "samples array as JSON"
-    println samplesArray as JSON
+    log.debug "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}, ${samples}"
+    log.debug "samples array as JSON"
+    log.debug samplesArray as JSON
 //    println "generate scored results with ${method},${geneSetName}, ${cohortNameA}, ${cohortNameB}"
     Gmt gmt = Gmt.findByName(geneSetName)
     log.info "gmt name ${gmt}"
@@ -152,12 +164,15 @@ class CompareResultController {
     if(cohortB==null)throw new RuntimeException("Unable to find cohort for ${cohortNameB}")
 
 
+        measureTime("post A")
 
     TpmGmtResult resultA = TpmGmtResult.findByMethodAndCohortAndGmt(method,cohortA,gmt)
     TpmGmtResult resultB = TpmGmtResult.findByMethodAndCohortAndGmt(method,cohortB,gmt)
 
-    println "resultA: $resultA"
-    println "resultB: $resultB"
+        measureTime("post B")
+
+//    log.info "resultA: $resultA"
+//    log.info "resultB: $resultB"
 
     if(resultA==null)throw new RuntimeException("No results available for $method ${cohortNameA} $gmt.name")
     if(resultB==null)throw new RuntimeException("No results available for $method ${cohortNameB} $gmt.name")
@@ -171,20 +186,25 @@ class CompareResultController {
 
     returnObject.put("gmt",gmtObject)
 
-    println "creating mean map "
-    Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
-    println "created mean map"
+    log.debug "creating mean map "
+        measureTime("pre mean-map")
+
+        Map meanMap = analysisService.createMeanMapFromTpmGmt(gmt,resultA,resultB,samplesArray)
+    log.debug "created mean map"
+        measureTime("post mean-map")
 
     String gmtData = gmt.data
     println "generating result"
     JSONArray inputArray = analysisService.generateResult(gmtData,meanMap)
     println "generated result"
+        measureTime("post input array")
 
     returnObject.data = inputArray
 
     println "dumping out"
     response.outputStream << returnObject.toString()
     response.outputStream.flush()
+        measureTime("post output stream")
 
   }
 
