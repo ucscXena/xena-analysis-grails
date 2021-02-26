@@ -130,6 +130,13 @@ class GmtController {
 
   @Transactional
   def store() {
+
+    AuthenticatedUser user = userService.getUserFromRequest(request)
+    if(!user){
+       throw new RuntimeException("Not authorized")
+    }
+
+
     def json = request.JSON
     String method = json.method
     String gmtname = json.gmtname
@@ -142,10 +149,10 @@ class GmtController {
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
       if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount,user:user,isPublic: false)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount,user:user,isPublic: false)
       }
       gmt.save(failOnError: true)
     }
