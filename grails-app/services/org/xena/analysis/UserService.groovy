@@ -39,6 +39,9 @@ class UserService {
         println "authHeader"
         println authHeader
         String jwtString = authHeader.split("jwt=")[1]
+        String accessToken = httpServletRequest.getHeader('GoogleAccessToken')
+        println "accessToken"
+        println accessToken
 
 //        // TODO:
 //        // from https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
@@ -69,6 +72,9 @@ class UserService {
 //        def headers =  new String(java.util.Base64.decoder.decode(tokens[1]))
 //        println headers
 //        def jsonObject = new JSONObject(headers)
+
+
+        // TODO: need to get the access  token to work here
 //        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
 //        // Specify the CLIENT_ID of the app that accesses the backend:
 //                .setAudience(Collections.singletonList(CLIENT_ID))
@@ -76,7 +82,7 @@ class UserService {
 //        //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
 //                .build();
 //        println "E"
-//        GoogleIdToken idToken = verifier.verify(jwtString);
+//        GoogleIdToken idToken = verifier.verify(accessToken);
 //        println "id token ${idToken}"
 //
 
