@@ -18,7 +18,4 @@ class AuthenticatedUser {
             gmts:Gmt
     ]
 
-    static mapping = {
-        role = RoleEnum.USER
-    }
 }

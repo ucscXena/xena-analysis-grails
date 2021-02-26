@@ -31,20 +31,20 @@ class UserService {
         println authHeader
         String jwtString = authHeader.split("jwt=")[1]
 
-        // TODO:
-        // from https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
-        //
-        RSAKey rsaJWK = new RSAKeyGenerator(2048)
-                .keyID(System.getenv("GOOGLE_KEY"))
-                .generate();
-        RSAKey rsaPublicJWK = rsaJWK.toPublicJWK();
-// Create RSA-signer with the private key
-        JWSSigner signer = new RSASSASigner(rsaJWK);
-        SignedJWT signedJWT = SignedJWT.parse(jwtString);
-        JWSVerifier verifier = new RSASSAVerifier(rsaPublicJWK);
-        Boolean validated  = signedJWT.verify(verifier)
-//        assertTrue(signedJWT.verify(verifier));
-        println "is valid token: ${validated}"
+//        // TODO:
+//        // from https://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
+//        //
+//        RSAKey rsaJWK = new RSAKeyGenerator(2048)
+//                .keyID(System.getenv("GOOGLE_KEY"))
+//                .generate();
+//        RSAKey rsaPublicJWK = rsaJWK.toPublicJWK();
+//// Create RSA-signer with the private key
+//        JWSSigner signer = new RSASSASigner(rsaJWK);
+//        SignedJWT signedJWT = SignedJWT.parse(jwtString);
+//        JWSVerifier verifier = new RSASSAVerifier(rsaPublicJWK);
+//        Boolean validated  = signedJWT.verify(verifier)
+////        assertTrue(signedJWT.verify(verifier));
+//        println "is valid token: ${validated}"
 
         // TODO: do stuff to extract the token and clean stuff up
         def tokens = jwtString.split("\\.")
@@ -59,9 +59,10 @@ class UserService {
         AuthenticatedUser user = AuthenticatedUser.findByEmail(username)
         if(!user){
             user = new AuthenticatedUser(
-                    firstName: jsonObject.profileObject.firstName,
-                    lastName: jsonObject.profileObject.lastName,
-                    email: jsonObject.profileObject.email,
+                    firstName: jsonObject["given_name"],
+                    lastName: jsonObject["family_name"],
+                    email: jsonObject["email"],
+                    role: RoleEnum.USER
             ).save(flush: true, failOnError:true,insert:true)
         }
         return user

@@ -89,6 +89,7 @@ class GmtController {
 
   }
 
+  @Transactional
   def names(String method) {
     println "method: ${method}"
     println "req: ${request.getHeader('Authorization')}"
