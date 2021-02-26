@@ -18,6 +18,9 @@ class UrlMappings {
       }
     }
 
+    "/user"(resources:'authenticatedUser')
+
+
 //    "/result/test"(controller: 'result', action: 'test')
 //    "/result/analyze"(controller: 'result', action: 'analyze')
     "/"(controller: 'application', action: 'index')

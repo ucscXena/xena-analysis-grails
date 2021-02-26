@@ -20,6 +20,7 @@ class GmtController {
   GmtService gmtService
   AnalysisService analysisService
   TpmAnalysisService tpmAnalysisService
+  UserService userService
 
   static responseFormats = ['json', 'xml']
   static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",deleteByMethodAndName: "DELETE", analyzeGmt: "POST"]
@@ -90,7 +91,20 @@ class GmtController {
 
   def names(String method) {
     println "method: ${method}"
+    println "req: ${request.getHeader('Authorization')}"
     def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r group by g")
+    println "gmt list: ${gmtList}"
+
+    if(request.getHeader('Authorization')){
+      AuthenticatedUser user = userService.getUserFromRequest(request)
+      if(user){
+        def userGmts = user.gmts
+        // TODO: add gmt list
+//        userGmts.
+      }
+    }
+
+
     println "gmtlist ${gmtList}"
     JSONArray jsonArray = new JSONArray()
     gmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
