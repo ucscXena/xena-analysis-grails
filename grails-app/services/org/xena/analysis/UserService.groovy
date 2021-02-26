@@ -74,7 +74,20 @@ class UserService {
                     role: RoleEnum.USER
             ).save(flush: true, failOnError:true,insert:true)
         }
+        else{
+            // update if different
+            user.firstName = claimObject["given_name"]
+            user.lastName = claimObject["family_name"]
+            user.save(insert:false,flush: true,failOnError: true)
+        }
         return user
 
+    }
+
+    def createAdmins(){
+        AuthenticatedUser.findOrSaveByEmailAndRole("ndunnme@gmail.com",RoleEnum.ADMIN)
+        AuthenticatedUser.findOrSaveByEmailAndRole("jzhu@soe.ucsc.edu",RoleEnum.ADMIN)
+        AuthenticatedUser.findOrSaveByEmailAndRole("craft@soe.ucsc.edu",RoleEnum.ADMIN)
+        AuthenticatedUser.findOrSaveByEmailAndRole("mary@soe.ucsc.edu",RoleEnum.ADMIN)
     }
 }
