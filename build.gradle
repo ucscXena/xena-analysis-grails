@@ -54,7 +54,8 @@ dependencies {
     compile "org.grails.plugins:views-json-templates"
     compileOnly "io.micronaut:micronaut-inject-groovy"
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.7'
-    console "org.grails:grails-console"
+    implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.31.2'
+    implementation group: 'com.google.api-client', name: 'google-api-client-jackson2', version: '1.20.0'
     profile "org.grails.profiles:rest-api"
     runtime "org.glassfish.web:el-impl:2.1.2-b03"
     runtime "com.h2database:h2"

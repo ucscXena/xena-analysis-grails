@@ -1,13 +1,18 @@
 package org.xena.analysis
 
-import com.nimbusds.jose.JWSSigner
-import com.nimbusds.jose.JWSVerifier
-import com.nimbusds.jose.crypto.RSASSASigner
-import com.nimbusds.jose.crypto.RSASSAVerifier
-import com.nimbusds.jose.jwk.RSAKey
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
-import com.nimbusds.jwt.JWT
-import com.nimbusds.jwt.JWTParser
+//import com.nimbusds.jose.JWSSigner
+//import com.nimbusds.jose.JWSVerifier
+//import com.nimbusds.jose.crypto.RSASSASigner
+//import com.nimbusds.jose.crypto.RSASSAVerifier
+//import com.nimbusds.jose.jwk.RSAKey
+//import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
+//import com.nimbusds.jwt.JWT
+//import com.nimbusds.jwt.JWTParser
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier
+import com.google.api.client.http.javanet.NetHttpTransport
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.nimbusds.jwt.SignedJWT
 import grails.gorm.transactions.Transactional
 import org.grails.web.json.JSONObject
@@ -18,6 +23,8 @@ import javax.servlet.http.HttpServletRequest
 class UserService {
 
     public final static String[] ROLES = [ "ADMIN", "USER","BANNED","INACTIVE"]
+
+    private final String CLIENT_ID = System.getenv("GOOGLE_ID")
 
     private final String[] ADMIN_USERS = [
             "nathandunn@lbl.gov",
@@ -51,8 +58,8 @@ class UserService {
 
         SignedJWT signedJWT = SignedJWT.parse(jwtString);
         def claimObject = new JSONObject(signedJWT.getJWTClaimsSet().toJSONObject())
-        Boolean isVerified = claimObject.getBoolean("email_verified")
-        if(!isVerified){
+        Boolean isEmailVerified = claimObject.getBoolean("email_verified")
+        if(!isEmailVerified){
             throw new RuntimeException("Not validated")
         }
 
@@ -62,6 +69,16 @@ class UserService {
 //        def headers =  new String(java.util.Base64.decoder.decode(tokens[1]))
 //        println headers
 //        def jsonObject = new JSONObject(headers)
+//        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+//        // Specify the CLIENT_ID of the app that accesses the backend:
+//                .setAudience(Collections.singletonList(CLIENT_ID))
+//        // Or, if multiple clients access the backend:
+//        //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
+//                .build();
+//        println "E"
+//        GoogleIdToken idToken = verifier.verify(jwtString);
+//        println "id token ${idToken}"
+//
 
         String username = claimObject.email
         // TODO: get user object
