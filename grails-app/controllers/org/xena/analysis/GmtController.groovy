@@ -101,11 +101,11 @@ class GmtController {
       if(user){
         def privateList = []
         if(user.role == RoleEnum.ADMIN){
-          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.isPublic != 't' group by g")
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r),u from Gmt g left outer join g.results r join g.authenticatedUser u where g.isPublic != 't' group by g, u")
         }
         else
         if(user.role == RoleEnum.USER){
-          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.authenticatedUser=:user group by g",[user:user])
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r),u from Gmt g left outer join g.results r  join g.authenticatedUser u where g.authenticatedUser=:user group by g, u",[user:user])
         }
         publicGmtList = publicGmtList + privateList
       }
@@ -125,7 +125,9 @@ class GmtController {
       obj.public = gmtEntry[3]
       obj.readyCount = gmtEntry[4]
       obj.ready = obj.availableCount == obj.readyCount
-//      obj.user = gmtEntry[5]
+      if(gmtEntry.size()>5){
+        obj.user = gmtEntry[5]
+      }
       jsonArray.add(obj)
     }
     render jsonArray as JSON
