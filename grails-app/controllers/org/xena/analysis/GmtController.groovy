@@ -93,7 +93,7 @@ class GmtController {
   def names(String method) {
     println "method: ${method}"
     println "req: ${request.getHeader('Authorization')}"
-    def publicGmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r where g.isPublic = 't' group by g")
+    def publicGmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.isPublic = 't' group by g")
     println "gmt list: ${publicGmtList}"
 
     if(request.getHeader('Authorization')){
@@ -101,18 +101,18 @@ class GmtController {
       if(user){
         def privateList = []
         if(user.role == RoleEnum.ADMIN){
-          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r where g.isPublic != 't' group by g")
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.isPublic != 't' group by g")
         }
         else
         if(user.role == RoleEnum.USER){
-          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r where g.authenticatedUser=:user group by g",[user:user])
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.authenticatedUser=:user group by g",[user:user])
         }
         publicGmtList = publicGmtList + privateList
       }
     }
 
 
-    println "gmtlist ${publicGmtList}"
+    println "gmtlist ${publicGmtList as JSON}"
     JSONArray jsonArray = new JSONArray()
     publicGmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
       def obj = new JSONObject()
@@ -122,8 +122,10 @@ class GmtController {
 //      obj.id = it.id
       obj.method = method
       obj.availableCount = gmtEntry[2]
-      obj.readyCount = gmtEntry[3]
+      obj.public = gmtEntry[3]
+      obj.readyCount = gmtEntry[4]
       obj.ready = obj.availableCount == obj.readyCount
+//      obj.user = gmtEntry[5]
       jsonArray.add(obj)
     }
     render jsonArray as JSON
