@@ -92,7 +92,7 @@ class GmtController {
   @Transactional
   def names(String method) {
     println "method: ${method}"
-    println "req: ${request.getHeader('Authorization')}"
+//    println "req: ${request.getHeader('Authorization')}"
     def publicGmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.isPublic = 't' group by g")
     println "gmt list: ${publicGmtList}"
 
@@ -112,7 +112,7 @@ class GmtController {
     }
 
 
-    println "gmtlist ${publicGmtList as JSON}"
+//    println "gmtlist ${publicGmtList as JSON}"
     JSONArray jsonArray = new JSONArray()
     publicGmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
       def obj = new JSONObject()
@@ -152,7 +152,7 @@ class GmtController {
     def geneCount = json.gmtdata.split("\n").findAll{it.split("\t").size()>2 }.size()
 
 
-    println "stroring with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
+//    println "stroring with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
