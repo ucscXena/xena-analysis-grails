@@ -93,22 +93,28 @@ class GmtController {
   def names(String method) {
     println "method: ${method}"
     println "req: ${request.getHeader('Authorization')}"
-    def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r group by g")
-    println "gmt list: ${gmtList}"
+    def publicGmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r where g.isPublic = 't' group by g")
+    println "gmt list: ${publicGmtList}"
 
     if(request.getHeader('Authorization')){
       AuthenticatedUser user = userService.getUserFromRequest(request)
       if(user){
-        def userGmts = user.gmts
-        // TODO: add gmt list
-//        userGmts.
+        def privateList = []
+        if(user.role == RoleEnum.ADMIN){
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r where g.isPublic != 't' group by g")
+        }
+        else
+        if(user.role == RoleEnum.USER){
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r where g.authenticatedUser=:user group by g",[user:user])
+        }
+        publicGmtList = publicGmtList + privateList
       }
     }
 
 
-    println "gmtlist ${gmtList}"
+    println "gmtlist ${publicGmtList}"
     JSONArray jsonArray = new JSONArray()
-    gmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
+    publicGmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
       def obj = new JSONObject()
       obj.name = gmtEntry[0]
       obj.geneCount = gmtEntry[1]
@@ -149,10 +155,10 @@ class GmtController {
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
       if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount,user:user,isPublic: false)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount,authenticatedUser:user,isPublic: false)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount,user:user,isPublic: false)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount,authenticatedUser:user,isPublic: false)
       }
       gmt.save(failOnError: true)
     }
