@@ -118,15 +118,13 @@ class GmtController {
       def obj = new JSONObject()
       obj.name = gmtEntry[0]
       obj.geneCount = gmtEntry[1]
-//      obj.hash = it.hash
-//      obj.id = it.id
       obj.method = method
       obj.availableCount = gmtEntry[2]
       obj.public = gmtEntry[3]
       obj.readyCount = gmtEntry[4]
       obj.ready = obj.availableCount == obj.readyCount
       if(gmtEntry.size()>5){
-        obj.user = gmtEntry[5]
+        obj.user = gmtEntry[5].firstName + " " + gmtEntry[5].lastName
       }
       jsonArray.add(obj)
     }
