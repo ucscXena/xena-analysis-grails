@@ -8,6 +8,8 @@ class Gmt {
   String data
   int geneSetCount
   int availableTpmCount // count from defaultGeneSet on initial load
+  AuthenticatedUser authenticatedUser
+  Boolean isPublic
 
   // use gene names as key
   String stats // { 'ABC':{mean: 0.11212, std: 0.272 },  'DEF': { mean:0.17, std:0.3 } }
@@ -15,6 +17,8 @@ class Gmt {
   static constraints = {
     name blank: false, unique: true
     stats nullable: true
+    authenticatedUser nullable: true
+    isPublic nullable: true
   }
 
   static mapping = {

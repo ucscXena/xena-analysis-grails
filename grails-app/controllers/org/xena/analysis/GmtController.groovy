@@ -20,6 +20,7 @@ class GmtController {
   GmtService gmtService
   AnalysisService analysisService
   TpmAnalysisService tpmAnalysisService
+  UserService userService
 
   static responseFormats = ['json', 'xml']
   static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE",deleteByMethodAndName: "DELETE", analyzeGmt: "POST"]
@@ -88,21 +89,43 @@ class GmtController {
 
   }
 
+  @Transactional
   def names(String method) {
     println "method: ${method}"
-    def gmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,count(r) from Gmt g left outer join g.results r group by g")
-    println "gmtlist ${gmtList}"
+//    println "req: ${request.getHeader('Authorization')}"
+    def publicGmtList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r) from Gmt g left outer join g.results r where g.isPublic = 't' group by g")
+    println "gmt list: ${publicGmtList}"
+
+    if(request.getHeader('Authorization')){
+      AuthenticatedUser user = userService.getUserFromRequest(request)
+      if(user){
+        def privateList = []
+        if(user.role == RoleEnum.ADMIN){
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r),u from Gmt g left outer join g.results r join g.authenticatedUser u where g.isPublic != 't' group by g, u")
+        }
+        else
+        if(user.role == RoleEnum.USER){
+          privateList = Gmt.executeQuery(" select g.name,g.geneSetCount,g.availableTpmCount,g.isPublic,count(r),u from Gmt g left outer join g.results r  join g.authenticatedUser u where g.authenticatedUser=:user group by g, u",[user:user])
+        }
+        publicGmtList = publicGmtList + privateList
+      }
+    }
+
+
+//    println "gmtlist ${publicGmtList as JSON}"
     JSONArray jsonArray = new JSONArray()
-    gmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
+    publicGmtList.sort{ a,b ->   a[0].toString().compareTo(b[0].toString())} .each { def gmtEntry ->
       def obj = new JSONObject()
       obj.name = gmtEntry[0]
       obj.geneCount = gmtEntry[1]
-//      obj.hash = it.hash
-//      obj.id = it.id
       obj.method = method
       obj.availableCount = gmtEntry[2]
-      obj.readyCount = gmtEntry[3]
+      obj.public = gmtEntry[3]
+      obj.readyCount = gmtEntry[4]
       obj.ready = obj.availableCount == obj.readyCount
+      if(gmtEntry.size()>5){
+        obj.user = gmtEntry[5].firstName + " " + gmtEntry[5].lastName
+      }
       jsonArray.add(obj)
     }
     render jsonArray as JSON
@@ -115,6 +138,13 @@ class GmtController {
 
   @Transactional
   def store() {
+
+    AuthenticatedUser user = userService.getUserFromRequest(request)
+    if(!user){
+       throw new RuntimeException("Not authorized")
+    }
+
+
     def json = request.JSON
     String method = json.method
     String gmtname = json.gmtname
@@ -122,15 +152,15 @@ class GmtController {
     def geneCount = json.gmtdata.split("\n").findAll{it.split("\t").size()>2 }.size()
 
 
-    println "stroring with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
+//    println "stroring with method '${method}' and gmt name '${gmtname}' '${gmtDataHash}"
     Gmt gmt = Gmt.findByName(gmtname)
     if (gmt == null) {
       def sameDataGmt = Gmt.findByHashAndMethod(gmtDataHash,method)
       if(sameDataGmt){
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: sameDataGmt.data, method: method, geneSetCount: geneCount,authenticatedUser:user,isPublic: false)
       }
       else{
-        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount)
+        gmt = new Gmt(name: gmtname, hash: gmtDataHash, data: json.gmtdata, method: method, geneSetCount: geneCount,authenticatedUser:user,isPublic: false)
       }
       gmt.save(failOnError: true)
     }
