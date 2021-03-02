@@ -13,13 +13,6 @@ class UserService {
 
     private final String CLIENT_ID = System.getenv("GOOGLE_ID")
 
-    private final String[] ADMIN_USERS = [
-            "nathandunn@lbl.gov",
-            "jing",
-            "bcraft",
-            "mariangoldman"
-    ]
-
     AuthenticatedUser getUserFromRequest(HttpServletRequest httpServletRequest) {
 
         String authHeader = httpServletRequest.getHeader('Authorization')
@@ -76,8 +69,6 @@ class UserService {
 
     def createAdmins(){
         AuthenticatedUser.findOrSaveByEmailAndRole("ndunnme@gmail.com",RoleEnum.ADMIN)
-        AuthenticatedUser.findOrSaveByEmailAndRole("jzhu@soe.ucsc.edu",RoleEnum.ADMIN)
-        AuthenticatedUser.findOrSaveByEmailAndRole("craft@soe.ucsc.edu",RoleEnum.ADMIN)
-        AuthenticatedUser.findOrSaveByEmailAndRole("mary@soe.ucsc.edu",RoleEnum.ADMIN)
+        AuthenticatedUser.findOrSaveByEmailAndRole("jingchunzhu@gmail.com",RoleEnum.ADMIN)
     }
 }
