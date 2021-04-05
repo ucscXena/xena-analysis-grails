@@ -2,6 +2,10 @@
 FROM ubuntu:18.04
 MAINTAINER Nathan Dunn <nathandunn@lbl.gov>
 ENV DEBIAN_FRONTEND noninteractive
+ENV LC_CTYPE en_US.UTF-8
+#ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
 
 # where bin directories are
 ENV CATALINA_HOME /usr/share/tomcat9
@@ -14,20 +18,19 @@ RUN apt-get -qq update --fix-missing && \
 	apt-get --no-install-recommends -y install \
 	git build-essential vim net-tools less \
 	apt-transport-https software-properties-common \
-	wget netcat postgresql tomcat9  \
+	wget netcat postgresql tomcat9  sudo \
 	curl ssl-cert zip unzip openjdk-11-jdk-headless
 
+
+
+RUN groupadd docker
+RUN useradd -ms /bin/bash -d /xena-analysis-grails xenauser
+RUN usermod -aG docker xenauser
+
+USER xenauser
+#  install R libraries
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
-RUN add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran40/'
 
-
-
-
-RUN apt-get -qq update --fix-missing && \
-	apt-get --no-install-recommends -y install r-base && \
-	apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /xena-analysis-grails/
-
-RUN useradd -ms /bin/bash -d /xena-analysis-grails xena-analysis-grails
 COPY gradlew /xena-analysis-grails
 COPY gradle.properties /xena-analysis-grails
 COPY gradle /xena-analysis-grails/gradle
@@ -40,28 +43,21 @@ COPY build.gradle /xena-analysis-grails/build.gradle
 RUN ls /xena-analysis-grails
 
 
-#  install R libraries
-COPY src/main/rlang /xena-analysis-grails/src/main/rlang
-RUN Rscript /xena-analysis-grails/src/main/rlang/install-packages
-#
-
-
-
-
-# install grails and python libraries
-USER xena-analysis-grails
-
-ENV LC_CTYPE en_US.UTF-8
-#ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE=en_US.UTF-8
-
-
 USER root
+RUN apt-get -qq update --fix-missing && \
+	apt-get --no-install-recommends -y install r-base && \
+	apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /xena-analysis-grails/
+
+#  install R libraries
+#RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+RUN add-apt-repository 'deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran40/'
+COPY src/main/rlang /xena-analysis-grails/src/main/rlang
+RUN Rscript /xena-analysis-grails/src/main/rlang/install-packages.R
+#
 #COPY docker-files/build.sh /bin/build.sh
 #RUN ["chmod", "+x", "/bin/build.sh"]
 #ADD docker-files/docker-xena-analysis-grails-config.groovy /xena-analysis-grails/xena-analysis-grails-config.groovy
-ADD docker-files/docker.xena-analysis-grails.yml /xena-analysis-grails/xena-analysis-grails.yml
+#ADD docker-files/docker.xena-analysis-grails.yml /xena-analysis-grails/xena-analysis-grails.yml
 RUN chown -R xena-analysis-grails:xena-analysis-grails /xena-analysis-grails
 RUN mkdir -p /data/xena-analysis-grails_data
 RUN chown -R xena-analysis-grails:xena-analysis-grails /data/xena-analysis-grails_data
