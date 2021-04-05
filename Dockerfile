@@ -16,9 +16,9 @@ ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
 
 RUN apt-get -qq update --fix-missing && \
 	apt-get --no-install-recommends -y install \
-	git build-essential vim net-tools less \
+	git build-essential vim net-tools less dirmngr \
 	apt-transport-https software-properties-common \
-	wget netcat postgresql tomcat9  sudo \
+	wget netcat postgresql tomcat9 sudo \
 	curl ssl-cert zip unzip openjdk-11-jdk-headless
 
 
@@ -29,7 +29,7 @@ RUN usermod -aG docker xenauser
 
 USER xenauser
 #  install R libraries
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
 
 COPY gradlew /xena-analysis-grails
 COPY gradle.properties /xena-analysis-grails
